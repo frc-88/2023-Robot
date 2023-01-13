@@ -5,35 +5,37 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.SwerveDrive;
 
-public class DriveDegrees extends CommandBase {
-  private Drive m_drive;
+public class DriveDistanceMeters extends CommandBase {
+  private SwerveDrive m_drive;
   private Pose2d startPose;
-  private double angleDegrees;
-  private double rotationalVelocityRadiansPerSecond;
-  /** Creates a new DriveDegrees. */
-  public DriveDegrees(Drive drive, double angleDegrees, double rotationalVelocityDegreesPerSecond) {
+  private double distanceMeters;
+  private double translationVelocityMetersPerSecond;
+  /** Creates a new DriveDistanceMeters. */
+  public DriveDistanceMeters(SwerveDrive drive, double distanceMeters, double translationVelocityMetersPerSecond) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_drive = drive;
-    this.angleDegrees = angleDegrees;
-    this.rotationalVelocityRadiansPerSecond = Units.degreesToRadians(rotationalVelocityDegreesPerSecond);
+    this.distanceMeters = distanceMeters;
+    this.translationVelocityMetersPerSecond = Math.abs(translationVelocityMetersPerSecond);
     addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("Running DriveDegrees command");
+    System.out.println("Running DriveDistanceMeters command");
     startPose = m_drive.getOdometryPose();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.drive(0.0, 0.0, rotationalVelocityRadiansPerSecond);
+    if (distanceMeters < 0.0 ) {
+      translationVelocityMetersPerSecond *= -1.0;
+    }
+    m_drive.drive(translationVelocityMetersPerSecond, 0.0, 0.0);
   }
 
   // Called once the command ends or is interrupted.
@@ -47,20 +49,14 @@ public class DriveDegrees extends CommandBase {
   public boolean isFinished() {
     Pose2d currentPose = m_drive.getOdometryPose();
     Pose2d relativePose = currentPose.relativeTo(startPose);
-    double angle = relativePose.getRotation().getDegrees();
-    boolean should_stop = false;
-    if (rotationalVelocityRadiansPerSecond > 0) {
-      if (angle < -180) {
-        angle += 360.0;  // put between 0..360 to avoid wrap around issues
-      }
-      should_stop = angle > angleDegrees;
+    System.out.println("Distance: " + relativePose.getX());
+    boolean shouldStop = false;
+    if (distanceMeters >= 0.0 ) {
+        shouldStop = relativePose.getX() > distanceMeters;
     }
     else {
-      if (angle > 180) {
-        angle -= 360.0;  // put between -360..0 to avoid wrap around issues
-      }
-      should_stop = angle < angleDegrees;
+        shouldStop = relativePose.getX() < distanceMeters;
     }
-    return should_stop;
+    return shouldStop;
   }
 }
