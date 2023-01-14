@@ -12,6 +12,7 @@ import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
 public final class Falcon500DriveControllerFactoryBuilder {
     private static final double TICKS_PER_ROTATION = 2048.0;
+    private static final double WHEEL_RADIUS = 0.0508;
 
     private static final int CAN_TIMEOUT_MS = 250;
     private static final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
@@ -103,6 +104,11 @@ public final class Falcon500DriveControllerFactoryBuilder {
         @Override
         public double getStateVelocity() {
             return motor.getSelectedSensorVelocity() * sensorVelocityCoefficient;
+        }
+
+        @Override
+        public double getDistance() {
+            return motor.getSelectedSensorPosition() * 2 * Math.PI * WHEEL_RADIUS / TICKS_PER_ROTATION;
         }
     }
 }

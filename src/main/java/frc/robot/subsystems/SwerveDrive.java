@@ -5,8 +5,7 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import cfrc.robot.subsystems.drivelties.swervelib.Mk4iSwerveModuleHelper;
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -102,12 +102,23 @@ public class SwerveDrive extends SubsystemBase {
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
-                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), m_pose);
+                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), 
+                getSwerveModulePositions(),
+                m_pose);
                 
                 // p_frontLeftOffset.addChangeHandler((Double unused) -> configureModules());
                 // p_frontRightOffset.addChangeHandler((Double unused) -> configureModules());
                 // p_backLeftOffset.addChangeHandler((Double unused) -> configureModules());
                 // p_backRightOffset.addChangeHandler((Double unused) -> configureModules());
+        }
+
+        public SwerveModulePosition[] getSwerveModulePositions() {
+                return new SwerveModulePosition[] {
+                        m_frontLeftModule.getPosition(),
+                        m_frontRightModule.getPosition(),
+                        m_backLeftModule.getPosition(),
+                        m_backRightModule.getPosition(),
+                      };
         }
 
         public void configureModules() {
@@ -147,7 +158,9 @@ public class SwerveDrive extends SubsystemBase {
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
-                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), m_pose);
+                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), 
+                getSwerveModulePositions(),
+                m_pose);
         }
 
 
@@ -188,7 +201,9 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
-                m_odometry.resetPosition(startPose, startGyro);
+                m_odometry.resetPosition(startGyro, 
+                getSwerveModulePositions(),
+                      startPose);
                 m_fieldOffset = startPose.getRotation().getDegrees();
         }
 
@@ -201,7 +216,7 @@ public class SwerveDrive extends SubsystemBase {
     
         public void updateOdometry() {
                 m_pose = m_odometry.update(getGyroscopeRotation(),
-                                        kinematics.toSwerveModuleStates(getChassisSpeeds()));
+                getSwerveModulePositions());
                 if (m_traj_reset_pose == null || m_traj_offset == null) {
                         m_traj_pose = m_pose;
                 } else {
@@ -251,10 +266,6 @@ public class SwerveDrive extends SubsystemBase {
 
         public void stop() {
                 drive(new ChassisSpeeds(0.0, 0.0, 0.0));
-        }
-
-        public void drive(VelocityCommand command) {
-                drive(new ChassisSpeeds(command.vx, command.vy, command.vt));
         }
 
         public void drive(double vx, double vy, double angularVelocity) {
