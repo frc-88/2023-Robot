@@ -274,6 +274,8 @@ public class SwerveDrive extends SubsystemBase {
 
         public void drive(ChassisSpeeds chassisSpeeds) {
                 m_chassisSpeeds = chassisSpeeds;
+                SwerveModuleState[] states = kinematics.toSwerveModuleStates(m_chassisSpeeds);
+                setModuleStates(states);
         }
 
 
@@ -292,11 +294,7 @@ public class SwerveDrive extends SubsystemBase {
 
         @Override
         public void periodic() {
-                updateOdometry();
-
-                // set modules to desired chassis speed
-                SwerveModuleState[] states = kinematics.toSwerveModuleStates(m_chassisSpeeds);
-                setModuleStates(states);
+                updateOdometry();                
                 
                 SmartDashboard.putNumber("odomX", Units.metersToFeet(m_pose.getX()));
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
