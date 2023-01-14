@@ -23,14 +23,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
-import frc.robot.util.coprocessor.BoundingBox;
-import frc.robot.util.coprocessor.ChassisInterface;
-import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.drive.DriveUtils;
 
 import static frc.robot.Constants.*;
 
-public class SwerveDrive extends SubsystemBase implements ChassisInterface {
+public class SwerveDrive extends SubsystemBase {
         /**
          * The maximum voltage that will be delivered to the drive motors.
          * 
@@ -87,8 +84,6 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface {
         private SwerveModule m_backLeftModule;
         private SwerveModule m_backRightModule;
         private SwerveModule[] m_modules;
-
-        private BoundingBox m_collisionBoundingBox;
 
         private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
         private double m_fieldOffset = 0.0;
@@ -153,16 +148,6 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface {
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), m_pose);
-
-                m_collisionBoundingBox = new BoundingBox(
-                        DRIVETRAIN_BOUNDARY_WIDTH / 2.0, 
-                        DRIVETRAIN_BOUNDARY_LENGTH / 2.0,
-                        -DRIVETRAIN_BOUNDARY_WIDTH / 2.0,
-                        -DRIVETRAIN_BOUNDARY_LENGTH / 2.0,
-                        DRIVETRAIN_MIN_COLLISION_INFLATE,
-                        DRIVETRAIN_MAX_COLLISION_INFLATE,
-                        MAX_TRAJ_VELOCITY
-                );
         }
 
 
@@ -280,9 +265,6 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface {
                 m_chassisSpeeds = chassisSpeeds;
         }
 
-        public BoundingBox getBoundingBox() {
-                return m_collisionBoundingBox;
-        }
 
         public void setModuleStates(SwerveModuleState[] states) {
                 SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
