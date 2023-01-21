@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANdleSystem;
-import frc.robot.commands.CANdleConfigCommands;
-import frc.robot.commands.CANdlePrintCommands;
+//import frc.robot.commands.CANdleConfigCommands;
+//import frc.robot.commands.CANdlePrintCommands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
+//import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -39,8 +39,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     //new JoystickButton(joy, Constants.BlockButton).whenPressed(m_candleSubsystem::setColors, m_candleSubsystem);
-    //new JoystickButton(joy, Constants.IncrementAnimButton).whenPressed(m_candleSubsystem::incrementAnimation, m_candleSubsystem);
-    //new JoystickButton(joy, Constants.DecrementAnimButton).whenPressed(m_candleSubsystem::decrementAnimation, m_candleSubsystem);
+    new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::setCone, m_candleSubsystem);
+    new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::setCube, m_candleSubsystem);
 
     new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
 
