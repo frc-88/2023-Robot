@@ -28,7 +28,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    configureBindings();
+    configureButtonBindings();
   }
 
   /**
@@ -56,8 +56,6 @@ public class RobotContainer {
     new JoystickButton(joy, Constants.TemperatureButton).whenPressed(new CANdlePrintCommands.PrintTemperature(m_candleSubsystem));
   }
   
-  private void configureBindings() {}
-
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
