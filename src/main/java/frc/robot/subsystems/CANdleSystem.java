@@ -17,7 +17,7 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
 public class CANdleSystem extends SubsystemBase {
-  private final int LEDS_PER_ANIMATION = 120;
+  private final int LEDS_PER_ANIMATION = 128;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private XboxController joystick;
     private int m_candleChannel = 0;
