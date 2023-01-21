@@ -74,8 +74,7 @@ public class CANdleSystem extends SubsystemBase {
         if(m_toAnimate == null) {
             if(!m_setAnim) {
                 /* Only setLEDs once, because every set will transmit a frame */
-                m_candle.setLEDs(100, 0, 120, 0, 0, 64);
-                m_candle.setLEDs(255, 200, 0, 0, 64, 64);
+                m_candle.setLEDs(100, 0, 120);
                 m_setAnim = true;
             }
         } else {
