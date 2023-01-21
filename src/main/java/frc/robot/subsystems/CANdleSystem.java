@@ -171,7 +171,10 @@ public class CANdleSystem extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         if(m_toAnimate == null) {
-            if(!m_setAnim) {
+            //if(!m_setAnim) {
+                for(int i = 0; i < 10; ++i) {
+                    m_candle.clearAnimation(i);
+                }
                 /* Only setLEDs once, because every set will transmit a frame */
                 m_candle.setLEDs(100, 0, 120, 0, 0, 64);
                 m_candle.setLEDs(255, 200, 0, 0, 64, 64);
@@ -184,7 +187,7 @@ public class CANdleSystem extends SubsystemBase {
                 // m_candle.setLEDs(0, 0, 0, 0, 6, 1);
                 // m_candle.setLEDs(0, 0, 255, 0, 7, 1);
                 m_setAnim = true;
-            }
+            //}
         } else {
             // m_toAnimate.setSpeed((joystick.getRightY() + 1.0) / 2.0);
             // m_candle.animate(m_toAnimate, m_candleChannel);
