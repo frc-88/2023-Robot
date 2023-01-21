@@ -143,7 +143,7 @@ public class CANdleSystem extends SubsystemBase {
                 break;
             case Strobe:
                 m_candleChannel = 6;
-                m_toAnimate = new StrobeAnimation(145, 0, 145, 0, 0.2, LEDS_PER_ANIMATION, 0);
+                m_toAnimate = new StrobeAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, 0);
                 break;
             case Twinkle:
                 m_candleChannel = 7;
@@ -155,7 +155,7 @@ public class CANdleSystem extends SubsystemBase {
                 break;
             case Empty:
                 m_candleChannel = 9;
-                m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, 0);
+                m_toAnimate = null;
                 break;
 
             case SetAll:
@@ -173,7 +173,8 @@ public class CANdleSystem extends SubsystemBase {
         if(m_toAnimate == null) {
             if(!m_setAnim) {
                 /* Only setLEDs once, because every set will transmit a frame */
-                m_candle.setLEDs(255, 0, 0);
+                m_candle.setLEDs(100, 0, 120, 0, 0, 64);
+                m_candle.setLEDs(255, 200, 0, 0, 64, 64);
                 // m_candle.setLEDs(255, 255, 255, 0, 0, 1);
                 // m_candle.setLEDs(255, 255, 0, 0, 1, 1);
                 // m_candle.setLEDs(255, 0, 255, 0, 2, 1);
