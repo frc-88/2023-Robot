@@ -176,8 +176,9 @@ public class CANdleSystem extends SubsystemBase {
                     m_candle.clearAnimation(i);
                 }
                 /* Only setLEDs once, because every set will transmit a frame */
-                m_candle.setLEDs(100, 0, 120, 0, 0, 64);
-                m_candle.setLEDs(255, 200, 0, 0, 64, 64);
+                m_candle.setLEDs(100, 0, 120);
+                // m_candle.setLEDs(100, 0, 120, 0, 0, 512);
+                // m_candle.setLEDs(255, 200, 0, 0, 64, 64);
                 // m_candle.setLEDs(255, 255, 255, 0, 0, 1);
                 // m_candle.setLEDs(255, 255, 0, 0, 1, 1);
                 // m_candle.setLEDs(255, 0, 255, 0, 2, 1);
