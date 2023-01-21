@@ -16,7 +16,7 @@ import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
-public class Lights extends SubsystemBase {
+public class CANdleSystem extends SubsystemBase {
   private final int LEDS_PER_ANIMATION = 30;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private XboxController joystick;
@@ -43,7 +43,7 @@ public class Lights extends SubsystemBase {
     }
     private AnimationTypes m_currentAnimation;
 
-    public Lights(XboxController joy) {
+    public CANdleSystem(XboxController joy) {
         this.joystick = joy;
         changeAnimation(AnimationTypes.SetAll);
         CANdleConfiguration configAll = new CANdleConfiguration();
