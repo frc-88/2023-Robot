@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
+import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -17,15 +20,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
+import frc.robot.Constants;
 import frc.robot.util.drive.DriveUtils;
-
-import static frc.robot.Constants.*;
+import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class SwerveDrive extends SubsystemBase {
         /**
@@ -94,8 +97,8 @@ public class SwerveDrive extends SubsystemBase {
         private Pose2d m_traj_reset_pose;
         private Pose2d m_traj_offset;
 
-        public SwerveDrive(AHRS navx) {
-                m_navx = navx;
+        public SwerveDrive() {
+                m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
                 configureModules();
 
                 zeroGyroscope();
@@ -127,30 +130,30 @@ public class SwerveDrive extends SubsystemBase {
                 m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
                                 tab.getLayout("Front Left", BuiltInLayouts.kList).withSize(2, 4).withPosition(0, 0),
                                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                                FRONT_LEFT_MODULE_DRIVE_MOTOR,
-                                FRONT_LEFT_MODULE_STEER_MOTOR,
-                                FRONT_LEFT_MODULE_STEER_ENCODER,
+                                Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+                                Constants.FRONT_LEFT_MODULE_STEER_MOTOR,
+                                Constants.FRONT_LEFT_MODULE_STEER_ENCODER,
                                 -Math.toRadians(p_frontLeftOffset.getValue()));
                 m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
                                 tab.getLayout("Front Right", BuiltInLayouts.kList).withSize(2, 4).withPosition(2, 0),
                                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                                FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-                                FRONT_RIGHT_MODULE_STEER_MOTOR,
-                                FRONT_RIGHT_MODULE_STEER_ENCODER,
+                                Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+                                Constants.FRONT_RIGHT_MODULE_STEER_MOTOR,
+                                Constants.FRONT_RIGHT_MODULE_STEER_ENCODER,
                                 -Math.toRadians(p_frontRightOffset.getValue()));
                 m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
                                 tab.getLayout("Back Left", BuiltInLayouts.kList).withSize(2, 4).withPosition(4, 0),
                                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                                BACK_LEFT_MODULE_DRIVE_MOTOR,
-                                BACK_LEFT_MODULE_STEER_MOTOR,
-                                BACK_LEFT_MODULE_STEER_ENCODER,
+                                Constants.BACK_LEFT_MODULE_DRIVE_MOTOR,
+                                Constants.BACK_LEFT_MODULE_STEER_MOTOR,
+                                Constants.BACK_LEFT_MODULE_STEER_ENCODER,
                                 -Math.toRadians(p_backLeftOffset.getValue()));
                 m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
                                 tab.getLayout("Back Right", BuiltInLayouts.kList).withSize(2, 4).withPosition(6, 0),
                                 Mk4iSwerveModuleHelper.GearRatio.L2,
-                                BACK_RIGHT_MODULE_DRIVE_MOTOR,
-                                BACK_RIGHT_MODULE_STEER_MOTOR,
-                                BACK_RIGHT_MODULE_STEER_ENCODER,
+                                Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+                                Constants.BACK_RIGHT_MODULE_STEER_MOTOR,
+                                Constants.BACK_RIGHT_MODULE_STEER_ENCODER,
                                 -Math.toRadians(p_backRightOffset.getValue()));
 
                 m_modules = new SwerveModule[] {m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule};
