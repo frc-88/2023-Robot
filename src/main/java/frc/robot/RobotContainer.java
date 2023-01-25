@@ -24,11 +24,33 @@ public class RobotContainer {
     () -> modifyAxis(filterX.calculate(m_driverController.getTranslationX())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
     () -> modifyAxis(m_driverController.getRotation()) * SwerveDrive.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
   );
+  private static double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
+  }
+  private static double modifyAxis(double value) {
+    // Deadband
+    value = deadband(value, 0.05);
+
+    // Square the axis
+    value = Math.copySign(value * value, value);
+
+    return value;
+  }
   public RobotContainer() {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    m_drive.setDefaultCommand(m_swerveDrive);
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
