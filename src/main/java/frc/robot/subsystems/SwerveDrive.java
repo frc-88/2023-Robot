@@ -351,13 +351,13 @@ public class SwerveDrive extends SubsystemBase {
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
-                //SmartDashboard.putNumber("FLSteerCurrent", m_);
-                //SmartDashboard.putNumber("FRSteerCurrent", m_);               
-                //SmartDashboard.putNumber("BLSteerCurrent", m_);               
-                //SmartDashboard.putNumber("BRSteerCurrent", m_);
-                //SmartDashboard.putNumber("FLDriveCurrent", m_);
-                //SmartDashboard.putNumber("FRDriveCurrent", m_);
-                //SmartDashboard.putNumber("BLDriveCurrent", m_);
-                //SmartDashboard.putNumber("BRDriveCurrent", m_);
+                SmartDashboard.putNumber("FLSteerCurrent", m_frontLeftModule.getSteerController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("FRSteerCurrent", m_frontRightModule.getSteerController().getMotor().getStatorCurrent());               
+                SmartDashboard.putNumber("BLSteerCurrent", m_backLeftModule.getSteerController().getMotor().getStatorCurrent());               
+                SmartDashboard.putNumber("BRSteerCurrent", m_backRightModule.getSteerController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("FLDriveCurrent", m_frontLeftModule.getDriveController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("FRDriveCurrent", m_frontRightModule.getDriveController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("BLDriveCurrent", m_backLeftModule.getDriveController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("BRDriveCurrent", m_backRightModule.getDriveController().getMotor().getStatorCurrent());
         }
 }
