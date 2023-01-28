@@ -31,6 +31,7 @@ import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
 import frc.robot.util.controllers.DriverController;
+import frc.robot.util.controllers.FrskyController;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -312,11 +313,13 @@ public class SwerveDrive extends SubsystemBase {
                         DriverController driverController) {
                 GrantDriveCommand grantDrive;
 
-                grantDrive = new GrantDriveCommand(drive,
-                        () -> modifyAxis(filterY.calculate(((FrskyController) m_driverController).getLeftStickY())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
-                        () -> modifyAxis(((FrskyController) m_driverController).getRightStickX()),
-                        () -> modifyAxis(((FrskyController) m_driverController).getRightStickY()),
-                        () -> -modifyAxis(((FrskyController) m_driverController).getLeftStickX()) * SwerveDrive.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+                grantDrive =new GrantDriveCommand(
+                        drive,
+                        () -> modifyAxis(filterY.calculate(((FrskyController) driverController).getLeftStickY())) * MAX_VELOCITY_METERS_PER_SECOND,
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickX()),
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickY()),
+                        () -> -modifyAxis(((FrskyController) driverController).getLeftStickX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+                      );
                 return grantDrive;
         }
 

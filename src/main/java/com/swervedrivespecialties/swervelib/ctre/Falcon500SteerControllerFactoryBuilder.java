@@ -161,7 +161,7 @@ public final class Falcon500SteerControllerFactoryBuilder {
         private double resetIteration = 0;
 
         private ControllerImplementation(TalonFX motor,
-                                         double motorEncoderPositionCoefficient,2
+                                         double motorEncoderPositionCoefficient,
                                          double motorEncoderVelocityCoefficient,
                                          TalonFXControlMode motorControlMode,
                                          AbsoluteEncoder absoluteEncoder) {
