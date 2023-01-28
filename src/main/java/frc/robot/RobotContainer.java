@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
@@ -21,6 +25,7 @@ public class RobotContainer {
   private void configureBindings() {
     // m_drive.setDefaultCommand(m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
   }
 
   public Command getAutonomousCommand() {

@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
+import java.util.stream.Stream;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -26,6 +28,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
@@ -323,6 +326,10 @@ public class SwerveDrive extends SubsystemBase {
                 return grantDrive;
         }
 
+        public InstantCommand resetYawCommandFactory() {
+                return new InstantCommand(() -> {zeroGyroscope();});
+        }
+
         private double deadband(double value, double deadband) {
                 if (Math.abs(value) > deadband) {
                         if (value > 0.0) {
@@ -348,6 +355,10 @@ public class SwerveDrive extends SubsystemBase {
 
         @Override
         public void periodic() {
+                for (SwerveModule module : m_modules) {
+                        module.zeroModule();
+                }
+
                 updateOdometry();
 
                 SmartDashboard.putNumber("NavX.yaw", m_navx.getYaw());
