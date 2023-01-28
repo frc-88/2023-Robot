@@ -8,7 +8,6 @@ import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.swervedrivespecialties.swervelib.DriveController;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
@@ -99,28 +98,23 @@ public class SwerveDrive extends SubsystemBase {
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
         private Pose2d m_pose;
-        private Pose2d m_traj_pose;
 
+        private Pose2d m_traj_pose;
         private Pose2d m_traj_reset_pose;
         private Pose2d m_traj_offset;
 
         public SwerveDrive() {
                 m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
-                configureModules();
 
                 zeroGyroscope();
+                configureModules();
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(),
                                 getSwerveModulePositions(),
                                 m_pose);
-
-                // p_frontLeftOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_frontRightOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_backLeftOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_backRightOffset.addChangeHandler((Double unused) -> configureModules());
-        }
+       }
 
         public SwerveModulePosition[] getSwerveModulePositions() {
                 return new SwerveModulePosition[] {
@@ -164,7 +158,6 @@ public class SwerveDrive extends SubsystemBase {
                                 -Math.toRadians(p_backRightOffset.getValue()));
 
                 m_modules = new SwerveModule[] {m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule};
-                zeroGyroscope();
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
