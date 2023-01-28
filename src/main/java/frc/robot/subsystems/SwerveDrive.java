@@ -250,7 +250,7 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public double getAccelerationEstimate() {
-                // TODO
+                //      
                 return 0.0;
         }
 
@@ -303,5 +303,13 @@ public class SwerveDrive extends SubsystemBase {
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
+                //SmartDashboard.putNumber("FLSteerCurrent", m_);
+                //SmartDashboard.putNumber("FRSteerCurrent", m_);               
+                //SmartDashboard.putNumber("BLSteerCurrent", m_);               
+                //SmartDashboard.putNumber("BRSteerCurrent", m_);
+                //SmartDashboard.putNumber("FLDriveCurrent", m_);
+                //SmartDashboard.putNumber("FRDriveCurrent", m_);
+                //SmartDashboard.putNumber("BLDriveCurrent", m_);
+                //SmartDashboard.putNumber("BRDriveCurrent", m_);
         }
       }
