@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
@@ -321,6 +322,10 @@ public class SwerveDrive extends SubsystemBase {
                         () -> -modifyAxis(((FrskyController) driverController).getLeftStickX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
                       );
                 return grantDrive;
+        }
+
+        public InstantCommand resetYawCommandFactory() {
+                return new InstantCommand(() -> {zeroGyroscope();});
         }
 
         private double deadband(double value, double deadband) {
