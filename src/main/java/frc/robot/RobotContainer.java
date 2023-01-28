@@ -19,7 +19,8 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_drive.setDefaultCommand(m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
+    // m_drive.setDefaultCommand(m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
+    m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
   }
 
   public Command getAutonomousCommand() {
