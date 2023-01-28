@@ -306,11 +306,11 @@ public class SwerveDrive extends SubsystemBase {
 
                 swerveDrive = new SwerveDriveCommand(drive,
                                 () -> modifyAxis(filterY.calculate(driverController.getTranslationY()))
-                                                * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
+                                                * MAX_VELOCITY_METERS_PER_SECOND,
                                 () -> modifyAxis(filterX.calculate(driverController.getTranslationX()))
-                                                * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
+                                                * MAX_VELOCITY_METERS_PER_SECOND,
                                 () -> modifyAxis(driverController.getRotation())
-                                                * SwerveDrive.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
+                                                * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
                 return swerveDrive;
         }
 
