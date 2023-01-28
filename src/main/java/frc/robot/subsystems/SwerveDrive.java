@@ -8,9 +8,11 @@ import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.swervedrivespecialties.swervelib.DriveController;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,6 +29,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.drive.SwerveDriveCommand;
+import frc.robot.util.controllers.DriverController;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -80,6 +84,9 @@ public class SwerveDrive extends SubsystemBase {
         private DoublePreferenceConstant p_backLeftOffset = new DoublePreferenceConstant("Drive Back Left Offset", 0.0);
         private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive Back Right Offset",
                         0.0);
+
+        private final SlewRateLimiter filterX = new SlewRateLimiter(3.0);
+        private final SlewRateLimiter filterY = new SlewRateLimiter(3.0);
 
         private final AHRS m_navx;
         private SwerveModule m_frontLeftModule;
@@ -294,6 +301,40 @@ public class SwerveDrive extends SubsystemBase {
                 m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
                                 states[3].angle.getRadians());
         }
+
+        public SwerveDriveCommand fieldOrientedDriveCommandFactory(SwerveDrive drive, DriverController driverController) {
+                SwerveDriveCommand swerveDrive;
+                
+                swerveDrive = new SwerveDriveCommand(drive,
+                () -> modifyAxis(filterY.calculate(driverController.getTranslationY())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
+                () -> modifyAxis(filterX.calculate(driverController.getTranslationX())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
+                () -> modifyAxis(driverController.getRotation()) * SwerveDrive.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+        );
+                return swerveDrive;
+        }              
+
+        private double deadband(double value, double deadband) {
+          if (Math.abs(value) > deadband) {
+            if (value > 0.0) {
+              return (value - deadband) / (1.0 - deadband);
+            } else {
+              return (value + deadband) / (1.0 - deadband);
+            }
+          } else {
+            return 0.0;
+          }
+          
+        }
+        private double modifyAxis(double value) {
+          // Deadband
+          value = deadband(value, 0.05);
+      
+          // Square the axis
+          value = Math.copySign(value * value, value);
+      
+          return value;
+        }
+      
 
         @Override
         public void periodic() {

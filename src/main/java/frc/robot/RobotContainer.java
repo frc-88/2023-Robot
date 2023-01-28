@@ -16,40 +16,13 @@ import frc.robot.util.controllers.FrskyDriverController;
 public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
-  private final SlewRateLimiter filterX = new SlewRateLimiter(3.0);
-  private final SlewRateLimiter filterY = new SlewRateLimiter(3.0);
-  private CommandBase m_swerveDrive = new SwerveDriveCommand(
-    m_drive,
-    () -> modifyAxis(filterY.calculate(m_driverController.getTranslationY())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
-    () -> modifyAxis(filterX.calculate(m_driverController.getTranslationX())) * SwerveDrive.MAX_VELOCITY_METERS_PER_SECOND,
-    () -> modifyAxis(m_driverController.getRotation()) * SwerveDrive.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-  );
-  private static double deadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
-      if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
-      } else {
-        return (value + deadband) / (1.0 - deadband);
-      }
-    } else {
-      return 0.0;
-    }
-  }
-  private static double modifyAxis(double value) {
-    // Deadband
-    value = deadband(value, 0.05);
 
-    // Square the axis
-    value = Math.copySign(value * value, value);
-
-    return value;
-  }
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
-    m_drive.setDefaultCommand(m_swerveDrive);
+    m_drive.setDefaultCommand(m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
   }
 
   public Command getAutonomousCommand() {
