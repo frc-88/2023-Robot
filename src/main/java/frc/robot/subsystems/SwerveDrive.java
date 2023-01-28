@@ -303,11 +303,11 @@ public class SwerveDrive extends SubsystemBase {
                 SwerveDriveCommand swerveDrive;
 
                 swerveDrive = new SwerveDriveCommand(drive,
-                                () -> modifyAxis(filterY.calculate(driverController.getTranslationY()))
+                                () -> modifyAxis(filterY.calculate(driverController.getTranslationY()), true)
                                                 * MAX_VELOCITY_METERS_PER_SECOND,
-                                () -> modifyAxis(filterX.calculate(driverController.getTranslationX()))
+                                () -> modifyAxis(filterX.calculate(driverController.getTranslationX()), true)
                                                 * MAX_VELOCITY_METERS_PER_SECOND,
-                                () -> modifyAxis(driverController.getRotation())
+                                () -> modifyAxis(driverController.getRotation(), false)
                                                 * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
                 return swerveDrive;
         }
@@ -318,10 +318,10 @@ public class SwerveDrive extends SubsystemBase {
 
                 grantDrive =new GrantDriveCommand(
                         drive,
-                        () -> modifyAxis(filterY.calculate(((FrskyController) driverController).getLeftStickY())) * MAX_VELOCITY_METERS_PER_SECOND,
-                        () -> modifyAxis(((FrskyController) driverController).getRightStickX()),
-                        () -> modifyAxis(((FrskyController) driverController).getRightStickY()),
-                        () -> -modifyAxis(((FrskyController) driverController).getLeftStickX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+                        () -> modifyAxis(filterY.calculate(((FrskyController) driverController).getLeftStickY()), true) * MAX_VELOCITY_METERS_PER_SECOND * 0.75,
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickX(), false),
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickY(), false),
+                        () -> -modifyAxis(((FrskyController) driverController).getLeftStickX(), false) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
                       );
                 return grantDrive;
         }
@@ -343,12 +343,12 @@ public class SwerveDrive extends SubsystemBase {
 
         }
 
-        private double modifyAxis(double value) {
+        private double modifyAxis(double value, boolean squared) {
                 // Deadband
                 value = deadband(value, 0.05);
 
                 // Square the axis
-                value = Math.copySign(value * value, value);
+                if (squared) value = Math.copySign(value * value, value);
 
                 return value;
         }

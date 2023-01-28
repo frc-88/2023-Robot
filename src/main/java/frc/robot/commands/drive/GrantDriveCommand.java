@@ -16,6 +16,8 @@ public class GrantDriveCommand extends CommandBase {
 
     private double m_lastHeading = 0;
 
+    private boolean m_wasRotating = false;
+
     public GrantDriveCommand(SwerveDrive drivetrainSubsystem,
                                DoubleSupplier throttleSupplier,
                                DoubleSupplier translationXSupplier,
@@ -34,22 +36,35 @@ public class GrantDriveCommand extends CommandBase {
     public void execute() {
         double heading = Math.atan2(-m_translationXSupplier.getAsDouble(), m_translationYSupplier.getAsDouble());
         heading -= Math.toRadians(m_drivetrainSubsystem.getFieldOffset());
+        double rotation = m_rotationSupplier.getAsDouble();
+        double throttle = m_throttleSupplier.getAsDouble();
+        boolean pointing = Math.abs(m_translationXSupplier.getAsDouble()) > 0.25 || Math.abs(m_translationYSupplier.getAsDouble()) > 0.25;
     
-        if (Math.abs(m_translationXSupplier.getAsDouble()) < 0.25 && Math.abs(m_translationYSupplier.getAsDouble()) < 0.25) {
+        if (!pointing) {
             heading = m_lastHeading;
         } else {
             m_lastHeading = heading;
         }
-        double throttle = m_throttleSupplier.getAsDouble();
-        if (Math.abs(throttle) < 0.001) {
-            throttle = 0.001;
+
+        if (Math.abs(throttle) < 0.001 && Math.abs(rotation) < 0.001) {
+            if (pointing) {
+                m_wasRotating = false;
+                throttle = 0.001;
+            } else if (m_wasRotating) {
+                rotation = 0.001;
+            } else {
+                throttle = 0.001;
+            }
+        } else {
+            m_wasRotating = Math.abs(rotation) >= 0.001;
         }
+
         double vx = throttle * Math.cos(heading);
         double vy = throttle * Math.sin(heading);
 
         m_drivetrainSubsystem.drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy,
-                        m_rotationSupplier.getAsDouble(),
+                        rotation,
                         m_drivetrainSubsystem.getGyroscopeRotation()
                 )
         );
