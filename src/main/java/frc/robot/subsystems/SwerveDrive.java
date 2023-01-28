@@ -11,6 +11,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,6 +28,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.drive.GrantDriveCommand;
+import frc.robot.commands.drive.SwerveDriveCommand;
+import frc.robot.util.controllers.DriverController;
+import frc.robot.util.controllers.FrskyController;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -47,12 +52,12 @@ public class SwerveDrive extends SubsystemBase {
          * This is a measure of how fast the robot should be able to drive in a straight
          * line. The calculated theoritical maximum is used below.
          */
-        
+
         /*public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
                         SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                         SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;*/
-        
-         public static final double MAX_VELOCITY_METERS_PER_SECOND = 0.9;
+
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 0.9;
 
         /**
          * The maximum angular velocity of the robot in radians per second.
@@ -81,6 +86,9 @@ public class SwerveDrive extends SubsystemBase {
         private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive Back Right Offset",
                         0.0);
 
+        private final SlewRateLimiter filterX = new SlewRateLimiter(3.0);
+        private final SlewRateLimiter filterY = new SlewRateLimiter(3.0);
+
         private final AHRS m_navx;
         private SwerveModule m_frontLeftModule;
         private SwerveModule m_frontRightModule;
@@ -92,36 +100,31 @@ public class SwerveDrive extends SubsystemBase {
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
         private Pose2d m_pose;
-        private Pose2d m_traj_pose;
 
+        private Pose2d m_traj_pose;
         private Pose2d m_traj_reset_pose;
         private Pose2d m_traj_offset;
 
         public SwerveDrive() {
                 m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
-                configureModules();
 
                 zeroGyroscope();
+                configureModules();
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
-                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), 
-                getSwerveModulePositions(),
-                m_pose);
-                
-                // p_frontLeftOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_frontRightOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_backLeftOffset.addChangeHandler((Double unused) -> configureModules());
-                // p_backRightOffset.addChangeHandler((Double unused) -> configureModules());
-        }
+                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(),
+                                getSwerveModulePositions(),
+                                m_pose);
+       }
 
         public SwerveModulePosition[] getSwerveModulePositions() {
                 return new SwerveModulePosition[] {
-                        m_frontLeftModule.getPosition(),
-                        m_frontRightModule.getPosition(),
-                        m_backLeftModule.getPosition(),
-                        m_backRightModule.getPosition(),
-                      };
+                                m_frontLeftModule.getPosition(),
+                                m_frontRightModule.getPosition(),
+                                m_backLeftModule.getPosition(),
+                                m_backRightModule.getPosition(),
+                };
         }
 
         public void configureModules() {
@@ -157,15 +160,13 @@ public class SwerveDrive extends SubsystemBase {
                                 -Math.toRadians(p_backRightOffset.getValue()));
 
                 m_modules = new SwerveModule[] {m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule};
-                zeroGyroscope();
 
                 m_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
                 m_traj_pose = new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d());
-                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(), 
-                getSwerveModulePositions(),
-                m_pose);
+                m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(),
+                                getSwerveModulePositions(),
+                                m_pose);
         }
-
 
         public SwerveModule[] getModules() {
                 return m_modules;
@@ -174,6 +175,7 @@ public class SwerveDrive extends SubsystemBase {
         public int getNumModules() {
                 return m_modules.length;
         }
+
         /**
          * Sets the gyroscope angle to zero. This can be used to set the direction the
          * robot is currently facing to the
@@ -204,22 +206,21 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
-                m_odometry.resetPosition(startGyro, 
-                getSwerveModulePositions(),
-                      startPose);
+                m_odometry.resetPosition(startGyro,
+                                getSwerveModulePositions(),
+                                startPose);
                 m_fieldOffset = startPose.getRotation().getDegrees();
         }
-
 
         public void resetTrajectoryPose(Pose2d startPose) {
                 m_traj_reset_pose = m_odometry.getPoseMeters();
                 m_traj_offset = startPose;
                 m_fieldOffset = startPose.getRotation().getDegrees();
         }
-    
+
         public void updateOdometry() {
                 m_pose = m_odometry.update(getGyroscopeRotation(),
-                getSwerveModulePositions());
+                                getSwerveModulePositions());
                 if (m_traj_reset_pose == null || m_traj_offset == null) {
                         m_traj_pose = m_pose;
                 } else {
@@ -281,7 +282,6 @@ public class SwerveDrive extends SubsystemBase {
                 setModuleStates(states);
         }
 
-
         public void setModuleStates(SwerveModuleState[] states) {
                 SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
 
@@ -295,10 +295,61 @@ public class SwerveDrive extends SubsystemBase {
                                 states[3].angle.getRadians());
         }
 
+        public SwerveDriveCommand fieldOrientedDriveCommandFactory(SwerveDrive drive,
+                        DriverController driverController) {
+                SwerveDriveCommand swerveDrive;
+
+                swerveDrive = new SwerveDriveCommand(drive,
+                                () -> modifyAxis(filterY.calculate(driverController.getTranslationY()))
+                                                * MAX_VELOCITY_METERS_PER_SECOND,
+                                () -> modifyAxis(filterX.calculate(driverController.getTranslationX()))
+                                                * MAX_VELOCITY_METERS_PER_SECOND,
+                                () -> modifyAxis(driverController.getRotation())
+                                                * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
+                return swerveDrive;
+        }
+
+        public GrantDriveCommand grantDriveCommandFactory(SwerveDrive drive,
+                        DriverController driverController) {
+                GrantDriveCommand grantDrive;
+
+                grantDrive =new GrantDriveCommand(
+                        drive,
+                        () -> modifyAxis(filterY.calculate(((FrskyController) driverController).getLeftStickY())) * MAX_VELOCITY_METERS_PER_SECOND,
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickX()),
+                        () -> modifyAxis(((FrskyController) driverController).getRightStickY()),
+                        () -> -modifyAxis(((FrskyController) driverController).getLeftStickX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+                      );
+                return grantDrive;
+        }
+
+        private double deadband(double value, double deadband) {
+                if (Math.abs(value) > deadband) {
+                        if (value > 0.0) {
+                                return (value - deadband) / (1.0 - deadband);
+                        } else {
+                                return (value + deadband) / (1.0 - deadband);
+                        }
+                } else {
+                        return 0.0;
+                }
+
+        }
+
+        private double modifyAxis(double value) {
+                // Deadband
+                value = deadband(value, 0.05);
+
+                // Square the axis
+                value = Math.copySign(value * value, value);
+
+                return value;
+        }
+
         @Override
         public void periodic() {
-                updateOdometry();                
-                
+                updateOdometry();
+
                 SmartDashboard.putNumber("odomX", Units.metersToFeet(m_pose.getX()));
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
@@ -312,4 +363,4 @@ public class SwerveDrive extends SubsystemBase {
                 SmartDashboard.putNumber("BLDriveCurrent", m_backLeftModule.getDriveController().getMotor().getStatorCurrent());
                 SmartDashboard.putNumber("BRDriveCurrent", m_backRightModule.getDriveController().getMotor().getStatorCurrent());
         }
-      }
+}
