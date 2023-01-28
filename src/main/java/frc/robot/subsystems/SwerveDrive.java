@@ -361,6 +361,7 @@ public class SwerveDrive extends SubsystemBase {
 
                 updateOdometry();
 
+                SmartDashboard.putNumber("NavX.yaw", m_navx.getYaw());
                 SmartDashboard.putNumber("odomX", Units.metersToFeet(m_pose.getX()));
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
