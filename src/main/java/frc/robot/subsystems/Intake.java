@@ -70,8 +70,7 @@ public class Intake extends SubsystemBase {
     public void armUp() {
       if (isArmUp()) {
         m_arm.set(armUpStallIntakeSpeed.getValue());
-      }
-      else {
+      } else {
        m_arm.set(armUpMoveIntakeSpeed.getValue()); 
       }
      }
@@ -79,8 +78,7 @@ public class Intake extends SubsystemBase {
      public void armDown() {
       if (isArmDown()) {
         m_arm.set(armDownStallIntakeSpeed.getValue());
-      }
-      else {
+      } else {
        m_arm.set(armDownMoveIntakeSpeed.getValue());
      }
       

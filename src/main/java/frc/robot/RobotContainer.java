@@ -40,18 +40,28 @@ public class RobotContainer {
   }
 
   private void configureControllers() {
-    
+    m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
+    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeConeFactory());
+    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch.negate()).whileTrue(m_intake.intakeCubeFactory());
+
   }
 
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    m_intake.setDefaultCommand(m_intake.stowFactory());
   }
 
   private void configureSmartDashboardButtons() {
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-    
+   // Intake
+    SmartDashboard.putData("Intake Cube", m_intake.intakeCubeFactory());
+    SmartDashboard.putData("Intake Cone", m_intake.intakeConeFactory());
+    SmartDashboard.putData("Outgest", m_intake.outgestFactory());
+    SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
+    SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
+
     SmartDashboard.putData(m_drive);
   }
 
