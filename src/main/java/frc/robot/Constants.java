@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
@@ -32,26 +30,22 @@ public final class Constants {
      * Should be measured from center to center.
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.57785; // 22.75 inches
-	public static final double DRIVETRAIN_BOUNDARY_WIDTH = 0.5;  // meters
-    public static final double DRIVETRAIN_BOUNDARY_LENGTH = 0.5;  // meters
-	public static final double DRIVETRAIN_MIN_COLLISION_INFLATE = 0.25;  // meters
-    public static final double DRIVETRAIN_MAX_COLLISION_INFLATE = 1.75;  // meters
 
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; 
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 0; 
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 0; 
+    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3; 
+    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
+    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 11; 
 
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 18; 
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 19; 
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 18; 
+    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 0; 
+    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 7; 
+    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10; 
 
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 8; 
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 9; 
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 8; 
+    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 6; 
+    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 4; 
+    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 9; 
 
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10; 
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 11; 
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 10;
+    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 1; 
+    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
+    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
 
 	public static final double MAX_TRAJ_VELOCITY = 6.0;
 	public static final double MAX_TRAJ_ACCELERATION = 4.0;
@@ -79,17 +73,4 @@ public final class Constants {
 	public static final double COPROCESSOR_SLOW_PERIODIC_UPDATE_DELAY = 1.0 / 5.0;
 	public static final double COPROCESSOR_SLOW_PERIODIC_UPDATE_OFFSET = 0.025;
 	
-	public static final class AutoConstants {
-		public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-		public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-	
-		public static final double kPXController = 0.5;
-		public static final double kPYController = 0.5;
-		public static final double kPThetaController = 0.5;
-	
-		// Constraint for the motion profilied robot angle controller
-		public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-			new TrapezoidProfile.Constraints(
-				kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-	  }
 }
