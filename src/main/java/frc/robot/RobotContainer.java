@@ -34,10 +34,26 @@ public class RobotContainer {
 
 
   public RobotContainer() {
-    configureBindings();
+    configureControllers();
+    configureDefaultCommands();
+    configureSmartDashboardButtons();
   }
 
-  private void configureBindings() {}
+  private void configureControllers() {
+    
+  }
+
+  private void configureDefaultCommands() {
+    m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+  }
+
+  private void configureSmartDashboardButtons() {
+    SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
+    SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
+    SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    
+    SmartDashboard.putData(m_drive);
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
