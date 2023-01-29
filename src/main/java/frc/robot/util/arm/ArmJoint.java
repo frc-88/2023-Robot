@@ -12,7 +12,7 @@ import frc.robot.Robot;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
-public class ArmLink {
+public class ArmJoint {
     
     private final WPI_TalonFX m_motor;
 
@@ -25,7 +25,7 @@ public class ArmLink {
     private final DoublePreferenceConstant maxAcceleration;
     private final PIDPreferenceConstants pid;
     
-    public ArmLink(String positionLabel, int motorID, boolean motorInverted) {
+    public ArmJoint(String positionLabel, int motorID, boolean motorInverted) {
         m_motor = new WPI_TalonFX(motorID, "1");
 
         m_motor.configFactoryDefault();
@@ -78,6 +78,17 @@ public class ArmLink {
         m_motor.set(TalonFXControlMode.PercentOutput, pivotPercent);
     }
 
+    public void setMotionMagic(double motorAngle, double motorSpeed) {
+        m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(motorSpeed));
+        m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(maxAcceleration.getValue() * maxVelocity.getValue() / motorSpeed));
+        
+        m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(motorAngle));
+    }
+
+    public void setMotionMagic(double pivotAngle) {
+        setMotionMagic(pivotAngle, maxVelocity.getValue());
+    }
+
     public void coast() {
         m_motor.setNeutralMode(NeutralMode.Coast);
     }
@@ -98,11 +109,11 @@ public class ArmLink {
         return convertMotorPositionToActualPosition(motorVelocity) * 10.;
     }
 
-    private static double convertActualPositiontoMotorPosition(double actualPosition) {
+    private static double convertActualPositionToMotorPosition(double actualPosition) {
         return actualPosition / RATIO;
     }
 
-    private static double convertActualVelocitytoMotorVelocity(double actualVelocity) {
-        return convertActualPositiontoMotorPosition(actualVelocity) * 0.1;
+    private static double convertActualVelocityToMotorVelocity(double actualVelocity) {
+        return convertActualPositionToMotorPosition(actualVelocity) * 0.1;
     }
 }
