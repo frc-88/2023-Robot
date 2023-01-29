@@ -5,6 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
@@ -14,64 +18,66 @@ public class Intake extends SubsystemBase {
   // Cube
   private DoublePreferenceConstant innerRollerCubeIntakeSpeed = 
       new DoublePreferenceConstant("Inner Roller Cube Intake Speed", 0.5);
-  private DoublePreferenceConstant outerRollerCubeIntakeSpeed;
+  private DoublePreferenceConstant outerRollerCubeIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Cube Intake Speed", 0.5);
   // Cone
-  private DoublePreferenceConstant innerRollerConeIntakeSpeed;
+  private DoublePreferenceConstant innerRollerConeIntakeSpeed =
       new DoublePreferenceConstant("Inner Roller Cone Intake Speed", -0.5);
-  private DoublePreferenceConstant outerRollerConeIntakeSpeed;
+  private DoublePreferenceConstant outerRollerConeIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Cone Intake Speed", 0.5);
   // Outgest
-  private DoublePreferenceConstant innerRollerOutgestIntakeSpeed;
+  private DoublePreferenceConstant innerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Inner Roller Outgest Intake Speed", -0.5);
-  private DoublePreferenceConstant outerRollerOutgestIntakeSpeed;
+  private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
   // Arm
-  private DoublePreferenceConstant armUpStallIntakeSpeed;
+  private DoublePreferenceConstant armUpStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Stall Intake Speed", 0.5);
-  private DoublePreferenceConstant armDownStallIntakeSpeed;
+  private DoublePreferenceConstant armDownStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Stall Intake Speed", 0.5);
-  private DoublePreferenceConstant armUpMoveIntakeSpeed;
+  private DoublePreferenceConstant armUpMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Move Intake Speed", 0.5);  
-  private DoublePreferenceConstant armDownMoveIntakeSpeed;
+  private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID);
-  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID);
+  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID); 
 
   /** Creates a new Intake. */
   public Intake() {}
 
-    public void intakeCube () {
+    public void intakeCube() {
       m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
       m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
     }
 
-    public void intakeCone () {
+    public void intakeCone() {
       m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
       m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
     }
-    public void Outgest () {
+
+    public void outgest() {
       m_innerRoller.set(innerRollerOutgestIntakeSpeed.getValue());
       m_outerRoller.set(outerRollerOutgestIntakeSpeed.getValue());
     }
 
-    public void stopRollers () {
+    public void stopRollers() {
       m_innerRoller.set(0);
       m_outerRoller.set(0);
     }
 
-    public void armUp () {
-      if (m_arm.isFwdLimitSwitchClosed() > 0) {
+    public void armUp() {
+      if (isArmUp()) {
         m_arm.set(armUpStallIntakeSpeed.getValue());
       }
       else {
-       m_arm.set(armUpMoveIntakeSpeed.getValue());
+       m_arm.set(armUpMoveIntakeSpeed.getValue()); 
+      }
      }
   
-     public void armDown () {
-      if (m_arm.isRevLimitSwitchClosed() > 0) {
+     public void armDown() {
+      if (isArmDown()) {
         m_arm.set(armDownStallIntakeSpeed.getValue());
       }
       else {
@@ -79,8 +85,40 @@ public class Intake extends SubsystemBase {
      }
       
     }
+
+    private boolean isArmUp() {
+      return m_arm.isFwdLimitSwitchClosed() > 0;
+    }
+
+    private boolean isArmDown() {
+      return m_arm.isRevLimitSwitchClosed() > 0;
+    }
+    
+    ///////// Commands :) /////////
+   
+    public CommandBase intakeCubeFactory() {
+      return new RunCommand(() -> {intakeCube(); armDown();}, this);
+    }
+
+    public CommandBase intakeConeFactory() {
+      return new RunCommand(() -> {intakeCone(); armDown();}, this);
+    }
+
+    public CommandBase outgestFactory() {
+      return new RunCommand(() -> {outgest(); armDown();}, this); 
+    }
+
+    public CommandBase stowFactory() {
+      return new RunCommand(() -> {stopRollers(); armUp();}, this);
+    }
+
+    public CommandBase handoffFactory() {
+      return new RunCommand (() -> {outgest(); armUp();}, this);
+    }
+
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Arm Up", isArmUp());
+    SmartDashboard.putBoolean("Arm Down", isArmDown());
   }
 }
