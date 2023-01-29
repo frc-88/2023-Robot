@@ -14,26 +14,26 @@ public class Intake extends SubsystemBase {
   // Cube
   private DoublePreferenceConstant innerRollerCubeIntakeSpeed = 
       new DoublePreferenceConstant("Inner Roller Cube Intake Speed", 0.5);
-  private DoublePreferenceConstant outerRollerCubeIntakeSpeed;
+  private DoublePreferenceConstant outerRollerCubeIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Cube Intake Speed", 0.5);
   // Cone
-  private DoublePreferenceConstant innerRollerConeIntakeSpeed;
+  private DoublePreferenceConstant innerRollerConeIntakeSpeed =
       new DoublePreferenceConstant("Inner Roller Cone Intake Speed", -0.5);
-  private DoublePreferenceConstant outerRollerConeIntakeSpeed;
+  private DoublePreferenceConstant outerRollerConeIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Cone Intake Speed", 0.5);
   // Outgest
-  private DoublePreferenceConstant innerRollerOutgestIntakeSpeed;
+  private DoublePreferenceConstant innerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Inner Roller Outgest Intake Speed", -0.5);
-  private DoublePreferenceConstant outerRollerOutgestIntakeSpeed;
+  private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
   // Arm
-  private DoublePreferenceConstant armUpStallIntakeSpeed;
+  private DoublePreferenceConstant armUpStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Stall Intake Speed", 0.5);
-  private DoublePreferenceConstant armDownStallIntakeSpeed;
+  private DoublePreferenceConstant armDownStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Stall Intake Speed", 0.5);
-  private DoublePreferenceConstant armUpMoveIntakeSpeed;
+  private DoublePreferenceConstant armUpMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Move Intake Speed", 0.5);  
-  private DoublePreferenceConstant armDownMoveIntakeSpeed;
+  private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID);
@@ -68,6 +68,7 @@ public class Intake extends SubsystemBase {
       }
       else {
        m_arm.set(armUpMoveIntakeSpeed.getValue());
+      }
      }
   
      public void armDown () {

@@ -83,6 +83,11 @@ public final class Constants {
 	public static final int INTAKE_INNER_ROLLER_ID = 0;
 	public static final int INTAKE_ARM_ID = 12;
 
+    // Arm
+    public static final int SHOULDER_ID = 40;
+    public static final int ELBOW_ID = 41;
+    public static final int WRIST_ID = 42;
+
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
