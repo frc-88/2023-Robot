@@ -87,6 +87,7 @@ public final class Constants {
     public static final int SHOULDER_ID = 40;
     public static final int ELBOW_ID = 41;
     public static final int WRIST_ID = 42;
+    public static final int PIVOT_ID = 43;
 
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;

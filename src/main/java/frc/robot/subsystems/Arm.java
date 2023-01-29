@@ -19,15 +19,17 @@ public class Arm extends SubsystemBase {
     public final ArmLink shoulder;
     public final ArmLink elbow;
     public final ArmLink wrist;
+    public final ArmLink pivot;
 
     private List<ArmLink> allArms;
 
     public Arm(BooleanSupplier coastButton) {
         this.coastButton = coastButton;
 
-        shoulder = new ArmLink("Outer Left", Constants.SHOULDER_ID, false);
-        elbow = new ArmLink("Inner Right", Constants.ELBOW_ID, false);
-        wrist = new ArmLink("Inner Right", Constants.WRIST_ID, false);
+        shoulder = new ArmLink("Shoulder", Constants.SHOULDER_ID, false);
+        elbow = new ArmLink("Elbow", Constants.ELBOW_ID, false);
+        wrist = new ArmLink("Wrist", Constants.WRIST_ID, false);
+        pivot = new ArmLink("Pivot", Constants.PIVOT_ID, false);
 
         allArms = Arrays.asList(new ArmLink[]{shoulder, elbow, wrist});
     }
