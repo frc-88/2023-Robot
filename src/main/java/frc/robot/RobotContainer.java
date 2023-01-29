@@ -16,13 +16,6 @@ public class RobotContainer {
 
   private final Intake m_intake = new Intake();
 
-  /////////////////////////////////////////////////////////////////////////////
-  //                              CONTROLLERS                                //
-  /////////////////////////////////////////////////////////////////////////////
-
-  private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
-
-
   public RobotContainer() {
     configureBindings();
   }

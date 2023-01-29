@@ -16,22 +16,20 @@ public class Arm extends SubsystemBase {
     private final BooleanSupplier coastButton;
     private boolean m_isCoasting = false;
 
-    public final ArmLink outerArm;
-    public final ArmLink innerArm;
+    public final ArmLink shoulder;
+    public final ArmLink elbow;
+    public final ArmLink wrist;
 
     private List<ArmLink> allArms;
 
     public Arm(BooleanSupplier coastButton) {
         this.coastButton = coastButton;
 
-        outerArm = new ArmLink("Outer Left", Constants.OUTER_CLIMBER_PIVOT_ID, Constants.OUTER_CLIMBER_TELESCOPE_ID, false, false);
-        innerArm = new ArmLink("Inner Right", Constants.INNER_CLIMBER_PIVOT_ID, Constants.INNER_CLIMBER_TELESCOPE_ID, true, false);
+        shoulder = new ArmLink("Outer Left", Constants.SHOULDER_ID, false);
+        elbow = new ArmLink("Inner Right", Constants.ELBOW_ID, false);
+        wrist = new ArmLink("Inner Right", Constants.WRIST_ID, false);
 
-        allArms = Arrays.asList(new ArmLink[]{outerArm, innerArm});
-    }
-
-    public void setInnerPercentOutput(double innerPivotOutput, double innerTelescopeOutput) {
-        this.innerArm.setPercentOutput(innerPivotOutput, innerTelescopeOutput);
+        allArms = Arrays.asList(new ArmLink[]{shoulder, elbow, wrist});
     }
 
     @Override
