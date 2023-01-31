@@ -13,6 +13,13 @@ import frc.robot.subsystems.CANdleSystem;
 //import frc.robot.commands.CANdlePrintCommands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.controllers.DriverController;
+import frc.robot.util.controllers.FrskyDriverController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,32 +29,34 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  private final SwerveDrive m_drive = new SwerveDrive();
+  private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final XboxController joy = new XboxController(Constants.JoystickId);
-  
   private final CANdleSystem m_candleSubsystem = new CANdleSystem(joy);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    configureButtonBindings();
+    configureControllers();
+    configureDefaultCommands();
+    configureSmartDashboardButtons();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
+  private void configureControllers() {
     //new JoystickButton(joy, Constants.BlockButton).whenPressed(m_candleSubsystem::setColors, m_candleSubsystem);
     new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::setCone, m_candleSubsystem);
     new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::setCube, m_candleSubsystem);
-
     new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
+  }
 
-    // new JoystickButton(joy, Constants.VbatButton).whenPressed(new CANdlePrintCommands.PrintVBat(m_candleSubsystem));
-    // new JoystickButton(joy, Constants.V5Button).whenPressed(new CANdlePrintCommands.Print5V(m_candleSubsystem));
-    // new JoystickButton(joy, Constants.CurrentButton).whenPressed(new CANdlePrintCommands.PrintCurrent(m_candleSubsystem));
-    // new JoystickButton(joy, Constants.TemperatureButton).whenPressed(new CANdlePrintCommands.PrintTemperature(m_candleSubsystem));
+  private void configureDefaultCommands() {
+    m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+  }
+
+  private void configureSmartDashboardButtons() {
+    SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
+    SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
+    SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    
+    SmartDashboard.putData(m_drive);
   }
   
   public Command getAutonomousCommand() {
