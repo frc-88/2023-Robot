@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,7 +46,12 @@ public class Intake extends SubsystemBase {
   private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID); 
 
   /** Creates a new Intake. */
-  public Intake() {}
+  public Intake() {
+
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(10; true; )
+
+    m_innerRoller.configStatorCurrentLimit(10);
+  }
 
     public void intakeCube() {
       m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
@@ -92,8 +98,8 @@ public class Intake extends SubsystemBase {
       return m_arm.isRevLimitSwitchClosed() > 0;
     }
     
-    ///////// Commands :) /////////
-   
+    ////////// Commands :) /////////
+
     public CommandBase intakeCubeFactory() {
       return new RunCommand(() -> {intakeCube(); armDown();}, this);
     }
@@ -118,5 +124,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Arm Up", isArmUp());
     SmartDashboard.putBoolean("Arm Down", isArmDown());
+    SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
+    SmartDashboard.putNumber("Arm Outer Motor Current", m_outerRoller.getStatorCurrent());
   }
 }
