@@ -55,9 +55,10 @@ public final class Constants {
 	public static final double FRSKY_DEADBAND = 0.07;
 
 	// Intake
-	public static final int INTAKE_OUTER_ROLLER_ID = 1;
-	public static final int INTAKE_INNER_ROLLER_ID = 0;
-	public static final int INTAKE_ARM_ID = 12;
+	public static final String INTAKE_CANBUS = "1";
+    public static final int INTAKE_OUTER_ROLLER_ID = 16;
+	public static final int INTAKE_INNER_ROLLER_ID = 15;
+	public static final int INTAKE_ARM_ID = 17;
 
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;

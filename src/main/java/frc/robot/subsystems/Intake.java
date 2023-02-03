@@ -41,9 +41,9 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
 
-  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID);
-  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID);
-  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID); 
+  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
+  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
+  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS); 
 
   /** Creates a new Intake. */
   public Intake() {
