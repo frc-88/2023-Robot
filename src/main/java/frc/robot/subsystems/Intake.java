@@ -48,7 +48,7 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake() {
 
-    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 10, 10, .1);
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 20, 30, .1);
 
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
@@ -60,8 +60,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeCone() {
-      m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+      // m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
+      // m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+      m_innerRoller.set(0.5);
+      m_outerRoller.set(0.5);
     }
 
     public void outgest() {
