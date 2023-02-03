@@ -48,9 +48,10 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake() {
 
-    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(10; true; )
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 10, 10, .1);
 
-    m_innerRoller.configStatorCurrentLimit(10);
+    m_innerRoller.configStatorCurrentLimit(sclc);
+    m_outerRoller.configStatorCurrentLimit(sclc);
   }
 
     public void intakeCube() {
