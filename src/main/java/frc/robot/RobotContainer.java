@@ -50,9 +50,10 @@ public class RobotContainer {
     // Test controller
     m_testController.a().onTrue(m_intake.intakeConeFactory());
     m_testController.b().onTrue(m_intake.intakeCubeFactory());
-    m_testController.x().onTrue(m_intake.outgestFactory());
-    m_testController.y().onTrue(m_intake.stowFactory());
-
+    m_testController.x().onTrue(m_intake.holdConeFactory());
+    m_testController.y().onTrue(m_intake.holdCubeFactory());
+    m_testController.rightBumper().onTrue(m_intake.outgestFactory());
+    m_testController.leftBumper().onTrue(m_intake.stowFactory());
   }
 
   private void configureDefaultCommands() {
