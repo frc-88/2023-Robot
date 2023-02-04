@@ -33,9 +33,13 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
   // Hold
-  private DoublePreferenceConstant innerRollerHoldIntakeSpeed =
+  private DoublePreferenceConstant innerRollerHoldCubeIntakeSpeed =
+    new DoublePreferenceConstant("Inner Roller Hold Intake Speed", 0.1);
+  private DoublePreferenceConstant outerRollerHoldCubeIntakeSpeed =
+    new DoublePreferenceConstant("Outer Roller Hold Intake Speed", 0.1);
+  private DoublePreferenceConstant innerRollerHoldConeIntakeSpeed =
     new DoublePreferenceConstant("Inner Roller Hold Intake Speed", -0.1);
-  private DoublePreferenceConstant outerRollerHoldIntakeSpeed =
+  private DoublePreferenceConstant outerRollerHoldConeIntakeSpeed =
     new DoublePreferenceConstant("Outer Roller Hold Intake Speed", 0.1);
   // Arm
   private DoublePreferenceConstant armUpStallIntakeSpeed =
@@ -78,8 +82,18 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopRollers() {
-      m_innerRoller.set(innerRollerHoldIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerHoldIntakeSpeed.getValue());
+      m_innerRoller.set(0.);
+      m_outerRoller.set(0.);
+    }
+
+    public void holdCube() {
+      m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
+      m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
+    }
+
+    public void holdCone() {
+      m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
+      m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
     }
 
     public void armUp() {
