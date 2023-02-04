@@ -56,7 +56,7 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-    m_intake.setDefaultCommand(m_intake.stowFactory());
+    m_intake.setDefaultCommand(m_intake.holdFactory());
   }
 
   private void configureSmartDashboardButtons() {
