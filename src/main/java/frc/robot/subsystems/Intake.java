@@ -54,6 +54,7 @@ public class Intake extends SubsystemBase {
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS); 
+  private boolean coneMode = false;
 
   /** Creates a new Intake. */
   public Intake() {
@@ -66,14 +67,22 @@ public class Intake extends SubsystemBase {
     m_outerRoller.configStatorCurrentLimit(sclc);
   }
 
-    public void intakeCube() {
-      m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
+    public void setCube() {
+      coneMode = false;
     }
 
-    public void intakeCone() {
-      m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+    public void setCone() {
+      coneMode = true;
+    }
+
+    public void intake() {
+      if (!coneMode) {
+        m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
+      } else {
+        m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+      }
     }
 
     public void outgest() {
@@ -86,14 +95,14 @@ public class Intake extends SubsystemBase {
       m_outerRoller.set(0.);
     }
 
-    public void holdCube() {
-      m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
-    }
-
-    public void holdCone() {
-      m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
+    public void hold() {
+      if (!coneMode) {
+        m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
+      } else {
+        m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
+      }
     }
 
     public void armUp() {
@@ -123,20 +132,20 @@ public class Intake extends SubsystemBase {
     
     ////////// Commands :) /////////
 
-    public CommandBase intakeCubeFactory() {
-      return new RunCommand(() -> {intakeCube(); armDown();}, this).withName("intakeCube");
+    public CommandBase setCubeFactory() {
+      return new RunCommand(() -> {setCube();}, this).withName("set cube");
     }
 
-    public CommandBase intakeConeFactory() {
-      return new RunCommand(() -> {intakeCone(); armDown();}, this).withName("intakeCone");
+    public CommandBase setConeFactory() {
+      return new RunCommand(() -> {setCone();}, this).withName("set cone");
+    }
+    
+    public CommandBase intakeFactory() {
+      return new RunCommand(() -> {intake(); armDown();}, this).withName("intake");
     }
 
-    public CommandBase holdCubeFactory() {
-      return new RunCommand(() -> {holdCube(); armUp();}, this).withName("holdCube");
-    }
-
-    public CommandBase holdConeFactory() {
-      return new RunCommand(() -> {holdCone(); armUp();}, this).withName("holdCone");
+    public CommandBase holdFactory() {
+      return new RunCommand(() -> {hold(); armUp();}, this).withName("hold");
     }
 
     public CommandBase outgestFactory() {

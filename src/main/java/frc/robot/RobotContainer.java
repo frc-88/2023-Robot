@@ -44,14 +44,11 @@ public class RobotContainer {
 
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
-    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeConeFactory());
-    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch.negate()).whileTrue(m_intake.intakeCubeFactory());
+    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeFactory());
 
     // // Test controller
-    m_testController.a().onTrue(m_intake.intakeConeFactory());
-    m_testController.b().onTrue(m_intake.intakeCubeFactory());
-    m_testController.x().onTrue(m_intake.holdConeFactory());
-    m_testController.y().onTrue(m_intake.holdCubeFactory());
+    m_testController.a().onTrue(m_intake.intakeFactory());
+    m_testController.x().onTrue(m_intake.holdFactory());
     m_testController.rightBumper().onTrue(m_intake.outgestFactory());
     m_testController.leftBumper().onTrue(m_intake.stowFactory());
   }
@@ -66,10 +63,10 @@ public class RobotContainer {
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
    // Intake
-    SmartDashboard.putData("Intake Cube", m_intake.intakeCubeFactory());
-    SmartDashboard.putData("Intake Cone", m_intake.intakeConeFactory());
-    SmartDashboard.putData("Hold Cube", m_intake.holdCubeFactory());
-    SmartDashboard.putData("Hold Cone", m_intake.holdConeFactory());
+    SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
+    SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
+    SmartDashboard.putData("Intake Game Piece", m_intake.intakeFactory());
+    SmartDashboard.putData("Hold Game Piece", m_intake.holdFactory());
     SmartDashboard.putData("Outgest", m_intake.outgestFactory());
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
