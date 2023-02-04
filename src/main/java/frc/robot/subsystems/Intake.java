@@ -34,13 +34,13 @@ public class Intake extends SubsystemBase {
       new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
   // Hold
   private DoublePreferenceConstant innerRollerHoldCubeIntakeSpeed =
-    new DoublePreferenceConstant("Inner Roller Hold Intake Speed", 0.1);
+    new DoublePreferenceConstant("Inner Roller Hold Cube Intake Speed", 0.1);
   private DoublePreferenceConstant outerRollerHoldCubeIntakeSpeed =
-    new DoublePreferenceConstant("Outer Roller Hold Intake Speed", 0.1);
+    new DoublePreferenceConstant("Outer Roller Hold Cube Intake Speed", 0.1);
   private DoublePreferenceConstant innerRollerHoldConeIntakeSpeed =
-    new DoublePreferenceConstant("Inner Roller Hold Intake Speed", -0.1);
+    new DoublePreferenceConstant("Inner Roller Hold Cone Intake Speed", -0.1);
   private DoublePreferenceConstant outerRollerHoldConeIntakeSpeed =
-    new DoublePreferenceConstant("Outer Roller Hold Intake Speed", 0.1);
+    new DoublePreferenceConstant("Outer Roller Hold Cone Intake Speed", 0.1);
   // Arm
   private DoublePreferenceConstant armUpStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Stall Intake Speed", 0.5);
