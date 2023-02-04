@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +31,11 @@ public class Intake extends SubsystemBase {
       new DoublePreferenceConstant("Inner Roller Outgest Intake Speed", -0.5);
   private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
       new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
+  // Hold
+  private DoublePreferenceConstant innerRollerHoldIntakeSpeed =
+    new DoublePreferenceConstant("Inner Roller Hold Intake Speed", -0.1);
+  private DoublePreferenceConstant outerRollerHoldIntakeSpeed =
+    new DoublePreferenceConstant("Outer Roller Hold Intake Speed", 0.1);
   // Arm
   private DoublePreferenceConstant armUpStallIntakeSpeed =
       new DoublePreferenceConstant("Arm Up Stall Intake Speed", 0.5);
@@ -40,12 +46,17 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
 
-  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID);
-  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID);
-  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID); 
+  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, "1");
+  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, "1");
+  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, "1"); 
 
-  /** Creates a new Intake. */
-  public Intake() {}
+    /** Creates a new Intake. */
+    public Intake() {
+      m_arm.setInverted(true);
+      m_arm.overrideLimitSwitchesEnable(false);
+
+      m_innerRoller.setInverted(true);
+    }
 
     public void intakeCube() {
       m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
@@ -63,15 +74,15 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopRollers() {
-      m_innerRoller.set(0);
-      m_outerRoller.set(0);
+      m_innerRoller.set(innerRollerHoldIntakeSpeed.getValue());
+      m_outerRoller.set(outerRollerHoldIntakeSpeed.getValue());
     }
 
     public void armUp() {
       if (isArmUp()) {
         m_arm.set(armUpStallIntakeSpeed.getValue());
       } else {
-       m_arm.set(armUpMoveIntakeSpeed.getValue()); 
+        m_arm.set(armUpMoveIntakeSpeed.getValue()); 
       }
      }
   
@@ -85,11 +96,11 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean isArmUp() {
-      return m_arm.isFwdLimitSwitchClosed() > 0;
+      return m_arm.isRevLimitSwitchClosed() > 0;
     }
 
     private boolean isArmDown() {
-      return m_arm.isRevLimitSwitchClosed() > 0;
+      return m_arm.isFwdLimitSwitchClosed() > 0;
     }
     
     ///////// Commands :) /////////
