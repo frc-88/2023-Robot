@@ -131,6 +131,14 @@ public class Intake extends SubsystemBase {
       return new RunCommand(() -> {intakeCone(); armDown();}, this);
     }
 
+    public CommandBase holdCubeFactory() {
+      return new RunCommand(() -> {holdCube(); armUp();}, this);
+    }
+
+    public CommandBase holdConeFactory() {
+      return new RunCommand(() -> {holdCone(); armUp();}, this);
+    }
+
     public CommandBase outgestFactory() {
       return new RunCommand(() -> {outgest(); armDown();}, this); 
     }
