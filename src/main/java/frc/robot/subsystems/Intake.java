@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,17 +47,20 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
 
-  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, "1");
-  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, "1");
-  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, "1"); 
+  private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
+  private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
+  private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS); 
 
-    /** Creates a new Intake. */
-    public Intake() {
-      m_arm.setInverted(true);
-      m_arm.overrideLimitSwitchesEnable(false);
+  /** Creates a new Intake. */
+  public Intake() {
+    m_arm.setInverted(true);
+    m_arm.overrideLimitSwitchesEnable(false);
 
-      m_innerRoller.setInverted(true);
-    }
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 20, 30, .1);
+
+    m_innerRoller.configStatorCurrentLimit(sclc);
+    m_outerRoller.configStatorCurrentLimit(sclc);
+  }
 
     public void intakeCube() {
       m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
@@ -64,8 +68,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeCone() {
-      m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+      // m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
+      // m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+      m_innerRoller.set(0.5);
+      m_outerRoller.set(0.5);
     }
 
     public void outgest() {
@@ -103,8 +109,8 @@ public class Intake extends SubsystemBase {
       return m_arm.isFwdLimitSwitchClosed() > 0;
     }
     
-    ///////// Commands :) /////////
-   
+    ////////// Commands :) /////////
+
     public CommandBase intakeCubeFactory() {
       return new RunCommand(() -> {intakeCube(); armDown();}, this);
     }
@@ -129,5 +135,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Arm Up", isArmUp());
     SmartDashboard.putBoolean("Arm Down", isArmDown());
+    SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
+    SmartDashboard.putNumber("Arm Outer Motor Current", m_outerRoller.getStatorCurrent());
   }
 }
