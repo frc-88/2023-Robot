@@ -163,6 +163,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putBoolean("Cone Mode", coneMode);
+    SmartDashboard.putBoolean("Cube Mode", !coneMode);
     SmartDashboard.putBoolean("Arm Up", isArmUp());
     SmartDashboard.putBoolean("Arm Down", isArmDown());
     SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
