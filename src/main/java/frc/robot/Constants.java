@@ -89,6 +89,9 @@ public final class Constants {
     public static final int WRIST_ID = 42;
     public static final int PIVOT_ID = 43;
 
+    // Grabber
+    public static final int GRABBER_MOTOR_ID = 50;
+
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;

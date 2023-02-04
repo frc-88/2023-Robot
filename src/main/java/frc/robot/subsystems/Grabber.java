@@ -13,26 +13,25 @@ import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 public class Grabber extends SubsystemBase {
   private final WPI_TalonFX m_motor = new WPI_TalonFX(Constants.GRABBER_MOTOR_ID);
 
-  private DoublePreferenceConstant intakeCubeSpeed =
-    new DoublePreferenceConstant("Intake Cube Speed", 0.5);
-  private DoublePreferenceConstant intakeConeSpeed =
-    new DoublePreferenceConstant("Intake Cone Speed", -0.5);
+  private DoublePreferenceConstant grabCubeSpeed =
+    new DoublePreferenceConstant("Grab Cube Speed", 0.5);
+  private DoublePreferenceConstant grabConeSpeed =
+    new DoublePreferenceConstant("Grab Cone Speed", -0.5);
   private DoublePreferenceConstant dropCubeSpeed =
     new DoublePreferenceConstant("Drop Cube Speed", -0.5);
   private DoublePreferenceConstant dropConeSpeed =
     new DoublePreferenceConstant("Drop Cone Speed", 0.5);
-  
-  /** Creates a new Grabber. */
+
   public Grabber() {
 
   }
 
-  public void intakeCube() {
-    m_motor.set(intakeCubeSpeed.getValue());
+  public void grabCube() {
+    m_motor.set(grabCubeSpeed.getValue());
   }
 
-  public void intakeCone() {
-    m_motor.set(intakeConeSpeed.getValue());
+  public void grabCone() {
+    m_motor.set(grabConeSpeed.getValue());
   }
 
   public void dropCube() {
