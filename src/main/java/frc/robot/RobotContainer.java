@@ -4,12 +4,14 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
@@ -30,6 +32,7 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
+  private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
 
@@ -43,6 +46,12 @@ public class RobotContainer {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeConeFactory());
     m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch.negate()).whileTrue(m_intake.intakeCubeFactory());
+
+    // Test controller
+    m_testController.a().onTrue(m_intake.intakeConeFactory());
+    m_testController.b().onTrue(m_intake.intakeCubeFactory());
+    m_testController.x().onTrue(m_intake.outgestFactory());
+    m_testController.y().onTrue(m_intake.stowFactory());
 
   }
 

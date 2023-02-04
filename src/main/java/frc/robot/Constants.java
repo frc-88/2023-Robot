@@ -63,6 +63,7 @@ public final class Constants {
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
+    public static final int TEST_CONTROLLER_ID = 2;
 
 	// ROS Interface
 	public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
