@@ -124,31 +124,31 @@ public class Intake extends SubsystemBase {
     ////////// Commands :) /////////
 
     public CommandBase intakeCubeFactory() {
-      return new RunCommand(() -> {intakeCube(); armDown();}, this);
+      return new RunCommand(() -> {intakeCube(); armDown();}, this).withName("intakeCube");
     }
 
     public CommandBase intakeConeFactory() {
-      return new RunCommand(() -> {intakeCone(); armDown();}, this);
+      return new RunCommand(() -> {intakeCone(); armDown();}, this).withName("intakeCone");
     }
 
     public CommandBase holdCubeFactory() {
-      return new RunCommand(() -> {holdCube(); armUp();}, this);
+      return new RunCommand(() -> {holdCube(); armUp();}, this).withName("holdCube");
     }
 
     public CommandBase holdConeFactory() {
-      return new RunCommand(() -> {holdCone(); armUp();}, this);
+      return new RunCommand(() -> {holdCone(); armUp();}, this).withName("holdCone");
     }
 
     public CommandBase outgestFactory() {
-      return new RunCommand(() -> {outgest(); armDown();}, this); 
+      return new RunCommand(() -> {outgest(); armDown();}, this).withName("outgest"); 
     }
 
     public CommandBase stowFactory() {
-      return new RunCommand(() -> {stopRollers(); armUp();}, this);
+      return new RunCommand(() -> {stopRollers(); armUp();}, this).withName("stow");
     }
 
     public CommandBase handoffFactory() {
-      return new RunCommand (() -> {outgest(); armUp();}, this);
+      return new RunCommand (() -> {outgest(); armUp();}, this).withName("handoff");
     }
 
   @Override

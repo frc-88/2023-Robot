@@ -75,6 +75,7 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
 
     SmartDashboard.putData(m_drive);
+    SmartDashboard.putData(m_intake);
   }
 
   public Command getAutonomousCommand() {
