@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -133,11 +134,11 @@ public class Intake extends SubsystemBase {
     ////////// Commands :) /////////
 
     public CommandBase setCubeFactory() {
-      return new RunCommand(() -> {setCube();}, this).withName("set cube");
+      return new InstantCommand(() -> {setCube();}).withName("set cube");
     }
 
     public CommandBase setConeFactory() {
-      return new RunCommand(() -> {setCone();}, this).withName("set cone");
+      return new InstantCommand(() -> {setCone();}).withName("set cone");
     }
     
     public CommandBase intakeFactory() {

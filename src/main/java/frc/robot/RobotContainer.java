@@ -44,7 +44,8 @@ public class RobotContainer {
 
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
-    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeFactory());
+    m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
+    m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     // // Test controller
     m_testController.a().onTrue(m_intake.intakeFactory());
