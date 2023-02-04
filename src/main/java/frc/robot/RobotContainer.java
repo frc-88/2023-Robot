@@ -43,17 +43,17 @@ public class RobotContainer {
   }
 
   private void configureControllers() {
-    m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
-    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeConeFactory());
-    m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch.negate()).whileTrue(m_intake.intakeCubeFactory());
+    // m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
+    // m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch).whileTrue(m_intake.intakeConeFactory());
+    // m_buttonBox.intakeButton.and(m_buttonBox.gamepieceSwitch.negate()).whileTrue(m_intake.intakeCubeFactory());
 
-    // Test controller
-    m_testController.a().onTrue(m_intake.intakeConeFactory());
-    m_testController.b().onTrue(m_intake.intakeCubeFactory());
-    m_testController.x().onTrue(m_intake.holdConeFactory());
-    m_testController.y().onTrue(m_intake.holdCubeFactory());
-    m_testController.rightBumper().onTrue(m_intake.outgestFactory());
-    m_testController.leftBumper().onTrue(m_intake.stowFactory());
+    // // Test controller
+    // m_testController.a().onTrue(m_intake.intakeConeFactory());
+    // m_testController.b().onTrue(m_intake.intakeCubeFactory());
+    // m_testController.x().onTrue(m_intake.holdConeFactory());
+    // m_testController.y().onTrue(m_intake.holdCubeFactory());
+    // m_testController.rightBumper().onTrue(m_intake.outgestFactory());
+    // m_testController.leftBumper().onTrue(m_intake.stowFactory());
   }
 
   private void configureDefaultCommands() {
@@ -68,6 +68,8 @@ public class RobotContainer {
    // Intake
     SmartDashboard.putData("Intake Cube", m_intake.intakeCubeFactory());
     SmartDashboard.putData("Intake Cone", m_intake.intakeConeFactory());
+    SmartDashboard.putData("Hold Cube", m_intake.holdCubeFactory());
+    SmartDashboard.putData("Hold Cone", m_intake.holdConeFactory());
     SmartDashboard.putData("Outgest", m_intake.outgestFactory());
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
