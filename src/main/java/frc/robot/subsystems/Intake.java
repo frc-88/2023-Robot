@@ -68,10 +68,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeCone() {
-      // m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
-      // m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
-      m_innerRoller.set(0.5);
-      m_outerRoller.set(0.5);
+      m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
+      m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
     }
 
     public void outgest() {
