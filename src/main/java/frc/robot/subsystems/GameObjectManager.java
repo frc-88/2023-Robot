@@ -79,6 +79,24 @@ public class GameObjectManager extends SubsystemBase {
                 }
             }
         }
+        for (int i = 9; i < 17; i++) {
+            if (gridZones.get(i).filled) {
+                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
+                    links.add(i+1);
+                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
+                    links.add(i-1);
+                }
+            }
+        }
+        for (int i = 19; i < 26; i++) {
+            if (gridZones.get(i).filled) {
+                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
+                    links.add(i+1);
+                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
+                    links.add(i-1);
+                }
+            }
+        }
         return links;
     }
 
