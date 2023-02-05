@@ -9,7 +9,7 @@ public class GridZone {
     private double radius = 1.0;
     public boolean filled = false;
 
-    GridZone(String type, String level, double x, double y, double z) {
+    public GridZone(String type, String level, double x, double y, double z) {
         this.type = type;
         this.level = level;
         this.x = x;

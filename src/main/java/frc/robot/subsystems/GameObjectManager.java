@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,12 +9,42 @@ import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
 
 public class GameObjectManager extends SubsystemBase {
-    public Set<GameObject> gameObjects;
-    public Set<GridZone> gridZones;
+    public ArrayList<GameObject> gameObjects;
+    public ArrayList<GridZone> gridZones;
 
     public GameObjectManager() {
-        gameObjects = new HashSet<>();
-        gridZones = new HashSet<>();
+        gameObjects = new ArrayList<>();
+        gridZones = new ArrayList<>();
+
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
@@ -38,9 +69,36 @@ public class GameObjectManager extends SubsystemBase {
         }
     }
 
+    public ArrayList<Integer> getLinkIndices() {
+        ArrayList<Integer> links = new ArrayList<>();
+        for (int i = 1; i < 8; i++) {
+            if (gridZones.get(i).filled) {
+                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
+                    links.add(i+1);
+                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
+                    links.add(i-1);
+                }
+            }
+        }
+        return links;
+    }
+
+    public int bestPlace() {
+        ArrayList<Integer> links = getLinkIndices();
+        if (links.size() > 0) {
+            return links.get(0);
+        }
+        for (int i = 0; i < gridZones.size(); i++) {
+            if (!gridZones.get(i).filled) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void periodic() {
         removeInactiveGameObjects();
-
+        fillGridZones();
     }
 }
