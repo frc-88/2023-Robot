@@ -59,6 +59,7 @@ public class GameObjectManager extends SubsystemBase {
 
     public void fillGridZones() {
         for (GridZone gridZone : gridZones) {
+            gridZone.filled = false;
             for (GameObject gameObject : gameObjects) {
                 if (gridZone.contains(gameObject) && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
                     gridZone.filled = true;
