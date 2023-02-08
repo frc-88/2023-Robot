@@ -12,10 +12,6 @@ import frc.robot.Constants;
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
-// import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
-// import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
-// import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
-// import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 
 public class CANdleSystem extends SubsystemBase {
@@ -23,8 +19,6 @@ public class CANdleSystem extends SubsystemBase {
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private XboxController joystick;
     private boolean m_clearAllAnims = false;
-    //private boolean m_last5V = false;
-    //private boolean m_animDirection = false;
     private boolean m_setAnim = false;
 
     private Animation m_toAnimate = null;
@@ -42,7 +36,6 @@ public class CANdleSystem extends SubsystemBase {
         SetAll,
         Empty
     }
-    //private AnimationTypes m_currentAnimation;
 
     public CANdleSystem() {
         CANdleConfiguration configAll = new CANdleConfiguration();
@@ -53,16 +46,6 @@ public class CANdleSystem extends SubsystemBase {
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
     }
-
-    /* Wrappers so we can access the CANdle from the subsystem */
-    // public double getVbat() { return m_candle.getBusVoltage(); }
-    // public double get5V() { return m_candle.get5VRailVoltage(); }
-    // public double getCurrent() { return m_candle.getCurrent(); }
-    // public double getTemperature() { return m_candle.getTemperature(); }
-    // public void configBrightness(double percent) { m_candle.configBrightnessScalar(percent, 0); }
-    // public void configLos(boolean disableWhenLos) { m_candle.configLOSBehavior(disableWhenLos, 0); }
-    // public void configLedType(LEDStripType type) { m_candle.configLEDType(type, 0); }
-    // public void configStatusLedBehavior(boolean offWhenActive) { m_candle.configStatusLedState(offWhenActive, 0); }
 
     public void clearAllAnims() {m_clearAllAnims = true;}
 
@@ -92,8 +75,6 @@ public class CANdleSystem extends SubsystemBase {
                 m_setAnim = true;
             }
         } else {
-            // m_toAnimate.setSpeed((joystick.getRightY() + 1.0) / 2.0);
-            // m_candle.animate(m_toAnimate, m_candleChannel);
             m_candle.animate(m_toAnimate);
             m_setAnim = false;
         }

@@ -4,20 +4,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANdleSystem;
-//import frc.robot.commands.CANdleConfigCommands;
-//import frc.robot.commands.CANdlePrintCommands;
-//import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
@@ -57,10 +47,6 @@ public class RobotContainer {
   }
 
   private void configureControllers() {
-    //new JoystickButton(joy, Constants.BlockButton).whenPressed(m_candleSubsystem::setColors, m_candleSubsystem);
-    // new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::wantCone, m_candleSubsystem);
-    // new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::wantCube, m_candleSubsystem);
-    // new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
