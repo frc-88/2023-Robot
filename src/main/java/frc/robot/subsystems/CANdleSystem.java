@@ -45,8 +45,8 @@ public class CANdleSystem extends SubsystemBase {
         configAll.brightnessScalar = 0.1;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
-        clearAllAnims();
-        rainbow();
+        // clearAllAnims();
+        // rainbow();
     }
 
     public void clearAllAnims() {m_clearAllAnims = true;}
