@@ -15,6 +15,7 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 // import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 // import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 // import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
+import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 
 public class CANdleSystem extends SubsystemBase {
   private final int LEDS_PER_ANIMATION = 128;
@@ -65,12 +66,20 @@ public class CANdleSystem extends SubsystemBase {
 
     public void clearAllAnims() {m_clearAllAnims = true;}
 
-    public void setCone() {
+    public void wantCone() {
         m_toAnimate = new StrobeAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, 0);
     }
 
-    public void setCube() {
+    public void holdingCone() {
+        m_toAnimate = new ColorFlowAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+    }
+
+    public void wantCube() {
         m_toAnimate = new StrobeAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, 0);
+    }
+
+    public void holdingCube() {
+        m_toAnimate = new ColorFlowAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
     }
 
     @Override

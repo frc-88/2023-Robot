@@ -42,8 +42,8 @@ public class RobotContainer {
 
   private void configureControllers() {
     //new JoystickButton(joy, Constants.BlockButton).whenPressed(m_candleSubsystem::setColors, m_candleSubsystem);
-    new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::setCone, m_candleSubsystem);
-    new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::setCube, m_candleSubsystem);
+    new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::wantCone, m_candleSubsystem);
+    new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::wantCube, m_candleSubsystem);
     new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
   }
 
