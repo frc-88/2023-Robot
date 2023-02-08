@@ -48,10 +48,21 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 1; 
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
-	
-	// Controllers
-	public static final int DRIVER_CONTROLLER_ID = 0;
 
+	public static final double MAX_TRAJ_VELOCITY = 6.0;
+	public static final double MAX_TRAJ_ACCELERATION = 4.0;
+	public static final double MAX_TRAJ_CENTRIP_ACC = 1.5;
+
+	public static final double XBOX_DEADBAND = 0.12;
+	public static final double FRSKY_DEADBAND = 0.07;
+
+	// Intake
+	public static final String INTAKE_CANBUS = "1";
+    public static final int INTAKE_OUTER_ROLLER_ID = 16;
+	public static final int INTAKE_INNER_ROLLER_ID = 15;
+	public static final int INTAKE_ARM_ID = 17;
+
+    // Lights
     public static final int CANDLE_ID = 0;
     public static final int JoystickId = 0;
     public static final int IncrementAnimButton = XboxController.Button.kRightBumper.value;
@@ -66,4 +77,9 @@ public final class Constants {
     public static final int CurrentButton = XboxController.Button.kX.value;
     public static final int TemperatureButton = XboxController.Button.kY.value;
 	
+    // Controllers
+	public static final int DRIVER_CONTROLLER_ID = 0;
+	public static final int BUTTON_BOX_ID = 1;
+    public static final int TEST_CONTROLLER_ID = 2;
+
 }
