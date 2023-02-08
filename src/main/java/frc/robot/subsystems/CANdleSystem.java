@@ -17,7 +17,6 @@ import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 public class CANdleSystem extends SubsystemBase {
   private final int LEDS_PER_ANIMATION = 128;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
-    private XboxController joystick;
     private boolean m_clearAllAnims = false;
     private boolean m_setAnim = false;
 
@@ -78,7 +77,6 @@ public class CANdleSystem extends SubsystemBase {
             m_candle.animate(m_toAnimate);
             m_setAnim = false;
         }
-        m_candle.modulateVBatOutput(joystick.getRightY());
 
         if(m_clearAllAnims) {
             m_clearAllAnims = false;
