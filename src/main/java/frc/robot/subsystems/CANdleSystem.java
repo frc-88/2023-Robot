@@ -45,8 +45,7 @@ public class CANdleSystem extends SubsystemBase {
         configAll.brightnessScalar = 0.1;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
-        // clearAllAnims();
-        // rainbow();
+        rainbow();
     }
 
     public void clearAllAnims() {m_clearAllAnims = true;}
@@ -68,7 +67,7 @@ public class CANdleSystem extends SubsystemBase {
     }
 
     public void rainbow() {
-        m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, LEDS_PER_ANIMATION);
+        m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, 0);
     }
 
     @Override
