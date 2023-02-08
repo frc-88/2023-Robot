@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants;
@@ -112,4 +113,8 @@ public class CANdleSystem extends SubsystemBase {
         // This method will be called once per scheduler run during simulation
     }
 
+    public InstantCommand wantConeFactory() {return new InstantCommand(() -> {wantCone();});}
+    public InstantCommand holdingConeFactory() {return new InstantCommand(() -> {holdingCone();});}
+    public InstantCommand wantCubeFactory() {return new InstantCommand(() -> {wantCube();});}
+    public InstantCommand holdingCubeFactory() {return new InstantCommand(() -> {holdingCube();});}
 }

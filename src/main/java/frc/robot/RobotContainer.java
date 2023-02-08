@@ -42,9 +42,9 @@ public class RobotContainer {
 
   private void configureControllers() {
     //new JoystickButton(joy, Constants.BlockButton).whenPressed(m_candleSubsystem::setColors, m_candleSubsystem);
-    new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::wantCone, m_candleSubsystem);
-    new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::wantCube, m_candleSubsystem);
-    new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
+    // new JoystickButton(joy, Constants.ConeButton).whenPressed(m_candleSubsystem::wantCone, m_candleSubsystem);
+    // new JoystickButton(joy, Constants.CubeButton).whenPressed(m_candleSubsystem::wantCube, m_candleSubsystem);
+    // new JoystickButton(joy, 9).whenPressed(()->m_candleSubsystem.clearAllAnims(), m_candleSubsystem);
   }
 
   private void configureDefaultCommands() {
@@ -56,6 +56,11 @@ public class RobotContainer {
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
     
+    SmartDashboard.putData("Want Cone", m_candleSubsystem.wantConeFactory());
+    SmartDashboard.putData("Holding Cone", m_candleSubsystem.holdingConeFactory());
+    SmartDashboard.putData("Want Cube", m_candleSubsystem.wantCubeFactory());
+    SmartDashboard.putData("Holding Cube", m_candleSubsystem.holdingCubeFactory());
+
     SmartDashboard.putData(m_drive);
   }
   
