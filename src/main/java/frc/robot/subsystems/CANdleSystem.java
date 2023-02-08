@@ -44,8 +44,7 @@ public class CANdleSystem extends SubsystemBase {
     }
     //private AnimationTypes m_currentAnimation;
 
-    public CANdleSystem(XboxController joy) {
-        this.joystick = joy;
+    public CANdleSystem() {
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;

@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANdleSystem;
 //import frc.robot.commands.CANdleConfigCommands;
 //import frc.robot.commands.CANdlePrintCommands;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,8 +45,7 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
-  private final XboxController joy = new XboxController(Constants.JoystickId);
-  private final CANdleSystem m_candleSubsystem = new CANdleSystem(joy);
+  private final CANdleSystem m_candleSubsystem = new CANdleSystem();
   private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
