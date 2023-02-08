@@ -59,6 +59,7 @@ public final class Constants {
     public static final int INTAKE_OUTER_ROLLER_ID = 16;
 	public static final int INTAKE_INNER_ROLLER_ID = 15;
 	public static final int INTAKE_ARM_ID = 17;
+    public static final int INTAKE_IR_ID = 0;
 
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
