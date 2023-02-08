@@ -18,6 +18,7 @@ public class CANdleSystem extends SubsystemBase {
   private final int LEDS_PER_ANIMATION = 128;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private boolean m_clearAllAnims = false;
+    private boolean m_animDirection = false;
     private boolean m_setAnim = false;
 
     private Animation m_toAnimate = null;
@@ -44,6 +45,7 @@ public class CANdleSystem extends SubsystemBase {
         configAll.brightnessScalar = 0.1;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
+        rainbow();
     }
 
     public void clearAllAnims() {m_clearAllAnims = true;}
@@ -62,6 +64,10 @@ public class CANdleSystem extends SubsystemBase {
 
     public void holdingCube() {
         m_toAnimate = new ColorFlowAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+    }
+
+    public void rainbow() {
+        m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, LEDS_PER_ANIMATION);
     }
 
     @Override
