@@ -4,10 +4,10 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -55,7 +55,13 @@ public class Intake extends SubsystemBase {
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_arm = new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS); 
+
+  private final AnalogInput m_irSensor = new AnalogInput(Constants.INTAKE_IR_ID);
+
   private boolean coneMode = false;
+
+  private final static double IR_HAS_PIECE_MIN = 1;
+  private final static double IR_HAS_PIECE_MAX = 2;
 
   /** Creates a new Intake. */
   public Intake() {
@@ -77,12 +83,16 @@ public class Intake extends SubsystemBase {
     }
 
     public void intake() {
-      if (!coneMode) {
-        m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
-        m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
+      if (!hasGamePiece()) {
+        if (!coneMode) {
+          m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
+          m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
+        } else {
+          m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
+          m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+        }
       } else {
-        m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
-        m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
+        hold();
       }
     }
 
@@ -97,12 +107,16 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      if (!coneMode) {
-        m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
-        m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
+      if (hasGamePiece()) {
+        if (!coneMode) {
+          m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
+          m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
+        } else {
+          m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
+          m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
+        }
       } else {
-        m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
-        m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
+        stopRollers();
       }
     }
 
@@ -129,6 +143,10 @@ public class Intake extends SubsystemBase {
 
     private boolean isArmDown() {
       return m_arm.isFwdLimitSwitchClosed() > 0;
+    }
+
+    private boolean hasGamePiece() {
+      return m_irSensor.getAverageVoltage() > IR_HAS_PIECE_MIN && m_irSensor.getAverageVoltage() < IR_HAS_PIECE_MAX;
     }
     
     ////////// Commands :) /////////
@@ -169,5 +187,9 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putBoolean("Arm Down", isArmDown());
     SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
     SmartDashboard.putNumber("Arm Outer Motor Current", m_outerRoller.getStatorCurrent());
+
+    SmartDashboard.putNumber("IR Sensor value", m_irSensor.getAverageVoltage());
+    SmartDashboard.putBoolean("Has Game Piece", hasGamePiece());
+
   }
 }
