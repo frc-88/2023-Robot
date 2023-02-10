@@ -49,5 +49,10 @@ public final class Constants {
 	
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
+
+    // Trajectory
+    public static final double MAX_TRAJ_VELOCITY = 4;
+    public static final double MAX_TRAJ_CENTRIP_ACC = 3;
+    public static final double MAX_TRAJ_ACCELERATION = 3;
 	
 }
