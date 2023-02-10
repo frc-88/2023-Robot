@@ -50,6 +50,16 @@ public class TrajectoryHelper
 
     return TrajectoryGenerator.generateTrajectory(waypoints, config);
   }
+   
+  public static Trajectory generateTrajectoryToPose(Pose2d start, Pose2d targetPose) {
+    TrajectoryConfig config = basicConfig();
+    
+    ArrayList<Pose2d> waypoints = new ArrayList<>();
+    waypoints.add(start);
+    waypoints.add(targetPose);
+
+    return TrajectoryGenerator.generateTrajectory(waypoints, config);
+  }
 
   public static Trajectory generatePathWeaverTrajectory(String trajectoryJSON) {
     trajectoryJSON = "output/" + trajectoryJSON;

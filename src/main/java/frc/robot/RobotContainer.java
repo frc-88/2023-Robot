@@ -42,6 +42,8 @@ public class RobotContainer {
     SmartDashboard.putData(m_drive);
 
     SmartDashboard.putData("Auto Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), true));
+    SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
+    SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
   }
 
   public Command getAutonomousCommand() {
