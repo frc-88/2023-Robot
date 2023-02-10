@@ -23,13 +23,13 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.56515; // 22.25 inches
+    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.55245; // 21.75 inches
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.57785; // 22.75 inches
+    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.55245; // 21.75 inches
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3; 
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
