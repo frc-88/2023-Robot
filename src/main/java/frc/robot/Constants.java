@@ -50,26 +50,22 @@ public final class Constants {
      * Should be measured from center to center.
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.57785; // 22.75 inches
-	public static final double DRIVETRAIN_BOUNDARY_WIDTH = 0.5;  // meters
-    public static final double DRIVETRAIN_BOUNDARY_LENGTH = 0.5;  // meters
-	public static final double DRIVETRAIN_MIN_COLLISION_INFLATE = 0.25;  // meters
-    public static final double DRIVETRAIN_MAX_COLLISION_INFLATE = 1.75;  // meters
 
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; 
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 0; 
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 0; 
+    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3; 
+    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
+    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 11; 
 
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 18; 
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 19; 
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 18; 
+    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 0; 
+    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 7; 
+    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10; 
 
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 8; 
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 9; 
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 8; 
+    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 6; 
+    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 4; 
+    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 9; 
 
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10; 
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 11; 
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 10;
+    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 1; 
+    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
+    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
 
 	public static final double MAX_TRAJ_VELOCITY = 6.0;
 	public static final double MAX_TRAJ_ACCELERATION = 4.0;
@@ -79,9 +75,11 @@ public final class Constants {
 	public static final double FRSKY_DEADBAND = 0.07;
 
 	// Intake
-	public static final int INTAKE_OUTER_ROLLER_ID = 1;
-	public static final int INTAKE_INNER_ROLLER_ID = 0;
-	public static final int INTAKE_ARM_ID = 12;
+	public static final String INTAKE_CANBUS = "1";
+    public static final int INTAKE_OUTER_ROLLER_ID = 16;
+	public static final int INTAKE_INNER_ROLLER_ID = 15;
+	public static final int INTAKE_ARM_ID = 17;
+    public static final int INTAKE_IR_ID = 0;
 
     // Arm
     public static final int SHOULDER_ID = 40;
@@ -92,28 +90,6 @@ public final class Constants {
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
+    public static final int TEST_CONTROLLER_ID = 2;
 
-	// ROS Interface
-	public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
-	public static final String COPROCESSOR_ADDRESS_SIMULATED = "127.0.0.1";
-	public static final int COPROCESSOR_PORT = 5800;
-	public static final double COPROCESSOR_TABLE_UPDATE_DELAY = 1.0 / 30.0;
-	public static final double COPROCESSOR_PERIODIC_UPDATE_DELAY = 1.0 / 30.0;
-	public static final double COPROCESSOR_PERIODIC_UPDATE_OFFSET = 1.0 / 60.0;
-	public static final double COPROCESSOR_SLOW_PERIODIC_UPDATE_DELAY = 1.0 / 5.0;
-	public static final double COPROCESSOR_SLOW_PERIODIC_UPDATE_OFFSET = 0.025;
-	
-	public static final class AutoConstants {
-		public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-		public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-	
-		public static final double kPXController = 0.5;
-		public static final double kPYController = 0.5;
-		public static final double kPThetaController = 0.5;
-	
-		// Constraint for the motion profilied robot angle controller
-		public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-			new TrapezoidProfile.Constraints(
-				kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-	  }
 }
