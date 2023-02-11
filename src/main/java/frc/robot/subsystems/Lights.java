@@ -16,7 +16,7 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
-public class CANdleSystem extends SubsystemBase {
+public class Lights extends SubsystemBase {
   private final int LEDS_PER_ANIMATION = 22;
   private int m_state = 0;
   private int counter = 0;
@@ -41,7 +41,7 @@ public class CANdleSystem extends SubsystemBase {
         Empty
     }
 
-    public CANdleSystem() {
+    public Lights() {
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
