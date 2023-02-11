@@ -46,13 +46,17 @@ public class Arm extends SubsystemBase {
         return shoulderPosition.plus(shoulder.getPositionVector()).plus(elbow.getPositionVector()).plus(wrist.getPositionVector());
     }
 
-    public Boolean isValidState(ArmState armState) {    
+    public boolean isValidState(ArmState armState) {    
         Translation2d grabberPosition = getGrabberPosition();
         if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) return false;
         if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) return false;
         if (shoulder.getAngle() < 0 || shoulder.getAngle() > 180) return false;
         if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) return false;
         return true;
+    }
+
+    public boolean canWristPivot() {
+        return Math.abs((shoulder.getAngle() - elbow.getAngle() + 180) % 360) > 15.;
     }
 
     public void calibrate() {
