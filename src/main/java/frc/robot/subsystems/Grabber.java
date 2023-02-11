@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,9 +32,16 @@ public class Grabber extends SubsystemBase {
   private final DoublePreferenceConstant p_pivotMaxVelocity = 
     new DoublePreferenceConstant("Grabber Pivot Max Velocity", 0);
   private final DoublePreferenceConstant p_pivotMaxAcceleration = 
-    new DoublePreferenceConstant("Grabber Pivot Max Acceleration", 0);;
+    new DoublePreferenceConstant("Grabber Pivot Max Acceleration", 0);
   private final PIDPreferenceConstants p_pivotPID = 
-    new PIDPreferenceConstants("Grabber Pivot");;
+    new PIDPreferenceConstants("Grabber Pivot");
+
+  private final DoublePreferenceConstant p_rollerTriggerCurrent =
+    new DoublePreferenceConstant("Grabber Roller Trigger Current", 60);
+  private final DoublePreferenceConstant p_rollerTriggerDuration =
+    new DoublePreferenceConstant("Grabber Roller Trigger Duration", 0.002);
+  private final DoublePreferenceConstant p_rollerContinuousCurrent =
+    new DoublePreferenceConstant("Grabber Continuous Current", 10);
 
   private DoublePreferenceConstant p_grabCubeSpeed =
     new DoublePreferenceConstant("Grab Cube Speed", 0.5);
@@ -55,7 +63,7 @@ public class Grabber extends SubsystemBase {
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(4);
 
-    Consumer<Double> handler = (Double unused) -> {
+    Consumer<Double> pivotHandler = (Double unused) -> {
       m_pivot.config_kP(0, p_pivotPID.getKP().getValue());
       m_pivot.config_kI(0, p_pivotPID.getKI().getValue());
       m_pivot.config_kD(0, p_pivotPID.getKD().getValue());
@@ -65,11 +73,25 @@ public class Grabber extends SubsystemBase {
       m_pivot.configMotionCruiseVelocity(convertActualVelocityToSensorVelocity(p_pivotMaxVelocity.getValue()));
       m_pivot.configMotionAcceleration(convertActualVelocityToSensorVelocity(p_pivotMaxAcceleration.getValue()));
     };
-    p_pivotPID.addChangeHandler(handler);
-    p_pivotMaxVelocity.addChangeHandler(handler);
-    p_pivotMaxAcceleration.addChangeHandler(handler);
+    p_pivotPID.addChangeHandler(pivotHandler);
+    p_pivotMaxVelocity.addChangeHandler(pivotHandler);
+    p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
+
+    Consumer<Double> rollerHandler = (Double unused) -> {
+      SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration(
+                true,
+                p_rollerContinuousCurrent.getValue(),
+                p_rollerTriggerCurrent.getValue(),
+                p_rollerTriggerDuration.getValue()
+            );
+      m_roller.configSupplyCurrentLimit(config);
+    };
+    p_rollerContinuousCurrent.addChangeHandler(rollerHandler);
+    p_rollerTriggerCurrent.addChangeHandler(rollerHandler);
+    p_rollerTriggerDuration.addChangeHandler(rollerHandler);
     
-    handler.accept(0.);
+    pivotHandler.accept(0.);
+    rollerHandler.accept(0.);
   }
 
   public void setPivotForwards() {

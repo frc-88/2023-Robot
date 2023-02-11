@@ -54,9 +54,9 @@ public class ArmJoint {
         m_motor.configNeutralDeadband(0);
         m_motor.configMotionSCurveStrength(4);
 
-        p_triggerCurrent = new DoublePreferenceConstant(name + " Trigger Current", 80);
+        p_triggerCurrent = new DoublePreferenceConstant(name + " Trigger Current", 120);
         p_triggerDuration = new DoublePreferenceConstant(name + " Trigger Duration", 0.002);
-        p_continuousCurrent = new DoublePreferenceConstant(name + " Continuous Current", 10);
+        p_continuousCurrent = new DoublePreferenceConstant(name + " Continuous Current", 80);
         p_maxVelocity = new DoublePreferenceConstant(name + " Max Velocity", 0);
         p_maxAcceleration = new DoublePreferenceConstant(name + " Max Acceleration", 0);
         p_pid = new PIDPreferenceConstants(name);
