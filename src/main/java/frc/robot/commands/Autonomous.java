@@ -7,6 +7,8 @@ package frc.robot.commands;
 import com.ctre.phoenix.led.CANdle;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.CANdleSystem;
@@ -20,9 +22,10 @@ public class Autonomous {
         return new SequentialCommandGroup(
             intake.setCubeFactory(), 
             candle.wantCubeFactory(),
-            intake.intakeFactory(),
-            new FollowTrajectory(drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), false),
-            intake.stowFactory()
-        );
+            new ParallelRaceGroup(
+                    intake.intakeFactory(),
+                    new FollowTrajectory(drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), false)
+                )
+            );
     }
 }
