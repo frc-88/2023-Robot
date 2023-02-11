@@ -27,6 +27,8 @@ public class Grabber extends SubsystemBase {
   private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
+  private boolean m_pivotForwards = true;
+
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber Pivot Offset", 0);
 
@@ -96,11 +98,15 @@ public class Grabber extends SubsystemBase {
   }
 
   public void setPivotForwards() {
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(0));
+    m_pivotForwards = true;
   }
 
   public void setPivotBackwards() {
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(180));
+    m_pivotForwards = false;
+  }
+
+  private void movePivot() {
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : 180));
   }
 
   public double getPivotAngle() {
@@ -171,19 +177,19 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase grabConeFactory() {
-    return new RunCommand(() -> grabCone()).withName("Grab Cone");
+    return new RunCommand(() -> {grabCone(); movePivot();}).withName("Grab Cone");
   }
 
   public CommandBase grabCubeFactory() {
-    return new RunCommand(() -> grabCube()).withName("Grab Cube");
+    return new RunCommand(() -> {grabCube(); movePivot();}).withName("Grab Cube");
   }
 
   public CommandBase dropConeFactory() {
-    return new RunCommand(() -> dropCone()).withName("Drop Cone");
+    return new RunCommand(() -> {dropCone(); movePivot();}).withName("Drop Cone");
   }
 
   public CommandBase dropCubeFactory() {
-    return new RunCommand(() -> dropCube()).withName("Drop Cube");
+    return new RunCommand(() -> {dropCube(); movePivot();}).withName("Drop Cube");
   }
 
   @Override
