@@ -76,6 +76,11 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
       .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
+    m_intake.holdAndHasPiece().and(m_buttonBox.gamepieceSwitch)
+      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromIntake));
+    m_intake.holdAndHasPiece().and(m_buttonBox.gamepieceSwitch.negate())
+      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromIntake));
+
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     // // Test controller

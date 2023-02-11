@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -149,6 +150,10 @@ public class Intake extends SubsystemBase {
       return m_irSensor.getAverageVoltage() > IR_HAS_PIECE_MIN && m_irSensor.getAverageVoltage() < IR_HAS_PIECE_MAX;
     }
     
+    public Trigger holdAndHasPiece() {
+      return new Trigger(() -> isArmUp() && hasGamePiece());
+    }
+
     ////////// Commands :) /////////
 
     public CommandBase setCubeFactory() {
