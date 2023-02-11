@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,19 +30,19 @@ public class Grabber extends SubsystemBase {
   }
 
   public void grabCube() {
-    m_motor.set(grabCubeSpeed.getValue());
+    m_roller.set(grabCubeSpeed.getValue());
   }
 
   public void grabCone() {
-    m_motor.set(grabConeSpeed.getValue());
+    m_roller.set(grabConeSpeed.getValue());
   }
 
   public void dropCube() {
-    m_motor.set(dropCubeSpeed.getValue());
+    m_roller.set(dropCubeSpeed.getValue());
   }
   
   public void dropCone() {
-    m_motor.set(dropConeSpeed.getValue());
+    m_roller.set(dropConeSpeed.getValue());
   }
 
   @Override
