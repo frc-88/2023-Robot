@@ -114,13 +114,17 @@ public class CANdleSystem extends SubsystemBase {
                 m_candle.setLEDs(100, 0, 120);
                 m_setAnim = true;
             }
+        } else if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
+            || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
+            m_candle.animate(new StrobeAnimation(255,0,0));
+            m_setAnim = false;
         } else {
             m_candle.animate(m_toAnimate);
             m_setAnim = false;
         }
 
-        if (SmartDashboard.getNumber("NavX.pitch", 0.0) > Constants.DANGER_ANGLE
-            || SmartDashboard.getNumber("NavX.roll", 0.0) > Constants.DANGER_ANGLE) {
+        if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
+            || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
             m_candle.animate(new StrobeAnimation(255,0,0));
             m_setAnim = false;
         }
