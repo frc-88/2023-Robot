@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Consumer;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -69,6 +70,14 @@ public class Grabber extends SubsystemBase {
     p_pivotMaxAcceleration.addChangeHandler(handler);
     
     handler.accept(0.);
+  }
+
+  public void setPivotForwards() {
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(0));
+  }
+
+  public void setPivotBackwards() {
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(180));
   }
 
   public double getPivotAngle() {
