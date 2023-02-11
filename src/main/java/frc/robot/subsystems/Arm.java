@@ -2,56 +2,60 @@ package frc.robot.subsystems;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.arm.ArmJoint;
 
 public class Arm extends SubsystemBase {
     
-    private final BooleanSupplier coastButton;
-    private boolean m_isCoasting = false;
+    private final DigitalInput coastButton;
 
     public final ArmJoint shoulder;
     public final ArmJoint elbow;
     public final ArmJoint wrist;
-    public final ArmJoint pivot;
 
-    private List<ArmJoint> allArms;
+    private List<ArmJoint> allJoints;
 
-    public Arm(BooleanSupplier coastButton) {
-        this.coastButton = coastButton;
+    public Arm() {
+        this.coastButton = new DigitalInput(0);
+        SmartDashboard.putBoolean("Coast Arm", false);
 
-        shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, false);
-        elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, false);
-        wrist = new ArmJoint("Wrist", Constants.WRIST_ID, false);
-        pivot = new ArmJoint("Pivot", Constants.PIVOT_ID, false);
+        shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, false, false, (16./42.) * (1./49.), 19.5);
+        elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, false, false, (16./42.) * (1./49.), 15.5);
+        wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, false, false, (16./42.) * (1./49.), 25.5);
 
-        allArms = Arrays.asList(new ArmJoint[]{shoulder, elbow, wrist});
+        allJoints = Arrays.asList(new ArmJoint[]{shoulder, elbow, wrist});
     }
 
-    public void setGrabberUp() {
-        pivot.setMotionMagic(0);
+    public void calibrate() {
+        allJoints.forEach(ArmJoint::calibrateAbsolute);
     }
 
-    public void setGrabberDown() {
-        pivot.setMotionMagic(180);
+    // COMMAND FACTORIES
+
+    public CommandBase calibrateFactory() {
+        return new InstantCommand(this::calibrate).ignoringDisable(true);
     }
 
     @Override
     public void periodic() {
-        if (coastButton.getAsBoolean()) {
-            if (!m_isCoasting) {
-                allArms.forEach(ArmJoint::coast);
-                m_isCoasting = true;
-            }
+        allJoints.forEach(ArmJoint::zeroRelative);
+        
+        if (DriverStation.isDisabled() && (coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false))) {
+            allJoints.forEach(ArmJoint::coast);
         }
         else {
-            if (m_isCoasting) {
-                allArms.forEach(ArmJoint::brake);
-                m_isCoasting = false;
-            }
+            allJoints.forEach(ArmJoint::brake);
         }
+
+        allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Angle", j.getAngle()));
+        allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
+        allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
     }
 }

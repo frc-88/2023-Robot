@@ -97,6 +97,11 @@ public final class Falcon500DriveControllerFactoryBuilder {
         }
 
         @Override
+        public TalonFX getMotor() {
+            return motor;
+        }
+
+        @Override
         public void setReferenceVoltage(double voltage) {
             motor.set(TalonFXControlMode.PercentOutput, voltage / nominalVoltage);
         }
