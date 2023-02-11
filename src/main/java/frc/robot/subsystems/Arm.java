@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
