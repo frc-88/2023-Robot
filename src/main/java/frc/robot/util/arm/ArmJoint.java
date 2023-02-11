@@ -3,6 +3,7 @@ package frc.robot.util.arm;
 import java.util.function.Consumer;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -34,6 +35,7 @@ public class ArmJoint {
     private final DoublePreferenceConstant p_maxAcceleration;
     private final PIDPreferenceConstants p_pid;
     private final DoublePreferenceConstant p_encoderOffset;
+    private final DoublePreferenceConstant p_gravityCompensation;
     
     public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length) {
         m_name = name;
@@ -59,6 +61,7 @@ public class ArmJoint {
         p_maxAcceleration = new DoublePreferenceConstant(name + " Max Acceleration", 0);
         p_pid = new PIDPreferenceConstants(name, 0, 0, 0, 0, 0, 0, 0);
         p_encoderOffset = new DoublePreferenceConstant(name + " Offset", 0);
+        p_gravityCompensation = new DoublePreferenceConstant(name + " Gravity Compensation", 0);
 
         Consumer<Double> handler = (Double unused) -> {
             StatorCurrentLimitConfiguration config = new StatorCurrentLimitConfiguration(
@@ -97,7 +100,7 @@ public class ArmJoint {
         m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(speed));
         m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue() * speed / p_maxVelocity.getValue()));
         
-        m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle));
+        m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle), DemandType.ArbitraryFeedForward, p_gravityCompensation.getValue() * Math.cos(Math.toRadians(getAngle())));
     }
 
     public void setMotionMagic(double angle) {
