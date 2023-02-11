@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
@@ -188,6 +189,14 @@ public class SwerveDrive extends SubsystemBase {
 
         public AHRS getNavX() {
                 return m_navx;
+        }
+
+        public Trigger isFacingForwards() {
+                return new Trigger(() -> m_navx.getYaw()<60 && m_navx.getYaw()>-60);
+        }
+
+        public Trigger isFacingBackwards() {
+                return new Trigger(() -> m_navx.getYaw()>120 || m_navx.getYaw()<-120);
         }
 
         public Rotation2d getGyroscopeRotation() {

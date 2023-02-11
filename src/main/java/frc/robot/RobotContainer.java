@@ -14,6 +14,7 @@ import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
+import frc.robot.util.arm.ArmStates;
 import frc.robot.util.controllers.ButtonBox;
 
 public class RobotContainer {
@@ -45,6 +46,36 @@ public class RobotContainer {
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
+
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
+      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf));
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
+      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     // // Test controller
@@ -57,6 +88,7 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
     m_intake.setDefaultCommand(m_intake.holdFactory());
+    m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stow));
   }
 
   private void configureSmartDashboardButtons() {
