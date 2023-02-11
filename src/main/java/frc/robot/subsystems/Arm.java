@@ -48,10 +48,10 @@ public class Arm extends SubsystemBase {
 
     public Boolean isValidState(ArmState armState) {    
         Translation2d grabberPosition = getGrabberPosition();
-        if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) {return false;}
-        if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) {return false;}
-        if (shoulder.getAngle() < 0 || shoulder.getAngle() > 180) {return false;}
-        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) {return false;}
+        if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) return false;
+        if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) return false;
+        if (shoulder.getAngle() < 0 || shoulder.getAngle() > 180) return false;
+        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) return false;
         return true;
     }
 
@@ -60,7 +60,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void goToArmState(ArmState armState) {
-        if (!isValidState(armState)) {return;}
+        if (!isValidState(armState)) return;
         targetArmState = armState;
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(armState.getShoulderAngle()-shoulder.getAngle()), 
@@ -73,9 +73,9 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isAtTarget() {
-        if (!(shoulder.isOnTarget(targetArmState.getShoulderAngle()))) {return false;}
-        if (!(elbow.isOnTarget(targetArmState.getElbowAngle()))) {return false;}
-        if (!(wrist.isOnTarget(targetArmState.getWristAngle()))) {return false;}
+        if (!(shoulder.isOnTarget(targetArmState.getShoulderAngle()))) return false;
+        if (!(elbow.isOnTarget(targetArmState.getElbowAngle()))) return false;
+        if (!(wrist.isOnTarget(targetArmState.getWristAngle()))) return false;
         return true;
     }
 
