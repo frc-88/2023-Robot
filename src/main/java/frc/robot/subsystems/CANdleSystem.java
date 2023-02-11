@@ -98,7 +98,8 @@ public class CANdleSystem extends SubsystemBase {
                 counter = 0;
             }
             break;
-            default: rainbow();
+            case 3: rainbow();
+            // No default
         }
         // This method will be called once per scheduler run
         if(m_toAnimate == null) {
