@@ -54,6 +54,16 @@ public class PIDPreferenceConstants {
     }
 
     /**
+     * Constructor. Sets all defaults to 0.
+     * 
+     * @param name
+     *                The name to pre-pend to all preference names
+     */
+    public PIDPreferenceConstants(String name) {
+        this(name, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    /**
      * Updates all of the PID's preference constants
      */
     public void updateAll() {
