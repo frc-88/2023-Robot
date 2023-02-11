@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.arm.ArmJoint;
@@ -54,6 +55,10 @@ public class Arm extends SubsystemBase {
 
     public CommandBase calibrateFactory() {
         return new InstantCommand(this::calibrate).ignoringDisable(true);
+    }
+
+    public CommandBase sendArmToState(ArmState armState) {
+        return new RunCommand(() -> goToArmState(armState));
     }
 
     @Override
