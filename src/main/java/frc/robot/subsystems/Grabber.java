@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
@@ -136,6 +137,22 @@ public class Grabber extends SubsystemBase {
 
   public CommandBase calibrateAbsolutePivotFactory() {
     return new InstantCommand(this::calibrateAbsolutePivot).ignoringDisable(true);
+  }
+
+  public CommandBase grabConeFactory() {
+    return new RunCommand(() -> grabCone()).withName("Grab Cone");
+  }
+
+  public CommandBase grabCubeFactory() {
+    return new RunCommand(() -> grabCube()).withName("Grab Cube");
+  }
+
+  public CommandBase dropConeFactory() {
+    return new RunCommand(() -> dropCone()).withName("Drop Cone");
+  }
+
+  public CommandBase dropCubeFactory() {
+    return new RunCommand(() -> dropCube()).withName("Drop Cube");
   }
 
   @Override

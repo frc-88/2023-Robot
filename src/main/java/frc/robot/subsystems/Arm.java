@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.arm.ArmJoint;
 import frc.robot.util.arm.ArmState;
+import frc.robot.util.arm.ArmStates;
 
 public class Arm extends SubsystemBase {
     
@@ -25,6 +26,7 @@ public class Arm extends SubsystemBase {
     public final ArmJoint wrist;
     public final Translation2d shoulderPosition;
 
+    private ArmState targetArmState;
     private List<ArmJoint> allJoints;
 
     public Arm() {
@@ -36,6 +38,7 @@ public class Arm extends SubsystemBase {
         wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, false, false, (16./42.) * (1./49.), 25.5);
         shoulderPosition = new Translation2d(18.5, 3);
 
+        targetArmState = ArmStates.stow;
         allJoints = Arrays.asList(new ArmJoint[]{shoulder, elbow, wrist});
     }
 
@@ -57,6 +60,7 @@ public class Arm extends SubsystemBase {
 
     public void goToArmState(ArmState armState) {
         if (!isValidState(armState)) {return;}
+        targetArmState = armState;
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(armState.getShoulderAngle()-shoulder.getAngle()), 
             Math.abs(armState.getElbowAngle()-elbow.getAngle()), 
@@ -67,6 +71,13 @@ public class Arm extends SubsystemBase {
         wrist.setMotionMagic(armState.getWristAngle(), wrist.getMaxVelocity() * Math.abs(wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
     }
 
+    public boolean isAtTarget() {
+        if (!(shoulder.isOnTarget(targetArmState.getShoulderAngle()))) {return false;}
+        if (!(elbow.isOnTarget(targetArmState.getElbowAngle()))) {return false;}
+        if (!(wrist.isOnTarget(targetArmState.getWristAngle()))) {return false;}
+        return true;
+    }
+
     // COMMAND FACTORIES
 
     public CommandBase calibrateFactory() {
@@ -75,6 +86,10 @@ public class Arm extends SubsystemBase {
 
     public CommandBase sendArmToState(ArmState armState) {
         return new RunCommand(() -> goToArmState(armState));
+    }
+
+    public CommandBase sendArmToStateAndEnd(ArmState armState) {
+        return sendArmToState(armState).until(this::isAtTarget);
     }
 
     @Override

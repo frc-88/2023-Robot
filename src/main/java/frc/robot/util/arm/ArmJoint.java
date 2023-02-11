@@ -137,6 +137,10 @@ public class ArmJoint {
         return p_maxVelocity.getValue();
     }
 
+    public boolean isOnTarget(double targetAngle) {
+        return (Math.abs(getAngle()-targetAngle)) < p_pid.getTolerance().getValue();
+    }
+
     public boolean isCancoderPresent() {
         return !(m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.BadRange_RedLED
                 || m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.Invalid_Unknown

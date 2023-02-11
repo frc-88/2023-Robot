@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
+import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
@@ -76,10 +77,8 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
       .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
-    m_intake.holdAndHasPiece().and(m_buttonBox.gamepieceSwitch)
-      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromIntake));
-    m_intake.holdAndHasPiece().and(m_buttonBox.gamepieceSwitch.negate())
-      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromIntake));
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
+      .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
 
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
