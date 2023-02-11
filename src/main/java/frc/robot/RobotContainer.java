@@ -46,14 +46,36 @@ public class RobotContainer {
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
-    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch).onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf));
-    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate()).onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf));
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).onTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).onTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).onTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
+      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf));
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
+      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
+      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     // // Test controller
