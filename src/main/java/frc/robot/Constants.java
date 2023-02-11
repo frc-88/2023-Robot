@@ -91,6 +91,10 @@ public final class Constants {
 
     public static final int COAST_BUTTON_ID = 1;
 
+    // Grabber
+    public static final int GRABBER_PIVOT_ID = 43;
+    public static final int GRABBER_ROLLER_ID = 44;
+
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
