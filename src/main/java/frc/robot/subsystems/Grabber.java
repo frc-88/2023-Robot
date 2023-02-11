@@ -4,14 +4,18 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class Grabber extends SubsystemBase {
-  private final WPI_TalonFX m_motor = new WPI_TalonFX(Constants.GRABBER_MOTOR_ID);
+
+  private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
+  private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private DoublePreferenceConstant intakeCubeSpeed =
     new DoublePreferenceConstant("Intake Cube Speed", 0.5);
@@ -24,7 +28,8 @@ public class Grabber extends SubsystemBase {
   
   /** Creates a new Grabber. */
   public Grabber() {
-
+    m_pivot.configFactoryDefault();
+    m_roller.configFactoryDefault();
   }
 
   public void intakeCube() {
