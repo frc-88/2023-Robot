@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 import com.ctre.phoenix.led.*;
@@ -99,6 +100,11 @@ public class CANdleSystem extends SubsystemBase {
             }
             break;
             case 3: rainbow();
+            if (counter++>100) {
+                m_state ++;
+                counter = 0;
+            }
+            break;
             // No default
         }
         // This method will be called once per scheduler run
@@ -110,6 +116,12 @@ public class CANdleSystem extends SubsystemBase {
             }
         } else {
             m_candle.animate(m_toAnimate);
+            m_setAnim = false;
+        }
+
+        if (SmartDashboard.getNumber("NavX.pitch", 0.0) > Constants.DANGER_ANGLE
+            || SmartDashboard.getNumber("NavX.roll", 0.0) > Constants.DANGER_ANGLE) {
+            m_candle.animate(new StrobeAnimation(255,0,0));
             m_setAnim = false;
         }
 
