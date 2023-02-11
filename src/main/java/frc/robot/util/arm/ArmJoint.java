@@ -174,7 +174,7 @@ public class ArmJoint {
     }
 
     private double convertActualPositionToMotorPosition(double actualPosition) {
-        return actualPosition * 2048 / (m_ratio * 360);
+        return actualPosition * 2048. / (m_ratio * 360.);
     }
 
     private double convertActualVelocityToMotorVelocity(double actualVelocity) {

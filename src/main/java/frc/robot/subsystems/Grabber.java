@@ -10,9 +10,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
@@ -59,8 +61,8 @@ public class Grabber extends SubsystemBase {
       m_pivot.config_kF(0, p_pivotPID.getKF().getValue());
       m_pivot.config_IntegralZone(0, p_pivotPID.getIZone().getValue());
       m_pivot.configMaxIntegralAccumulator(0, p_pivotPID.getIMax().getValue());
-      m_pivot.configMotionCruiseVelocity(p_pivotMaxVelocity.getValue());
-      m_pivot.configMotionAcceleration(p_pivotMaxAcceleration.getValue());
+      m_pivot.configMotionCruiseVelocity(convertActualVelocityToSensorVelocity(p_pivotMaxVelocity.getValue()));
+      m_pivot.configMotionAcceleration(convertActualVelocityToSensorVelocity(p_pivotMaxAcceleration.getValue()));
     };
     p_pivotPID.addChangeHandler(handler);
     p_pivotMaxVelocity.addChangeHandler(handler);
@@ -70,7 +72,11 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAngle() {
-    return m_pivot.getSelectedSensorPosition();
+    return convertSensorPositionToActualPosition(m_pivot.getSelectedSensorPosition());
+  }
+
+  public double getPivotSpeed() {
+    return convertSensorVelocityToActualVelocity(m_pivot.getSelectedSensorVelocity());
   }
 
   public double getPivotAbsoluteAngle() {
@@ -102,6 +108,30 @@ public class Grabber extends SubsystemBase {
     m_roller.set(p_dropConeSpeed.getValue());
   }
 
+  public boolean hasGamePiece() {
+    return m_roller.isFwdLimitSwitchClosed() > 0;
+  }
+
+  public Trigger hasGamePieceTrigger() {
+    return new Trigger(this::hasGamePiece);
+  }
+
+  private double convertSensorPositionToActualPosition(double motorPosition) {
+    return motorPosition * 360. / 4096.;
+  }
+
+  private double convertSensorVelocityToActualVelocity(double motorVelocity) {
+      return convertSensorPositionToActualPosition(motorVelocity) * 10.;
+  }
+
+  private double convertActualPositionToSensorPosition(double actualPosition) {
+      return actualPosition * 4096. / 360.;
+  }
+
+  private double convertActualVelocityToSensorVelocity(double actualVelocity) {
+      return convertActualPositionToSensorPosition(actualVelocity) * 0.1;
+  }
+
   // COMMAND FACTORIES
 
   public CommandBase calibrateAbsolutePivotFactory() {
@@ -113,5 +143,9 @@ public class Grabber extends SubsystemBase {
     if (m_pivot.hasResetOccurred()) {
       zeroRelativePivot();
     }
+
+    SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
+    SmartDashboard.putNumber("Grabber Pivot Velocity", getPivotSpeed());
+    SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
   }
 }
