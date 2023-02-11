@@ -5,19 +5,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.Results;
-import edu.wpi.first.networktables.NetworkTable;
 
 public class Limelight extends SubsystemBase {
-  /** Creates a new Limelight. */
-  public Limelight() {}
+
+  public Limelight() {
+
+  }
 
   public InstantCommand llLocalize(SwerveDrive drive) {
     return new InstantCommand (
@@ -28,7 +27,6 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     Results aprilTagResults = LimelightHelpers.getLatestResults(Constants.LIMELIGHT_NAME).targetingResults;
     Pose3d botPose3d = aprilTagResults.getBotPose3d();
     SmartDashboard.putString("April Tags", aprilTagResults.targets_Fiducials.toString());
