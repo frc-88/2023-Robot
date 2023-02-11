@@ -46,6 +46,7 @@ public class Arm extends SubsystemBase {
     public Boolean isValidState(ArmState armState) {
         Translation2d grabberPosition = getGrabberPosition();
         if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) {return false;}
+        if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) {return false;}
         if (shoulder.getAngle() < 0 || shoulder.getAngle() > 180) {return false;}
         return true;
     }
