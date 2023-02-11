@@ -84,7 +84,12 @@ public final class Constants {
     public static final int SHOULDER_ID = 40;
     public static final int ELBOW_ID = 41;
     public static final int WRIST_ID = 42;
-    public static final int PIVOT_ID = 43;
+    
+    public static final int SHOULDER_ENCODER_ID = 50;
+    public static final int ELBOW_ENCODER_ID = 51;
+    public static final int WRIST_ENCODER_ID = 52;
+
+    public static final int COAST_BUTTON_ID = 1;
 
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.util.controllers.ButtonBox;
 
@@ -22,6 +23,7 @@ public class RobotContainer {
 
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
+  private final Arm m_arm = new Arm();
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -56,10 +58,13 @@ public class RobotContainer {
   }
 
   private void configureSmartDashboardButtons() {
+
+    // Drive
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-   // Intake
+
+    // Intake
     SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
     SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
     SmartDashboard.putData("Intake Game Piece", m_intake.intakeFactory());
@@ -68,8 +73,13 @@ public class RobotContainer {
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
 
+    //Arm
+    SmartDashboard.putData("!!Calibrate Arm Absolute!!", m_arm.calibrateFactory());
+
+    // Subsystems
     SmartDashboard.putData(m_drive);
     SmartDashboard.putData(m_intake);
+    SmartDashboard.putData(m_arm);
   }
 
   public Command getAutonomousCommand() {
