@@ -12,6 +12,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
 import frc.robot.util.controllers.ButtonBox;
 
@@ -24,6 +25,7 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
+  private final Grabber m_grabber = new Grabber();
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -73,8 +75,11 @@ public class RobotContainer {
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
 
-    //Arm
+    // Arm
     SmartDashboard.putData("!!Calibrate Arm Absolute!!", m_arm.calibrateFactory());
+
+    // Grabber
+    SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
 
     // Subsystems
     SmartDashboard.putData(m_drive);

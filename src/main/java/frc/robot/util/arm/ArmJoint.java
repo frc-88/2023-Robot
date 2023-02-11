@@ -57,7 +57,7 @@ public class ArmJoint {
         p_continuousCurrent = new DoublePreferenceConstant(name + " Continuous Current", 10);
         p_maxVelocity = new DoublePreferenceConstant(name + " Max Velocity", 0);
         p_maxAcceleration = new DoublePreferenceConstant(name + " Max Acceleration", 0);
-        p_pid = new PIDPreferenceConstants(name, 0, 0, 0, 0, 0, 0, 0);
+        p_pid = new PIDPreferenceConstants(name);
         p_encoderOffset = new DoublePreferenceConstant(name + " Offset", 0);
 
         Consumer<Double> handler = (Double unused) -> {
@@ -74,13 +74,15 @@ public class ArmJoint {
             m_motor.config_kF(0, p_pid.getKF().getValue());
             m_motor.config_IntegralZone(0, p_pid.getIZone().getValue());
             m_motor.configMaxIntegralAccumulator(0, p_pid.getIMax().getValue());
+            m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(p_maxVelocity.getValue()));
+            m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue()));
         };
         p_triggerCurrent.addChangeHandler(handler);
         p_triggerDuration.addChangeHandler(handler);
         p_continuousCurrent.addChangeHandler(handler);
+        p_pid.addChangeHandler(handler);
         p_maxVelocity.addChangeHandler(handler);
         p_maxAcceleration.addChangeHandler(handler);
-        p_pid.addChangeHandler(handler);
 
         handler.accept(0.);
     }
