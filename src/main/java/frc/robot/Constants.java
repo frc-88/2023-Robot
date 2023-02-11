@@ -47,10 +47,6 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
 
-	public static final double MAX_TRAJ_VELOCITY = 6.0;
-	public static final double MAX_TRAJ_ACCELERATION = 4.0;
-	public static final double MAX_TRAJ_CENTRIP_ACC = 1.5;
-
 	public static final double XBOX_DEADBAND = 0.12;
 	public static final double FRSKY_DEADBAND = 0.07;
 
@@ -66,4 +62,10 @@ public final class Constants {
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
 
+
+    // Trajectory
+    public static final double MAX_TRAJ_VELOCITY = 4;
+    public static final double MAX_TRAJ_CENTRIP_ACC = 3;
+    public static final double MAX_TRAJ_ACCELERATION = 3;
+	
 }
