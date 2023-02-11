@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.arm.ArmJoint;
+import frc.robot.util.arm.ArmState;
 
 public class Arm extends SubsystemBase {
     
@@ -35,6 +38,17 @@ public class Arm extends SubsystemBase {
 
     public void calibrate() {
         allJoints.forEach(ArmJoint::calibrateAbsolute);
+    }
+
+    public void goToArmState(ArmState armState) {
+        double greatestAngle = Collections.max(Arrays.asList(new Double[]{
+            Math.abs(armState.getShoulderAngle()-shoulder.getAngle()), 
+            Math.abs(armState.getElbowAngle()-elbow.getAngle()), 
+            Math.abs(armState.getWristAngle()-wrist.getAngle())}));
+        // Keep max velocities the same or change this
+        shoulder.setMotionMagic(armState.getShoulderAngle(), shoulder.getMaxVelocity() * Math.abs(shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
+        elbow.setMotionMagic(armState.getElbowAngle(), elbow.getMaxVelocity() * Math.abs(elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
+        wrist.setMotionMagic(armState.getWristAngle(), wrist.getMaxVelocity() * Math.abs(wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
     }
 
     // COMMAND FACTORIES

@@ -91,6 +91,8 @@ public final class Constants {
 
     public static final int COAST_BUTTON_ID = 1;
 
+    public static final double MAX_JOINT_VELOCITY = 1.;
+
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;

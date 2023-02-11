@@ -128,6 +128,10 @@ public class ArmJoint {
         return m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue();
     }
 
+    public double getMaxVelocity() {
+        return p_maxVelocity.getValue();
+    }
+
     public boolean isCancoderPresent() {
         return !(m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.BadRange_RedLED
                 || m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.Invalid_Unknown
