@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CANdleSystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.TrajectoryHelper;
@@ -89,6 +90,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), true));
     SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
     SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
+
+    SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp"));
   }
   
   public Command getAutonomousCommand() {
