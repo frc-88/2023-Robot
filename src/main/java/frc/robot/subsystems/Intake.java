@@ -51,7 +51,12 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armUpMoveIntakeSpeed =
       new DoublePreferenceConstant("Intake/Arm/Up Move Speed", 0.5);  
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.5);  
+      new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.5); 
+  // IR Sensor
+  private DoublePreferenceConstant irSensorMin =
+      new DoublePreferenceConstant("Intake IR Min", 0.33);
+  private DoublePreferenceConstant irSensorMax =
+      new DoublePreferenceConstant("Intake IR Max", 0.38);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
@@ -60,9 +65,6 @@ public class Intake extends SubsystemBase {
   private final AnalogInput m_irSensor = new AnalogInput(Constants.INTAKE_IR_ID);
 
   private boolean coneMode = false;
-
-  private final static double IR_HAS_PIECE_MIN = 1;
-  private final static double IR_HAS_PIECE_MAX = 2;
 
   /** Creates a new Intake. */
   public Intake() {
@@ -73,6 +75,8 @@ public class Intake extends SubsystemBase {
 
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
+
+    m_irSensor.setAverageBits(12);
   }
 
     public void setCube() {
@@ -147,7 +151,7 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean hasGamePiece() {
-      return m_irSensor.getAverageVoltage() > IR_HAS_PIECE_MIN && m_irSensor.getAverageVoltage() < IR_HAS_PIECE_MAX;
+      return m_irSensor.getAverageVoltage() > irSensorMin.getValue() && m_irSensor.getAverageVoltage() < irSensorMax.getValue();
     }
     
     public Trigger holdAndHasPiece() {
@@ -177,7 +181,7 @@ public class Intake extends SubsystemBase {
     }
 
     public CommandBase stowFactory() {
-      return new RunCommand(() -> {stopRollers(); armUp();}, this).withName("stow");
+      return new RunCommand(() -> {hold(); armUp();}, this).withName("stow");
     }
 
     public CommandBase handoffFactory() {

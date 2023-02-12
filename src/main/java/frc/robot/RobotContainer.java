@@ -7,8 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.CANdleSystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Handoff;
@@ -19,6 +23,12 @@ import frc.robot.subsystems.Intake;
 import frc.robot.util.arm.ArmStates;
 import frc.robot.util.controllers.ButtonBox;
 
+/**
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and button mappings) should be declared here.
+ */
 public class RobotContainer {
 
   /////////////////////////////////////////////////////////////////////////////
@@ -35,6 +45,7 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
+  private final CANdleSystem m_candleSubsystem = new CANdleSystem();
   private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
@@ -111,6 +122,13 @@ public class RobotContainer {
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
 
+    // CANdle
+
+    SmartDashboard.putData("Want Cone", m_candleSubsystem.wantConeFactory());
+    SmartDashboard.putData("Holding Cone", m_candleSubsystem.holdingConeFactory());
+    SmartDashboard.putData("Want Cube", m_candleSubsystem.wantCubeFactory());
+    SmartDashboard.putData("Holding Cube", m_candleSubsystem.holdingCubeFactory());
+  
     // Intake
     SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
     SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
@@ -131,10 +149,13 @@ public class RobotContainer {
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_arm);
 
-    // :)
-    SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp"));
-  }
+    SmartDashboard.putData("Auto Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), true));
+    SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
+    SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
 
+    SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake));
+  }
+  
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }

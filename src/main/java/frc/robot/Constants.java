@@ -42,13 +42,13 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.56515; // 22.25 inches
+    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.55245; // 21.75 inches
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.57785; // 22.75 inches
+    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.55245; // 21.75 inches
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 18; 
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 19; 
@@ -65,10 +65,6 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 8; 
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9; 
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 9;
-
-	public static final double MAX_TRAJ_VELOCITY = 6.0;
-	public static final double MAX_TRAJ_ACCELERATION = 4.0;
-	public static final double MAX_TRAJ_CENTRIP_ACC = 1.5;
 
 	public static final double XBOX_DEADBAND = 0.12;
 	public static final double FRSKY_DEADBAND = 0.07;
@@ -100,4 +96,10 @@ public final class Constants {
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
 
+
+    // Trajectory
+    public static final double MAX_TRAJ_VELOCITY = 4;
+    public static final double MAX_TRAJ_CENTRIP_ACC = 3;
+    public static final double MAX_TRAJ_ACCELERATION = 3;
+	
 }
