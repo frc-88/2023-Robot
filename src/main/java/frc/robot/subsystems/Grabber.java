@@ -32,34 +32,34 @@ public class Grabber extends SubsystemBase {
   private boolean m_pivotLocked = true;
 
   private DoublePreferenceConstant p_pivotOffset = 
-    new DoublePreferenceConstant("Grabber Pivot Offset", 0);
+    new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
 
   private final DoublePreferenceConstant p_pivotMaxVelocity = 
-    new DoublePreferenceConstant("Grabber Pivot Max Velocity", 0);
+    new DoublePreferenceConstant("Grabber/Pivot/Max Velocity", 0);
   private final DoublePreferenceConstant p_pivotMaxAcceleration = 
-    new DoublePreferenceConstant("Grabber Pivot Max Acceleration", 0);
+    new DoublePreferenceConstant("Grabber/Pivot/Max Acceleration", 0);
   private final PIDPreferenceConstants p_pivotPID = 
-    new PIDPreferenceConstants("Grabber Pivot");
+    new PIDPreferenceConstants("Grabber/Pivot/");
 
   private final DoublePreferenceConstant p_rollerTriggerCurrent =
-    new DoublePreferenceConstant("Grabber Roller Trigger Current", 60);
+    new DoublePreferenceConstant("Grabber/Roller/Trigger Current", 60);
   private final DoublePreferenceConstant p_rollerTriggerDuration =
-    new DoublePreferenceConstant("Grabber Roller Trigger Duration", 0.002);
+    new DoublePreferenceConstant("Grabber/Roller/Trigger Duration", 0.002);
   private final DoublePreferenceConstant p_rollerContinuousCurrent =
-    new DoublePreferenceConstant("Grabber Continuous Current", 10);
+    new DoublePreferenceConstant("Grabber/Roller/Continuous Current", 10);
 
   private DoublePreferenceConstant p_grabCubeSpeed =
-    new DoublePreferenceConstant("Grab Cube Speed", 0.5);
+    new DoublePreferenceConstant("Grabber/Roller/Grab Cube Speed", 0.5);
   private DoublePreferenceConstant p_grabConeSpeed =
-    new DoublePreferenceConstant("Grab Cone Speed", -0.5);
+    new DoublePreferenceConstant("Grabber/Roller/Grab Cone Speed", -0.5);
   private DoublePreferenceConstant p_dropCubeSpeed =
-    new DoublePreferenceConstant("Drop Cube Speed", -0.5);
+    new DoublePreferenceConstant("Grabber/Roller/Drop Cube Speed", -0.5);
   private DoublePreferenceConstant p_dropConeSpeed =
-    new DoublePreferenceConstant("Drop Cone Speed", 0.5);
+    new DoublePreferenceConstant("Grabber/Roller/Drop Cone Speed", 0.5);
   private DoublePreferenceConstant p_holdCubeSpeed =
-    new DoublePreferenceConstant("Hold Cube Speed", -0.05);
+    new DoublePreferenceConstant("Grabber/Roller/Hold Cube Speed", -0.05);
   private DoublePreferenceConstant p_holdConeSpeed =
-    new DoublePreferenceConstant("Hold Cone Speed", 0.05);
+    new DoublePreferenceConstant("Grabber/Roller/Hold Cone Speed", 0.05);
 
   public Grabber() {
     m_pivot.configFactoryDefault();
@@ -68,6 +68,7 @@ public class Grabber extends SubsystemBase {
     m_pivot.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     zeroRelativePivot();
 
+    m_pivot.setInverted(true);
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(4);
@@ -132,7 +133,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return m_pivot.getSensorCollection().getPulseWidthPosition() - p_pivotOffset.getValue();
+    return m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue();
   }
 
   public void zeroRelativePivot() {
@@ -253,7 +254,6 @@ public class Grabber extends SubsystemBase {
     }
 
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
-    SmartDashboard.putNumber("Grabber Pivot Velocity", getPivotSpeed());
     SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
   }
 }

@@ -33,9 +33,9 @@ public class Arm extends SubsystemBase {
         this.coastButton = new DigitalInput(0);
         SmartDashboard.putBoolean("Coast Arm", false);
 
-        shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, false, false, (16./42.) * (1./49.), 19.5);
-        elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, false, false, (16./42.) * (1./49.), 15.5);
-        wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, false, false, (16./42.) * (1./49.), 25.5);
+        shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, true, false, (16./42.) * (1./49.), 19.5);
+        elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, true, false, (16./42.) * (1./49.), 15.5);
+        wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, false, (16./42.) * (1./49.), 25.5);
         shoulderPosition = new Translation2d(18.5, 3);
 
         targetArmState = ArmStates.stow;
@@ -86,7 +86,7 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return new RunCommand(() -> goToArmState(armState));
+        return new RunCommand(() -> goToArmState(armState), this);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {

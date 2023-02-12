@@ -86,8 +86,8 @@ public class RobotContainer {
     m_drive.isFacingForwards().onTrue(m_grabber.setPivotForwardsFactory());
     m_drive.isFacingBackwards().onTrue(m_grabber.setPivotBackwardsFactory());
 
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
-      .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
+    // m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
+    //   .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
 
     // // Test controller
     m_testController.a().onTrue(m_intake.intakeFactory());

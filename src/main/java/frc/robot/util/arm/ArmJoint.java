@@ -13,6 +13,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
@@ -27,6 +28,7 @@ public class ArmJoint {
     private final boolean m_encoderInverted;
 
     private boolean m_zeroed = false;
+    private boolean m_braking = true;
 
     private final DoublePreferenceConstant p_triggerCurrent;
     private final DoublePreferenceConstant p_triggerDuration;
@@ -110,11 +112,17 @@ public class ArmJoint {
     }
 
     public void coast() {
-        m_motor.setNeutralMode(NeutralMode.Coast);
+        if (m_braking) {
+            m_motor.setNeutralMode(NeutralMode.Coast);
+            m_braking = false;
+        }
     }
 
     public void brake() {
-        m_motor.setNeutralMode(NeutralMode.Brake);
+        if (!m_braking) {
+            m_motor.setNeutralMode(NeutralMode.Brake);
+            m_braking = true;
+        }
     }
 
     public double getAngle() {
@@ -151,7 +159,8 @@ public class ArmJoint {
         if (m_motor.hasResetOccurred()) {
             m_zeroed = false;
         }
-        if (isCancoderPresent() && !m_zeroed) {
+        if (!m_zeroed && isCancoderPresent()) {
+            SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;
         }
