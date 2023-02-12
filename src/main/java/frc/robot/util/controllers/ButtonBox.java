@@ -8,7 +8,6 @@ public class ButtonBox extends Joystick {
 	
     private static int INTAKE = 2;
     private static int OUTGEST = 3;
-    private static int TO_SCORING_POSITION = 4;
     private static int GRAB_FROM_SHELF = 5;
     private static int SET_LOW = 10;
     private static int SET_MIDDLE = 11;
