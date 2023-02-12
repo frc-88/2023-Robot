@@ -20,6 +20,9 @@ public class PlaySong extends CommandBase {
         m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS));
         m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS));
         m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS));
+        m_orchestra.addInstrument(new WPI_TalonFX(6, Constants.INTAKE_CANBUS));
+        m_orchestra.addInstrument(new WPI_TalonFX(12, Constants.INTAKE_CANBUS));
+        m_orchestra.addInstrument(new WPI_TalonFX(2, Constants.INTAKE_CANBUS));
         m_orchestra.loadMusic(filename);
         m_orchestra.play();
     }
