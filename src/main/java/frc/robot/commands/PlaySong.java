@@ -5,13 +5,15 @@ import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Intake;
 
 public class PlaySong extends CommandBase {
     String filename;
-    Orchestra m_orchestra = new Orchestra();   
+    Orchestra m_orchestra = new Orchestra();
 
-    public PlaySong(String filename) {
+    public PlaySong(String filename, Intake intake) {
         this.filename = filename;
+        addRequirements(intake);
     }
 
     public void initialize() {
@@ -28,6 +30,6 @@ public class PlaySong extends CommandBase {
     }
 
     public boolean isFinished() {
-        return !m_orchestra.isPlaying();
+        return false;
     }
 }
