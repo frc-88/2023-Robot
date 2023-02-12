@@ -12,6 +12,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Handoff;
+import frc.robot.commands.PlaySong;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
@@ -121,6 +122,9 @@ public class RobotContainer {
     SmartDashboard.putData(m_drive);
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_arm);
+
+    // :)
+    SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp"));
   }
 
   public Command getAutonomousCommand() {
