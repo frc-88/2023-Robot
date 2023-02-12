@@ -80,13 +80,14 @@ public class SwerveDrive extends SubsystemBase {
                         // Back right
                         new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0));
 
-        private DoublePreferenceConstant p_frontLeftOffset = new DoublePreferenceConstant("Drive Front Left Offset",
-                        0.0);
-        private DoublePreferenceConstant p_frontRightOffset = new DoublePreferenceConstant("Drive Front Right Offset",
-                        0.0);
-        private DoublePreferenceConstant p_backLeftOffset = new DoublePreferenceConstant("Drive Back Left Offset", 0.0);
-        private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive Back Right Offset",
-                        0.0);
+        private DoublePreferenceConstant p_frontLeftOffset = new DoublePreferenceConstant("Drive/Offsets/Front Left",
+                        220.1);
+        private DoublePreferenceConstant p_frontRightOffset = new DoublePreferenceConstant("Drive/Offsets/Front Right",
+                        182.7);
+        private DoublePreferenceConstant p_backLeftOffset = new DoublePreferenceConstant("Drive/Offsets/Back Left",
+                        5.5);
+        private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive/Offsets/Back Right",
+                        317);
 
         private final SlewRateLimiter filterX = new SlewRateLimiter(3.0);
         private final SlewRateLimiter filterY = new SlewRateLimiter(3.0);

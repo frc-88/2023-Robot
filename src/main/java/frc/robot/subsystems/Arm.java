@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,9 +22,9 @@ public class Arm extends SubsystemBase {
     
     private final DigitalInput coastButton;
 
-    public final ArmJoint shoulder;
-    public final ArmJoint elbow;
-    public final ArmJoint wrist;
+    public final ArmJoint m_shoulder;
+    public final ArmJoint m_elbow;
+    public final ArmJoint m_wrist;
     public final Translation2d shoulderPosition;
 
     private ArmState targetArmState;
@@ -33,56 +34,72 @@ public class Arm extends SubsystemBase {
         this.coastButton = new DigitalInput(0);
         SmartDashboard.putBoolean("Coast Arm", false);
 
-        shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, true, false, (16./42.) * (1./49.), 19.5);
-        elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, true, false, (16./42.) * (1./49.), 15.5);
-        wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, false, (16./42.) * (1./49.), 25.5);
+        m_shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, true, true, (16./42.) * (1./49.), 19.5);
+        m_elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, true, true, (16./42.) * (1./49.), 15.5);
+        m_wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, true, (16./42.) * (1./49.), 25.5);
         shoulderPosition = new Translation2d(18.5, 3);
 
         targetArmState = ArmStates.stow;
-        allJoints = Arrays.asList(new ArmJoint[]{shoulder, elbow, wrist});
+        allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+    }
+
+    public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
+        return shoulderPosition.plus(shoulder).plus(elbow).plus(wrist);
     }
 
     public Translation2d getGrabberPosition() {
-        return shoulderPosition.plus(shoulder.getPositionVector()).plus(elbow.getPositionVector()).plus(wrist.getPositionVector());
+        return getGrabberPosition(m_shoulder.getPositionVector(), m_elbow.getPositionVector(), m_wrist.getPositionVector());
     }
 
     public boolean isValidState(ArmState armState) {    
-        Translation2d grabberPosition = getGrabberPosition();
+        Translation2d grabberPosition = getGrabberPosition(
+            new Translation2d(m_shoulder.getLength(), new Rotation2d(armState.getShoulderAngle())),
+            new Translation2d(m_elbow.getLength(), new Rotation2d(armState.getElbowAngle())),
+            new Translation2d(m_wrist.getLength(), new Rotation2d(armState.getWristAngle())));
         if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) return false;
         if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) return false;
-        if (shoulder.getAngle() < 0 || shoulder.getAngle() > 180) return false;
+        if (armState.getShoulderAngle() < 0 || armState.getShoulderAngle() > 180) return false;
+        if (armState.getElbowAngle() < -360 || armState.getElbowAngle() > 360) return false;
+        if (armState.getWristAngle() < -360 || armState.getWristAngle() > 360) return false;
         if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) return false;
         return true;
     }
 
-    public void calibrate() {
-        allJoints.forEach(ArmJoint::calibrateAbsolute);
-    }
-
     public void goToArmState(ArmState armState) {
-        if (!isValidState(armState)) return;
+        if (!isValidState(armState)) {
+            System.out.println("Arm state invalid");
+            return;
+        }
         targetArmState = armState;
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
-            Math.abs(armState.getShoulderAngle()-shoulder.getAngle()), 
-            Math.abs(armState.getElbowAngle()-elbow.getAngle()), 
-            Math.abs(armState.getWristAngle()-wrist.getAngle())}));
+            Math.abs(armState.getShoulderAngle()-m_shoulder.getAngle()), 
+            Math.abs(armState.getElbowAngle()-m_elbow.getAngle()), 
+            Math.abs(armState.getWristAngle()-m_wrist.getAngle())}));
         // Keep max velocities the same or change this
-        shoulder.setMotionMagic(armState.getShoulderAngle(), shoulder.getMaxVelocity() * Math.abs(shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
-        elbow.setMotionMagic(armState.getElbowAngle(), elbow.getMaxVelocity() * Math.abs(elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
-        wrist.setMotionMagic(armState.getWristAngle(), wrist.getMaxVelocity() * Math.abs(wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+        m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
+        m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
+        m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
     }
 
     public boolean isAtTarget() {
-        if (!(shoulder.isOnTarget(targetArmState.getShoulderAngle()))) return false;
-        if (!(elbow.isOnTarget(targetArmState.getElbowAngle()))) return false;
-        if (!(wrist.isOnTarget(targetArmState.getWristAngle()))) return false;
+        if (!(m_shoulder.isOnTarget(targetArmState.getShoulderAngle()))) return false;
+        if (!(m_elbow.isOnTarget(targetArmState.getElbowAngle()))) return false;
+        if (!(m_wrist.isOnTarget(targetArmState.getWristAngle()))) return false;
         return true;
     }
 
     // COMMAND FACTORIES
 
-    public CommandBase calibrateFactory() {
-        return new InstantCommand(this::calibrate).ignoringDisable(true);
+    public CommandBase calibrateShoulderFactory() {
+        return new InstantCommand(() -> m_shoulder.calibrateAbsolute(90)).ignoringDisable(true);
+    }
+
+    public CommandBase calibrateElbowFactory() {
+        return new InstantCommand(() -> m_elbow.calibrateAbsolute(90)).ignoringDisable(true);
+    }
+
+    public CommandBase calibrateWristFactory() {
+        return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
     public CommandBase sendArmToState(ArmState armState) {
@@ -97,7 +114,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         allJoints.forEach(ArmJoint::zeroRelative);
         
-        if (DriverStation.isDisabled() && (coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false))) {
+        if (DriverStation.isDisabled() && (!coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false))) {
             allJoints.forEach(ArmJoint::coast);
         }
         else {

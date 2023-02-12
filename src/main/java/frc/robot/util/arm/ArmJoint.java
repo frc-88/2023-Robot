@@ -56,14 +56,14 @@ public class ArmJoint {
         m_motor.configNeutralDeadband(0);
         m_motor.configMotionSCurveStrength(4);
 
-        p_triggerCurrent = new DoublePreferenceConstant(name + " Trigger Current", 120);
-        p_triggerDuration = new DoublePreferenceConstant(name + " Trigger Duration", 0.002);
-        p_continuousCurrent = new DoublePreferenceConstant(name + " Continuous Current", 80);
-        p_maxVelocity = new DoublePreferenceConstant(name + " Max Velocity", 0);
-        p_maxAcceleration = new DoublePreferenceConstant(name + " Max Acceleration", 0);
-        p_pid = new PIDPreferenceConstants(name);
-        p_encoderOffset = new DoublePreferenceConstant(name + " Offset", 0);
-        p_gravityCompensation = new DoublePreferenceConstant(name + " Gravity Compensation", 0);
+        p_triggerCurrent = new DoublePreferenceConstant("Arm/" + name + "/Trigger Current", 120);
+        p_triggerDuration = new DoublePreferenceConstant("Arm/" + name + "/Trigger Duration", 0.002);
+        p_continuousCurrent = new DoublePreferenceConstant("Arm/" + name + "/Continuous Current", 80);
+        p_maxVelocity = new DoublePreferenceConstant("Arm/" + name + "/Max Velocity", 0);
+        p_maxAcceleration = new DoublePreferenceConstant("Arm/" + name + "/Max Acceleration", 0);
+        p_pid = new PIDPreferenceConstants("Arm/" + name + "/");
+        p_encoderOffset = new DoublePreferenceConstant("Arm/" + name + "/Offset", 0);
+        p_gravityCompensation = new DoublePreferenceConstant("Arm/" + name + "/Gravity Compensation", 0);
 
         Consumer<Double> handler = (Double unused) -> {
             StatorCurrentLimitConfiguration config = new StatorCurrentLimitConfiguration(
@@ -133,12 +133,16 @@ public class ArmJoint {
         return new Translation2d(m_length, new Rotation2d(getAngle()));
     }
 
+    public double getLength() {
+        return m_length;
+    }
+
     public double getSpeed() {
         return convertMotorVelocityToActualVelocity(m_motor.getSelectedSensorVelocity());
     }
 
     public double getAbsoluteAngle() {
-        return m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue();
+        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 540.) % 360. - 180.;
     }
 
     public double getMaxVelocity() {
@@ -171,7 +175,9 @@ public class ArmJoint {
     }
 
     public void calibrateAbsolute(double angle) {
-        p_encoderOffset.setValue(m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - angle);
+        p_encoderOffset.setValue(0.);
+        p_encoderOffset.setValue(getAbsoluteAngle() - angle);
+        m_zeroed = false;
     }
 
     public void calibrateAbsolute() {

@@ -45,18 +45,18 @@ public class Intake extends SubsystemBase {
     new DoublePreferenceConstant("Intake/Speeds/Hold/Outer Cone", 0.1);
   // Arm
   private DoublePreferenceConstant armUpStallIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Arm/Up Stall Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Arm/Up Stall Speed", -0.03);
   private DoublePreferenceConstant armDownStallIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Arm/Down Stall Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Arm/Down Stall Speed", 0.03);
   private DoublePreferenceConstant armUpMoveIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Arm/Up Move Speed", 0.5);  
+      new DoublePreferenceConstant("Intake/Arm/Up Move Speed", -0.35);  
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.5); 
+      new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.35); 
   // IR Sensor
   private DoublePreferenceConstant irSensorMin =
-      new DoublePreferenceConstant("Intake IR Min", 0.33);
+      new DoublePreferenceConstant("Intake/IR/Min", 0.35);
   private DoublePreferenceConstant irSensorMax =
-      new DoublePreferenceConstant("Intake IR Max", 0.38);
+      new DoublePreferenceConstant("Intake/IR/Max", 0.44);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);

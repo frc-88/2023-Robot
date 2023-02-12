@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -54,6 +56,10 @@ public class RobotContainer {
     configureControllers();
     configureDefaultCommands();
     configureSmartDashboardButtons();
+
+    PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
+    pdh.setSwitchableChannel(true);
+    pdh.close();
   }
 
   private void configureControllers() {
@@ -139,10 +145,14 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
 
     // Arm
-    SmartDashboard.putData("!!Calibrate Arm Absolute!!", m_arm.calibrateFactory());
+    SmartDashboard.putData("!!Calibrate Shoulder Absolute!!", m_arm.calibrateShoulderFactory());
+    SmartDashboard.putData("!!Calibrate Elbow Absolute!!", m_arm.calibrateElbowFactory());
+    SmartDashboard.putData("!!Calibrate Wrist Absolute!!", m_arm.calibrateWristFactory());
 
     // Grabber
     SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
+
+    SmartDashboard.putData("Arm Stow", m_arm.sendArmToState(ArmStates.stow));
 
     // Subsystems
     SmartDashboard.putData(m_drive);

@@ -143,6 +143,7 @@ public class Grabber extends SubsystemBase {
   public void calibrateAbsolutePivot() {
     p_pivotOffset.setValue(0.);
     p_pivotOffset.setValue(getPivotAbsoluteAngle());
+    zeroRelativePivot();
   }
 
   public void grabCube() {

@@ -11,9 +11,9 @@ public class ArmState {
     ArmState(String name) {
         this.name = name;
 
-        shoulderAngle = new DoublePreferenceConstant(name + " Shoulder Angle", 0);
-        elbowAngle = new DoublePreferenceConstant(name + " Elbow Angle", 0);
-        wristAngle = new DoublePreferenceConstant(name + " Wrist Angle", 0);
+        shoulderAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Shoulder Angle", 0);
+        elbowAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Elbow Angle", 0);
+        wristAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Wrist Angle", 0);
     }
 
     public String getName() {
