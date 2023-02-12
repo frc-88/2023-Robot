@@ -55,10 +55,6 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
-    public boolean canWristPivot() {
-        return Math.abs((shoulder.getAngle() - elbow.getAngle() + 180) % 360) > 15.;
-    }
-
     public void calibrate() {
         allJoints.forEach(ArmJoint::calibrateAbsolute);
     }

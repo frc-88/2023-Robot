@@ -47,11 +47,12 @@ public class RobotContainer {
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
+    m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
-      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf));
+      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).onTrue(m_grabber.grabConeFactory());
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
-      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf));
+      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).onTrue(m_grabber.grabCubeFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
       .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
@@ -77,10 +78,16 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
       .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
+    m_buttonBox.scoreButton.and(m_buttonBox.gamepieceSwitch)
+      .onTrue(m_grabber.grabConeFactory());
+    m_buttonBox.scoreButton.and(m_buttonBox.gamepieceSwitch.negate())
+      .onTrue(m_grabber.grabCubeFactory());
+
+    m_drive.isFacingForwards().onTrue(m_grabber.setPivotForwardsFactory());
+    m_drive.isFacingBackwards().onTrue(m_grabber.setPivotBackwardsFactory());
+
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
       .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
-
-    m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     // // Test controller
     m_testController.a().onTrue(m_intake.intakeFactory());
@@ -93,6 +100,7 @@ public class RobotContainer {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
     m_intake.setDefaultCommand(m_intake.holdFactory());
     m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stow));
+    m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
 
   private void configureSmartDashboardButtons() {

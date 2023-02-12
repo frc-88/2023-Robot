@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -103,11 +104,11 @@ public class Grabber extends SubsystemBase {
   }
 
   public void setPivotForwards() {
-    m_pivotForwards = true;
+    m_pivotForwards = m_pivotLocked ? m_pivotForwards : true;
   }
 
   public void setPivotBackwards() {
-    m_pivotForwards = false;
+    m_pivotForwards = m_pivotLocked ? m_pivotForwards : false;
   }
 
   private void movePivot() {
@@ -198,27 +199,51 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase grabConeFactory() {
-    return new RunCommand(() -> {grabCone(); movePivot(); lockPivot();}).withName("Grab Cone");
+    return new RunCommand(() -> {grabCone(); movePivot(); lockPivot();}, this).withName("Grab Cone");
   }
 
   public CommandBase grabCubeFactory() {
-    return new RunCommand(() -> {grabCube(); movePivot(); lockPivot();}).withName("Grab Cube");
+    return new RunCommand(() -> {grabCube(); movePivot(); lockPivot();}, this).withName("Grab Cube");
   }
 
   public CommandBase dropConeFactory() {
-    return new RunCommand(() -> {dropCone(); movePivot(); lockPivot();}).withName("Drop Cone");
+    return new RunCommand(() -> {dropCone(); movePivot(); lockPivot();}, this).withName("Drop Cone");
   }
 
   public CommandBase dropCubeFactory() {
-    return new RunCommand(() -> {dropCube(); movePivot(); lockPivot();}).withName("Drop Cube");
+    return new RunCommand(() -> {dropCube(); movePivot(); lockPivot();}, this).withName("Drop Cube");
   }
 
   public CommandBase holdConeFactory() {
-    return new RunCommand(() -> {holdCone(); movePivot(); unlockPivot();}).withName("Hold Cone");
+    return new RunCommand(() -> {holdCone(); movePivot(); unlockPivot();}, this).withName("Hold Cone");
   }
 
   public CommandBase holdCubeFactory() {
-    return new RunCommand(() -> {holdCube(); movePivot(); unlockPivot();}).withName("Hold Cube");
+    return new RunCommand(() -> {holdCube(); movePivot(); unlockPivot();}, this).withName("Hold Cube");
+  }
+
+  public CommandBase holdFactory(BooleanSupplier coneMode) {
+    return new RunCommand(() -> {
+      if (coneMode.getAsBoolean()) {
+        holdCone();
+      } else {
+        holdCube();
+      }
+    }, this);
+  }
+
+  public CommandBase setPivotForwardsFactory() {
+    return new InstantCommand(() -> {
+      if (hasGamePiece()) {
+        setPivotForwards();
+      } else {
+        setPivotBackwards();
+      }
+    });
+  }
+
+  public CommandBase setPivotBackwardsFactory() {
+    return new InstantCommand(this::setPivotBackwards);
   }
 
   @Override
