@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -324,6 +325,13 @@ public class SwerveDrive extends SubsystemBase {
                 return grantDrive;
         }
 
+        public TalonFX[] getMotors() {
+                TalonFX[] motors = {m_frontLeftModule.getDriveController().getMotor(), m_frontRightModule.getDriveController().getMotor(),
+                        m_backLeftModule.getDriveController().getMotor(), m_backRightModule.getDriveController().getMotor(),
+                        m_frontLeftModule.getSteerController().getMotor(), m_frontRightModule.getSteerController().getMotor(),
+                        m_backLeftModule.getSteerController().getMotor(), m_backRightModule.getSteerController().getMotor()};
+                return motors;
+        }
         public InstantCommand resetYawCommandFactory() {
                 return new InstantCommand(() -> {zeroGyroscope();});
         }
