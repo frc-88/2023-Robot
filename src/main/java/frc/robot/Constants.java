@@ -81,19 +81,19 @@ public final class Constants {
     public static final int INTAKE_IR_ID = 0;
 
     // Arm
-    public static final int SHOULDER_ID = 40;
-    public static final int ELBOW_ID = 41;
-    public static final int WRIST_ID = 42;
+    public static final int SHOULDER_ID = 6;
+    public static final int ELBOW_ID = 12;
+    public static final int WRIST_ID = 2;
     
-    public static final int SHOULDER_ENCODER_ID = 50;
-    public static final int ELBOW_ENCODER_ID = 51;
-    public static final int WRIST_ENCODER_ID = 52;
+    public static final int SHOULDER_ENCODER_ID = 2;
+    public static final int ELBOW_ENCODER_ID = 1;
+    public static final int WRIST_ENCODER_ID = 3;
 
     public static final int COAST_BUTTON_ID = 0;
 
     // Grabber
-    public static final int GRABBER_PIVOT_ID = 43;
-    public static final int GRABBER_ROLLER_ID = 44;
+    public static final int GRABBER_PIVOT_ID = 17;
+    public static final int GRABBER_ROLLER_ID = 14;
 
 	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
