@@ -28,6 +28,7 @@ public class Grabber extends SubsystemBase {
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private boolean m_pivotForwards = true;
+  private boolean m_pivotLocked = true;
 
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber Pivot Offset", 0);
@@ -54,6 +55,10 @@ public class Grabber extends SubsystemBase {
     new DoublePreferenceConstant("Drop Cube Speed", -0.5);
   private DoublePreferenceConstant p_dropConeSpeed =
     new DoublePreferenceConstant("Drop Cone Speed", 0.5);
+  private DoublePreferenceConstant p_holdCubeSpeed =
+    new DoublePreferenceConstant("Hold Cube Speed", -0.05);
+  private DoublePreferenceConstant p_holdConeSpeed =
+    new DoublePreferenceConstant("Hold Cone Speed", 0.05);
 
   public Grabber() {
     m_pivot.configFactoryDefault();
@@ -109,6 +114,14 @@ public class Grabber extends SubsystemBase {
     m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : 180));
   }
 
+  private void lockPivot() {
+    m_pivotLocked = true;
+  }
+
+  private void unlockPivot() {
+    m_pivotLocked = true;
+  }
+
   public double getPivotAngle() {
     return convertSensorPositionToActualPosition(m_pivot.getSelectedSensorPosition());
   }
@@ -146,6 +159,14 @@ public class Grabber extends SubsystemBase {
     m_roller.set(p_dropConeSpeed.getValue());
   }
 
+  public void holdCube() {
+    m_roller.set(hasGamePiece() ? p_holdCubeSpeed.getValue() : 0);
+  }
+  
+  public void holdCone() {
+    m_roller.set(hasGamePiece() ? p_holdConeSpeed.getValue() : 0);
+  }
+
   public boolean hasGamePiece() {
     return m_roller.isFwdLimitSwitchClosed() > 0;
   }
@@ -177,19 +198,27 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase grabConeFactory() {
-    return new RunCommand(() -> {grabCone(); movePivot();}).withName("Grab Cone");
+    return new RunCommand(() -> {grabCone(); movePivot(); lockPivot();}).withName("Grab Cone");
   }
 
   public CommandBase grabCubeFactory() {
-    return new RunCommand(() -> {grabCube(); movePivot();}).withName("Grab Cube");
+    return new RunCommand(() -> {grabCube(); movePivot(); lockPivot();}).withName("Grab Cube");
   }
 
   public CommandBase dropConeFactory() {
-    return new RunCommand(() -> {dropCone(); movePivot();}).withName("Drop Cone");
+    return new RunCommand(() -> {dropCone(); movePivot(); lockPivot();}).withName("Drop Cone");
   }
 
   public CommandBase dropCubeFactory() {
-    return new RunCommand(() -> {dropCube(); movePivot();}).withName("Drop Cube");
+    return new RunCommand(() -> {dropCube(); movePivot(); lockPivot();}).withName("Drop Cube");
+  }
+
+  public CommandBase holdConeFactory() {
+    return new RunCommand(() -> {holdCone(); movePivot(); unlockPivot();}).withName("Hold Cone");
+  }
+
+  public CommandBase holdCubeFactory() {
+    return new RunCommand(() -> {holdCube(); movePivot(); unlockPivot();}).withName("Hold Cube");
   }
 
   @Override
