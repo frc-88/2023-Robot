@@ -10,16 +10,18 @@ import frc.robot.subsystems.Intake;
 public class PlaySong extends CommandBase {
     String filename;
     Orchestra m_orchestra = new Orchestra();
+    Intake m_intake;
 
     public PlaySong(String filename, Intake intake) {
         this.filename = filename;
         addRequirements(intake);
+        m_intake = intake;
     }
 
     public void initialize() {
-        m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS));
-        m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS));
-        m_orchestra.addInstrument(new WPI_TalonFX(Constants.INTAKE_ARM_ID, Constants.INTAKE_CANBUS));
+        m_orchestra.addInstrument(m_intake.getMotors()[0]);
+        m_orchestra.addInstrument(m_intake.getMotors()[1]);
+        m_orchestra.addInstrument(m_intake.getMotors()[2]);
         m_orchestra.addInstrument(new WPI_TalonFX(6, Constants.INTAKE_CANBUS));
         m_orchestra.addInstrument(new WPI_TalonFX(12, Constants.INTAKE_CANBUS));
         m_orchestra.addInstrument(new WPI_TalonFX(2, Constants.INTAKE_CANBUS));

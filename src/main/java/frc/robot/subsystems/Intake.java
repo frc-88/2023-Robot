@@ -78,6 +78,11 @@ public class Intake extends SubsystemBase {
     m_irSensor.setAverageBits(12);
   }
 
+    public WPI_TalonFX[] getMotors() {
+      WPI_TalonFX[] motors = {m_innerRoller, m_outerRoller, m_arm};
+      return motors;
+    }
+
     public void setCube() {
       coneMode = false;
     }
