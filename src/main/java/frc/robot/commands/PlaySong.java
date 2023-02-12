@@ -33,6 +33,6 @@ public class PlaySong extends CommandBase {
     }
 
     public boolean isFinished() {
-        return false;
+        return !m_orchestra.isPlaying();
     }
 }
