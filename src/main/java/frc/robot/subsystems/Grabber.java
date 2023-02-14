@@ -25,6 +25,8 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
 public class Grabber extends SubsystemBase {
 
+  private final BooleanSupplier m_coastMode;
+
   private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
@@ -61,7 +63,9 @@ public class Grabber extends SubsystemBase {
   private DoublePreferenceConstant p_holdConeSpeed =
     new DoublePreferenceConstant("Grabber/Roller/Hold Cone Speed", 0.05);
 
-  public Grabber() {
+  public Grabber(BooleanSupplier coastMode) {
+    m_coastMode = coastMode;
+
     m_pivot.configFactoryDefault();
     m_roller.configFactoryDefault();
 
@@ -231,6 +235,8 @@ public class Grabber extends SubsystemBase {
       } else {
         holdCube();
       }
+      movePivot();
+      unlockPivot();
     }, this);
   }
 
@@ -254,7 +260,14 @@ public class Grabber extends SubsystemBase {
       zeroRelativePivot();
     }
 
+    if (m_coastMode.getAsBoolean()) {
+      m_pivot.setNeutralMode(NeutralMode.Coast);
+    } else {
+      m_pivot.setNeutralMode(NeutralMode.Brake);
+    }
+
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
+    SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
   }
 }

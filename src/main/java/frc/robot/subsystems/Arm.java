@@ -88,6 +88,10 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
+    public boolean coastModeEnabled() {
+        return DriverStation.isDisabled() && (!coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
+    }
+
     // COMMAND FACTORIES
 
     public CommandBase calibrateShoulderFactory() {
@@ -114,7 +118,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         allJoints.forEach(ArmJoint::zeroRelative);
         
-        if (DriverStation.isDisabled() && (!coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false))) {
+        if (coastModeEnabled()) {
             allJoints.forEach(ArmJoint::coast);
         }
         else {

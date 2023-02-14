@@ -101,6 +101,11 @@ public class ArmJoint {
     }
 
     public void setMotionMagic(double angle, double speed) {
+        if (!m_zeroed) {
+            setPercentOutput(0);
+            return;
+        }
+        
         m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(speed));
         m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue() * speed / p_maxVelocity.getValue()));
         

@@ -40,7 +40,7 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
-  private final Grabber m_grabber = new Grabber();
+  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -101,8 +101,8 @@ public class RobotContainer {
     m_buttonBox.scoreButton.and(m_buttonBox.gamepieceSwitch.negate())
       .onTrue(m_grabber.grabCubeFactory());
 
-    m_drive.isFacingForwards().onTrue(m_grabber.setPivotForwardsFactory());
-    m_drive.isFacingBackwards().onTrue(m_grabber.setPivotBackwardsFactory());
+    // m_drive.isFacingForwards().onTrue(m_grabber.setPivotForwardsFactory());
+    // m_drive.isFacingBackwards().onTrue(m_grabber.setPivotBackwardsFactory());
 
     // m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
     //   .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
@@ -149,10 +149,12 @@ public class RobotContainer {
     SmartDashboard.putData("!!Calibrate Elbow Absolute!!", m_arm.calibrateElbowFactory());
     SmartDashboard.putData("!!Calibrate Wrist Absolute!!", m_arm.calibrateWristFactory());
 
+    SmartDashboard.putData("Arm Stow", m_arm.sendArmToState(ArmStates.stow));
+
     // Grabber
     SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
-
-    SmartDashboard.putData("Arm Stow", m_arm.sendArmToState(ArmStates.stow));
+    SmartDashboard.putData("Set Grabber Forwards", m_grabber.setPivotForwardsFactory());
+    SmartDashboard.putData("Set Grabber Backwards", m_grabber.setPivotBackwardsFactory());
 
     // Subsystems
     SmartDashboard.putData(m_drive);
