@@ -17,6 +17,23 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public final class Constants {
     ///////////////////////////////////////////////////////
+    // CANDLE
+    ///////////////////////////////////////////////////////
+    public static final int CANDLE_ID = 2;
+    public static final int JoystickId = 0;
+    public static final int ConeButton = XboxController.Button.kRightBumper.value;
+    public static final int CubeButton = XboxController.Button.kLeftBumper.value;
+    public static final int BlockButton = XboxController.Button.kStart.value;
+    public static final int MaxBrightnessAngle = 90;
+    public static final int MidBrightnessAngle = 180;
+    public static final int ZeroBrightnessAngle = 270;
+    public static final int ChangeDirectionAngle = 0;
+    public static final int VbatButton = XboxController.Button.kA.value;
+    public static final int V5Button = XboxController.Button.kB.value;
+    public static final int CurrentButton = XboxController.Button.kX.value;
+    public static final int TemperatureButton = XboxController.Button.kY.value;
+
+    ///////////////////////////////////////////////////////
     // DRIVETRAIN
     ///////////////////////////////////////////////////////
 
@@ -33,21 +50,21 @@ public final class Constants {
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.55245; // 21.75 inches
 
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3; 
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 11; 
+    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 18; 
+    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 19; 
+    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 19; 
 
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 0; 
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 7; 
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10; 
+    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 10; 
+    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 11; 
+    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 11; 
 
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 6; 
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 4; 
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 9; 
+    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 0; 
+    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 1; 
+    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 1; 
 
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 1; 
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
+    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 8; 
+    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9; 
+    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 9;
 
 	public static final double XBOX_DEADBAND = 0.12;
 	public static final double FRSKY_DEADBAND = 0.07;
@@ -59,22 +76,22 @@ public final class Constants {
 	public static final int INTAKE_ARM_ID = 17;
     public static final int INTAKE_IR_ID = 0;
 
-    // Lights
-    public static final int CANDLE_ID = 0;
-    public static final int JoystickId = 0;
-    public static final int IncrementAnimButton = XboxController.Button.kRightBumper.value;
-    public static final int DecrementAnimButton = XboxController.Button.kLeftBumper.value;
-    public static final int BlockButton = XboxController.Button.kStart.value;
-    public static final int MaxBrightnessAngle = 90;
-    public static final int MidBrightnessAngle = 180;
-    public static final int ZeroBrightnessAngle = 270;
-    public static final int ChangeDirectionAngle = 0;
-    public static final int VbatButton = XboxController.Button.kA.value;
-    public static final int V5Button = XboxController.Button.kB.value;
-    public static final int CurrentButton = XboxController.Button.kX.value;
-    public static final int TemperatureButton = XboxController.Button.kY.value;
-	
-    // Controllers
+    // Arm
+    public static final int SHOULDER_ID = 4;
+    public static final int ELBOW_ID = 3;
+    public static final int WRIST_ID = 5;
+    
+    public static final int SHOULDER_ENCODER_ID = 4;
+    public static final int ELBOW_ENCODER_ID = 3;
+    public static final int WRIST_ENCODER_ID = 5;
+
+    public static final int COAST_BUTTON_ID = 0;
+
+    // Grabber
+    public static final int GRABBER_PIVOT_ID = 13;
+    public static final int GRABBER_ROLLER_ID = 12;
+
+	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
