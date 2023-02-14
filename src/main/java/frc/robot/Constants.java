@@ -33,21 +33,21 @@ public final class Constants {
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.55245; // 21.75 inches
 
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3; 
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; 
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 11; 
+    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 18; 
+    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 19; 
+    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 19; 
 
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 0; 
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 7; 
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10; 
+    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 10; 
+    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 11; 
+    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 11; 
 
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 6; 
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 4; 
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 9; 
+    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 0; 
+    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 1; 
+    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 1; 
 
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 1; 
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 5; 
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8;
+    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 8; 
+    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 9; 
+    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 9;
 
 	public static final double XBOX_DEADBAND = 0.12;
 	public static final double FRSKY_DEADBAND = 0.07;
@@ -76,6 +76,22 @@ public final class Constants {
     public static final double DANGER_ANGLE = 5.0;
 	
     // Controllers
+    // Arm
+    public static final int SHOULDER_ID = 4;
+    public static final int ELBOW_ID = 3;
+    public static final int WRIST_ID = 5;
+    
+    public static final int SHOULDER_ENCODER_ID = 4;
+    public static final int ELBOW_ENCODER_ID = 3;
+    public static final int WRIST_ENCODER_ID = 5;
+
+    public static final int COAST_BUTTON_ID = 0;
+
+    // Grabber
+    public static final int GRABBER_PIVOT_ID = 13;
+    public static final int GRABBER_ROLLER_ID = 12;
+
+	// Controllers
 	public static final int DRIVER_CONTROLLER_ID = 0;
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;

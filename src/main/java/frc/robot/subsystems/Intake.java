@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -20,42 +21,42 @@ public class Intake extends SubsystemBase {
   
   // Cube
   private DoublePreferenceConstant innerRollerCubeIntakeSpeed = 
-      new DoublePreferenceConstant("Inner Roller Cube Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Intake/Inner Cube", -0.5);
   private DoublePreferenceConstant outerRollerCubeIntakeSpeed =
-      new DoublePreferenceConstant("Outer Roller Cube Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Intake/Outer Cube", 0.5);
   // Cone
   private DoublePreferenceConstant innerRollerConeIntakeSpeed =
-      new DoublePreferenceConstant("Inner Roller Cone Intake Speed", -0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Intake/Inner Cone", 0.5);
   private DoublePreferenceConstant outerRollerConeIntakeSpeed =
-      new DoublePreferenceConstant("Outer Roller Cone Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Intake/Outer Cone", 0.5);
   // Outgest
   private DoublePreferenceConstant innerRollerOutgestIntakeSpeed =
-      new DoublePreferenceConstant("Inner Roller Outgest Intake Speed", -0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner", -0.25);
   private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
-      new DoublePreferenceConstant("Outer Roller Outgest Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer", 0.5);
   // Hold
   private DoublePreferenceConstant innerRollerHoldCubeIntakeSpeed =
-    new DoublePreferenceConstant("Inner Roller Hold Cube Intake Speed", 0.1);
+    new DoublePreferenceConstant("Intake/Speeds/Hold/Inner Cube", 0.025);
   private DoublePreferenceConstant outerRollerHoldCubeIntakeSpeed =
-    new DoublePreferenceConstant("Outer Roller Hold Cube Intake Speed", 0.1);
+    new DoublePreferenceConstant("Intake/Speeds/Hold/Outer Cube", 0.1);
   private DoublePreferenceConstant innerRollerHoldConeIntakeSpeed =
-    new DoublePreferenceConstant("Inner Roller Hold Cone Intake Speed", -0.1);
+    new DoublePreferenceConstant("Intake/Speeds/Hold/Inner Cone", 0.07);
   private DoublePreferenceConstant outerRollerHoldConeIntakeSpeed =
-    new DoublePreferenceConstant("Outer Roller Hold Cone Intake Speed", 0.1);
+    new DoublePreferenceConstant("Intake/Speeds/Hold/Outer Cone", 0.1);
   // Arm
   private DoublePreferenceConstant armUpStallIntakeSpeed =
-      new DoublePreferenceConstant("Arm Up Stall Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Arm/Up Stall Speed", -0.03);
   private DoublePreferenceConstant armDownStallIntakeSpeed =
-      new DoublePreferenceConstant("Arm Down Stall Intake Speed", 0.5);
+      new DoublePreferenceConstant("Intake/Arm/Down Stall Speed", 0.03);
   private DoublePreferenceConstant armUpMoveIntakeSpeed =
-      new DoublePreferenceConstant("Arm Up Move Intake Speed", 0.5);  
+      new DoublePreferenceConstant("Intake/Arm/Up Move Speed", -0.35);  
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
-      new DoublePreferenceConstant("Arm Down Move Intake Speed", 0.5);  
+      new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.35); 
   // IR Sensor
   private DoublePreferenceConstant irSensorMin =
-      new DoublePreferenceConstant("Intake IR Min", 0.33);
-      private DoublePreferenceConstant irSensorMax =
-      new DoublePreferenceConstant("Intake IR Max", 0.38);
+      new DoublePreferenceConstant("Intake/IR/Min", 0.35);
+  private DoublePreferenceConstant irSensorMax =
+      new DoublePreferenceConstant("Intake/IR/Max", 0.44);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
@@ -77,6 +78,11 @@ public class Intake extends SubsystemBase {
 
     m_irSensor.setAverageBits(12);
   }
+
+    public WPI_TalonFX[] getMotors() {
+      WPI_TalonFX[] motors = {m_innerRoller, m_outerRoller, m_arm};
+      return motors;
+    }
 
     public void setCube() {
       coneMode = false;
@@ -153,6 +159,10 @@ public class Intake extends SubsystemBase {
       return m_irSensor.getAverageVoltage() > irSensorMin.getValue() && m_irSensor.getAverageVoltage() < irSensorMax.getValue();
     }
     
+    public Trigger holdAndHasPiece() {
+      return new Trigger(() -> isArmUp() && hasGamePiece());
+    }
+
     ////////// Commands :) /////////
 
     public CommandBase setCubeFactory() {

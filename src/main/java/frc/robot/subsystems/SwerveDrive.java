@@ -7,8 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
-import java.util.stream.Stream;
-
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -30,6 +29,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
@@ -81,13 +81,14 @@ public class SwerveDrive extends SubsystemBase {
                         // Back right
                         new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0));
 
-        private DoublePreferenceConstant p_frontLeftOffset = new DoublePreferenceConstant("Drive Front Left Offset",
-                        0.0);
-        private DoublePreferenceConstant p_frontRightOffset = new DoublePreferenceConstant("Drive Front Right Offset",
-                        0.0);
-        private DoublePreferenceConstant p_backLeftOffset = new DoublePreferenceConstant("Drive Back Left Offset", 0.0);
-        private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive Back Right Offset",
-                        0.0);
+        private DoublePreferenceConstant p_frontLeftOffset = new DoublePreferenceConstant("Drive/Offsets/Front Left",
+                        220.1);
+        private DoublePreferenceConstant p_frontRightOffset = new DoublePreferenceConstant("Drive/Offsets/Front Right",
+                        182.7);
+        private DoublePreferenceConstant p_backLeftOffset = new DoublePreferenceConstant("Drive/Offsets/Back Left",
+                        5.5);
+        private DoublePreferenceConstant p_backRightOffset = new DoublePreferenceConstant("Drive/Offsets/Back Right",
+                        317);
 
         private final SlewRateLimiter filterX = new SlewRateLimiter(3.0);
         private final SlewRateLimiter filterY = new SlewRateLimiter(3.0);
@@ -190,6 +191,14 @@ public class SwerveDrive extends SubsystemBase {
 
         public AHRS getNavX() {
                 return m_navx;
+        }
+
+        public Trigger isFacingForwards() {
+                return new Trigger(() -> m_navx.getYaw()<60 && m_navx.getYaw()>-60);
+        }
+
+        public Trigger isFacingBackwards() {
+                return new Trigger(() -> m_navx.getYaw()>120 || m_navx.getYaw()<-120);
         }
 
         public Rotation2d getGyroscopeRotation() {
@@ -326,6 +335,13 @@ public class SwerveDrive extends SubsystemBase {
                 return grantDrive;
         }
 
+        public TalonFX[] getMotors() {
+                TalonFX[] motors = {m_frontLeftModule.getDriveController().getMotor(), m_frontRightModule.getDriveController().getMotor(),
+                        m_backLeftModule.getDriveController().getMotor(), m_backRightModule.getDriveController().getMotor(),
+                        m_frontLeftModule.getSteerController().getMotor(), m_frontRightModule.getSteerController().getMotor(),
+                        m_backLeftModule.getSteerController().getMotor(), m_backRightModule.getSteerController().getMotor()};
+                return motors;
+        }
         public InstantCommand resetYawCommandFactory() {
                 return new InstantCommand(() -> {zeroGyroscope();});
         }
