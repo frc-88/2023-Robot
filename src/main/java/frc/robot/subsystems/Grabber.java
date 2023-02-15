@@ -73,6 +73,7 @@ public class Grabber extends SubsystemBase {
     zeroRelativePivot();
 
     m_pivot.setInverted(true);
+    m_pivot.setSensorPhase(true);
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(4);
@@ -141,7 +142,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void zeroRelativePivot() {
-    m_pivot.setSelectedSensorPosition(getPivotAbsoluteAngle());
+    m_pivot.setSelectedSensorPosition(convertActualPositionToSensorPosition(getPivotAbsoluteAngle()));
   }
 
   public void calibrateAbsolutePivot() {
@@ -241,7 +242,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase setPivotForwardsFactory() {
-    return new InstantCommand(this::setPivotForwardsFactory);
+    return new InstantCommand(this::setPivotForwards);
   }
 
   public CommandBase setPivotBackwardsFactory() {
@@ -255,7 +256,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase forcePivotBackwardsFactory() {
-    return new InstantCommand(this::setPivotBackwardsFactory);
+    return new InstantCommand(this::setPivotBackwards);
   }
 
   @Override
