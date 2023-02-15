@@ -20,7 +20,6 @@ public class Lights extends SubsystemBase {
     private int m_state = 0;
     private int counter = 0;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
-    private boolean m_clearAllAnims = false;
     private boolean m_animDirection = false;
     private boolean m_setAnim = false;
 
@@ -51,32 +50,39 @@ public class Lights extends SubsystemBase {
         rainbow();
     }
 
-    public void clearAllAnims() {
-        m_clearAllAnims = true;
-    }
-
     public void wantCone() {
         m_toAnimate = new StrobeAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_setAnim = true;
     }
 
     public void holdingCone() {
         m_toAnimate = new ColorFlowAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+        m_setAnim = true;
     }
 
     public void wantCube() {
         m_toAnimate = new StrobeAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_setAnim = true;
     }
 
     public void holdingCube() {
         m_toAnimate = new ColorFlowAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+        m_setAnim = true;
     }
 
     public void larsonColor(int r, int g, int b) {
         m_toAnimate = new LarsonAnimation(r, g, b, 0, 0.2, LEDS_PER_ANIMATION, BounceMode.Front, 5, 0);
+        m_setAnim = true;
     }
 
     public void rainbow() {
         m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, 0);
+        m_setAnim = true;
+    }
+
+    public void strobe(int r, int g, int b) {
+        m_toAnimate = new StrobeAnimation(r, g, b, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_setAnim = true;
     }
 
     @Override
@@ -112,33 +118,16 @@ public class Lights extends SubsystemBase {
                 break;
             // No default
         }
-        // This method will be called once per scheduler run
-        if (m_toAnimate == null) {
-            if (!m_setAnim) {
-                /* Only setLEDs once, because every set will transmit a frame */
-                m_candle.setLEDs(100, 0, 120);
-                m_setAnim = true;
-            }
-        } else if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
-                || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
-            m_candle.animate(new StrobeAnimation(255, 0, 0));
-            m_setAnim = false;
-        } else {
-            m_candle.animate(m_toAnimate);
-            m_setAnim = false;
-        }
-
+        
         if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
                 || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
-            m_candle.animate(new StrobeAnimation(255, 0, 0));
+            strobe(255, 0, 0);
+        } 
+        
+        if (m_setAnim) {
+            m_candle.clearAnimation(0);
+            m_candle.animate(m_toAnimate, 0);
             m_setAnim = false;
-        }
-
-        if (m_clearAllAnims) {
-            m_clearAllAnims = false;
-            for (int i = 0; i < 10; ++i) {
-                m_candle.clearAnimation(i);
-            }
         }
     }
 

@@ -31,7 +31,7 @@ public class Grabber extends SubsystemBase {
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private boolean m_pivotForwards = true;
-  private boolean m_pivotLocked = true;
+  private boolean m_pivotLocked = false;
 
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
@@ -73,6 +73,7 @@ public class Grabber extends SubsystemBase {
     zeroRelativePivot();
 
     m_pivot.setInverted(true);
+    m_pivot.setSensorPhase(true);
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(4);
@@ -125,7 +126,7 @@ public class Grabber extends SubsystemBase {
   }
 
   private void unlockPivot() {
-    m_pivotLocked = true;
+    m_pivotLocked = false;
   }
 
   public double getPivotAngle() {
@@ -141,7 +142,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void zeroRelativePivot() {
-    m_pivot.setSelectedSensorPosition(getPivotAbsoluteAngle());
+    m_pivot.setSelectedSensorPosition(convertActualPositionToSensorPosition(getPivotAbsoluteAngle()));
   }
 
   public void calibrateAbsolutePivot() {
@@ -241,16 +242,20 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase setPivotForwardsFactory() {
+    return new InstantCommand(this::setPivotForwards);
+  }
+
+  public CommandBase setPivotBackwardsFactory() {
     return new InstantCommand(() -> {
       if (hasGamePiece()) {
-        setPivotForwards();
-      } else {
         setPivotBackwards();
+      } else {
+        setPivotForwards();
       }
     });
   }
 
-  public CommandBase setPivotBackwardsFactory() {
+  public CommandBase forcePivotBackwardsFactory() {
     return new InstantCommand(this::setPivotBackwards);
   }
 
