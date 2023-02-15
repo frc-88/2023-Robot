@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.ctre.phoenix.music.Orchestra;
+import com.fasterxml.jackson.databind.jsontype.impl.AsDeductionTypeDeserializer;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -112,6 +115,12 @@ public class Arm extends SubsystemBase {
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
         return sendArmToState(armState).until(this::isAtTarget);
+    }
+
+    public void addToOrchestra(Orchestra m_orchestra) {
+        m_orchestra.addInstrument(m_elbow.getMotor());
+        m_orchestra.addInstrument(m_shoulder.getMotor());
+        m_orchestra.addInstrument(m_wrist.getMotor());
     }
 
     @Override

@@ -100,6 +100,10 @@ public class ArmJoint {
         m_motor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
+    public WPI_TalonFX getMotor() {
+        return m_motor;
+    }
+
     public void setMotionMagic(double angle, double speed) {
         if (!m_zeroed) {
             setPercentOutput(0);

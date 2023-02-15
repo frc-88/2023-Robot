@@ -8,6 +8,7 @@ import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.music.Orchestra;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -335,12 +336,15 @@ public class SwerveDrive extends SubsystemBase {
                 return grantDrive;
         }
 
-        public TalonFX[] getMotors() {
-                TalonFX[] motors = {m_frontLeftModule.getDriveController().getMotor(), m_frontRightModule.getDriveController().getMotor(),
-                        m_backLeftModule.getDriveController().getMotor(), m_backRightModule.getDriveController().getMotor(),
-                        m_frontLeftModule.getSteerController().getMotor(), m_frontRightModule.getSteerController().getMotor(),
-                        m_backLeftModule.getSteerController().getMotor(), m_backRightModule.getSteerController().getMotor()};
-                return motors;
+        public void addToOrchestra(Orchestra m_orchestra) {
+                m_orchestra.addInstrument(m_frontLeftModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_frontRightModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_backLeftModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_backRightModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_frontLeftModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_frontRightModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_backLeftModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_backRightModule.getSteerController().getMotor());
         }
         public InstantCommand resetYawCommandFactory() {
                 return new InstantCommand(() -> {zeroGyroscope();});

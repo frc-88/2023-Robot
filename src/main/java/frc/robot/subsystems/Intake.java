@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -78,10 +79,10 @@ public class Intake extends SubsystemBase {
 
     m_irSensor.setAverageBits(12);
   }
-
-    public WPI_TalonFX[] getMotors() {
-      WPI_TalonFX[] motors = {m_innerRoller, m_outerRoller, m_arm};
-      return motors;
+    public void addToOrchestra(Orchestra m_orchestra) {
+      m_orchestra.addInstrument(m_arm);
+      m_orchestra.addInstrument(m_innerRoller);
+      m_orchestra.addInstrument(m_outerRoller);
     }
 
     public void setCube() {
