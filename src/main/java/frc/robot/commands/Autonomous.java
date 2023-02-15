@@ -11,14 +11,14 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.FollowTrajectory;
-import frc.robot.subsystems.CANdleSystem;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.TrajectoryHelper;
 
 /** Add your docs here. */
 public class Autonomous {
-    public static Command simpleAuto(SwerveDrive drive, Intake intake, CANdleSystem candle) {
+    public static Command simpleAuto(SwerveDrive drive, Intake intake, Lights candle) {
         return new SequentialCommandGroup(
             intake.setCubeFactory(), 
             candle.wantCubeFactory(),
