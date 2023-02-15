@@ -29,13 +29,13 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
     Results aprilTagResults = LimelightHelpers.getLatestResults(Constants.LIMELIGHT_NAME).targetingResults;
     Pose3d botPose3d = aprilTagResults.getBotPose3d();
-    SmartDashboard.putString("April Tags", aprilTagResults.targets_Fiducials.toString());
-    SmartDashboard.putNumber("X", botPose3d.getX());
-    SmartDashboard.putNumber("Y", botPose3d.getY());
-    SmartDashboard.putNumber("Z", botPose3d.getZ());
-    SmartDashboard.putNumber("Roll", Math.toDegrees(botPose3d.getRotation().getX()));
-    SmartDashboard.putNumber("Pitch", Math.toDegrees(botPose3d.getRotation().getY()));
-    SmartDashboard.putNumber("Yaw", Math.toDegrees(botPose3d.getRotation().getZ()));
+    SmartDashboard.putNumber("LL:AprilTag", aprilTagResults.targets_Fiducials[0].fiducialID);
+    SmartDashboard.putNumber("LL:BotX", botPose3d.getX());
+    SmartDashboard.putNumber("LL:BotY", botPose3d.getY());
+    SmartDashboard.putNumber("LL:BotZ", botPose3d.getZ());
+    SmartDashboard.putNumber("LL:BotRoll", Math.toDegrees(botPose3d.getRotation().getX()));
+    SmartDashboard.putNumber("LL:BotPitch", Math.toDegrees(botPose3d.getRotation().getY()));
+    SmartDashboard.putNumber("LL:BotYaw", Math.toDegrees(botPose3d.getRotation().getZ()));
 
   }
 }
