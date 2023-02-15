@@ -102,4 +102,6 @@ public final class Constants {
     public static final double MAX_TRAJ_CENTRIP_ACC = 3;
     public static final double MAX_TRAJ_ACCELERATION = 3;
 	
+    // Limelight
+    public static final String LIMELIGHT_NAME = "limelight";
 }

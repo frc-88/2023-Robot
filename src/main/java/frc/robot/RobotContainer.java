@@ -22,6 +22,7 @@ import frc.robot.commands.PlaySong;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Limelight;
 import frc.robot.util.arm.ArmStates;
 import frc.robot.util.controllers.ButtonBox;
 
@@ -39,6 +40,7 @@ public class RobotContainer {
 
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
+  private final Limelight m_limelight = new Limelight();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
 
@@ -50,6 +52,7 @@ public class RobotContainer {
   private final Lights m_candleSubsystem = new Lights();
   private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
+
 
 
   public RobotContainer() {
@@ -161,6 +164,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
     SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
 
+    SmartDashboard.putData("Reset Robot Pose", m_limelight.llLocalize(m_drive));
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive));
   }
   
