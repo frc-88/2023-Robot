@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.CANdleSystem;
+import frc.robot.subsystems.Lights;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
@@ -47,7 +47,7 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
-  private final CANdleSystem m_candleSubsystem = new CANdleSystem();
+  private final Lights m_candleSubsystem = new Lights();
   private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 

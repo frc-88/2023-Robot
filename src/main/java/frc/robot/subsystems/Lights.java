@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 import com.ctre.phoenix.led.*;
@@ -14,10 +15,10 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
-public class CANdleSystem extends SubsystemBase {
-  private final int LEDS_PER_ANIMATION = 128;
-  private int m_state = 0;
-  private int counter = 0;
+public class Lights extends SubsystemBase {
+    private final int LEDS_PER_ANIMATION = 22;
+    private int m_state = 0;
+    private int counter = 0;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private boolean m_clearAllAnims = false;
     private boolean m_animDirection = false;
@@ -39,7 +40,7 @@ public class CANdleSystem extends SubsystemBase {
         Empty
     }
 
-    public CANdleSystem() {
+    public Lights() {
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
@@ -50,7 +51,9 @@ public class CANdleSystem extends SubsystemBase {
         rainbow();
     }
 
-    public void clearAllAnims() {m_clearAllAnims = true;}
+    public void clearAllAnims() {
+        m_clearAllAnims = true;
+    }
 
     public void wantCone() {
         m_toAnimate = new StrobeAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, 0);
@@ -78,42 +81,62 @@ public class CANdleSystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        switch(m_state){
-            case 0: larsonColor(255,0,0);
-            if (counter++>100) {
-                m_state ++;
-                counter = 0;
-            }
-            break;
-            case 1: larsonColor(0,255,0);
-            if (counter++>100) {
-                m_state ++;
-                counter = 0;
-            }
-            break;
-            case 2: larsonColor(0,0,255);
-            if (counter++>100) {
-                m_state ++;
-                counter = 0;
-            }
-            break;
-            default: rainbow();
+        switch (m_state) {
+            case 0:
+                larsonColor(255, 0, 0);
+                if (counter++ > 100) {
+                    m_state++;
+                    counter = 0;
+                }
+                break;
+            case 1:
+                larsonColor(0, 255, 0);
+                if (counter++ > 100) {
+                    m_state++;
+                    counter = 0;
+                }
+                break;
+            case 2:
+                larsonColor(0, 0, 255);
+                if (counter++ > 100) {
+                    m_state++;
+                    counter = 0;
+                }
+                break;
+            case 3:
+                rainbow();
+                if (counter++ > 100) {
+                    m_state++;
+                    counter = 0;
+                }
+                break;
+            // No default
         }
         // This method will be called once per scheduler run
-        if(m_toAnimate == null) {
-            if(!m_setAnim) {
+        if (m_toAnimate == null) {
+            if (!m_setAnim) {
                 /* Only setLEDs once, because every set will transmit a frame */
                 m_candle.setLEDs(100, 0, 120);
                 m_setAnim = true;
             }
+        } else if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
+                || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
+            m_candle.animate(new StrobeAnimation(255, 0, 0));
+            m_setAnim = false;
         } else {
             m_candle.animate(m_toAnimate);
             m_setAnim = false;
         }
 
-        if(m_clearAllAnims) {
+        if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
+                || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
+            m_candle.animate(new StrobeAnimation(255, 0, 0));
+            m_setAnim = false;
+        }
+
+        if (m_clearAllAnims) {
             m_clearAllAnims = false;
-            for(int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 10; ++i) {
                 m_candle.clearAnimation(i);
             }
         }
@@ -124,8 +147,27 @@ public class CANdleSystem extends SubsystemBase {
         // This method will be called once per scheduler run during simulation
     }
 
-    public InstantCommand wantConeFactory() {return new InstantCommand(() -> {wantCone();});}
-    public InstantCommand holdingConeFactory() {return new InstantCommand(() -> {holdingCone();});}
-    public InstantCommand wantCubeFactory() {return new InstantCommand(() -> {wantCube();});}
-    public InstantCommand holdingCubeFactory() {return new InstantCommand(() -> {holdingCube();});}
+    public InstantCommand wantConeFactory() {
+        return new InstantCommand(() -> {
+            wantCone();
+        });
+    }
+
+    public InstantCommand holdingConeFactory() {
+        return new InstantCommand(() -> {
+            holdingCone();
+        });
+    }
+
+    public InstantCommand wantCubeFactory() {
+        return new InstantCommand(() -> {
+            wantCube();
+        });
+    }
+
+    public InstantCommand holdingCubeFactory() {
+        return new InstantCommand(() -> {
+            holdingCube();
+        });
+    }
 }
