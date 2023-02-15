@@ -153,6 +153,10 @@ public class RobotContainer {
     SmartDashboard.putData("Set Grabber Forwards", m_grabber.setPivotForwardsFactory());
     SmartDashboard.putData("Set Grabber Backwards", m_grabber.setPivotBackwardsFactory());
     SmartDashboard.putData("Force Grabber Backwards", m_grabber.forcePivotBackwardsFactory());
+    SmartDashboard.putData("Grab Cone", m_grabber.grabConeFactory());
+    SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
+    SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
+    SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
 
     // Subsystems
     SmartDashboard.putData(m_drive);
