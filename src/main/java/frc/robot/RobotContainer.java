@@ -56,10 +56,6 @@ public class RobotContainer {
     configureControllers();
     configureDefaultCommands();
     configureSmartDashboardButtons();
-
-    PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
-    pdh.setSwitchableChannel(true);
-    pdh.close();
   }
 
   private void configureControllers() {
