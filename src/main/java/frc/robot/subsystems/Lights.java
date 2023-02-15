@@ -125,7 +125,8 @@ public class Lights extends SubsystemBase {
         } 
         
         if (m_setAnim) {
-            m_candle.animate(m_toAnimate);
+            m_candle.clearAnimation(0);
+            m_candle.animate(m_toAnimate, 0);
             m_setAnim = false;
         }
     }
