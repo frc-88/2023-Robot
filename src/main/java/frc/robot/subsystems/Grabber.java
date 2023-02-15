@@ -31,7 +31,7 @@ public class Grabber extends SubsystemBase {
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private boolean m_pivotForwards = true;
-  private boolean m_pivotLocked = true;
+  private boolean m_pivotLocked = false;
 
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
@@ -125,7 +125,7 @@ public class Grabber extends SubsystemBase {
   }
 
   private void unlockPivot() {
-    m_pivotLocked = true;
+    m_pivotLocked = false;
   }
 
   public double getPivotAngle() {
@@ -241,17 +241,21 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase setPivotForwardsFactory() {
+    return new InstantCommand(this::setPivotForwardsFactory);
+  }
+
+  public CommandBase setPivotBackwardsFactory() {
     return new InstantCommand(() -> {
       if (hasGamePiece()) {
-        setPivotForwards();
-      } else {
         setPivotBackwards();
+      } else {
+        setPivotForwards();
       }
     });
   }
 
-  public CommandBase setPivotBackwardsFactory() {
-    return new InstantCommand(this::setPivotBackwards);
+  public CommandBase forcePivotBackwardsFactory() {
+    return new InstantCommand(this::setPivotBackwardsFactory);
   }
 
   @Override
