@@ -29,7 +29,6 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
     Results aprilTagResults = LimelightHelpers.getLatestResults(Constants.LIMELIGHT_NAME).targetingResults;
     Pose3d botPose3d = aprilTagResults.getBotPose3d();
-    SmartDashboard.putNumber("LL:AprilTag", aprilTagResults.targets_Fiducials[0].fiducialID);
     SmartDashboard.putNumber("LL:BotX", botPose3d.getX());
     SmartDashboard.putNumber("LL:BotY", botPose3d.getY());
     SmartDashboard.putNumber("LL:BotZ", botPose3d.getZ());
