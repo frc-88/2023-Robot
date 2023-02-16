@@ -92,6 +92,8 @@ public class Grabber extends SubsystemBase {
     p_pivotMaxVelocity.addChangeHandler(pivotHandler);
     p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
 
+    m_roller.configNeutralDeadband(0);
+
     Consumer<Double> rollerHandler = (Double unused) -> {
       SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration(
                 true,
@@ -152,11 +154,13 @@ public class Grabber extends SubsystemBase {
   }
 
   public void grabCube() {
-    m_roller.set(p_grabCubeSpeed.getValue());
+    if (!hasGamePiece()) m_roller.set(p_grabCubeSpeed.getValue());
+    else holdCube();
   }
 
   public void grabCone() {
-    m_roller.set(p_grabConeSpeed.getValue());
+    if (!hasGamePiece()) m_roller.set(p_grabConeSpeed.getValue());
+    else holdCone();
   }
 
   public void dropCube() {
