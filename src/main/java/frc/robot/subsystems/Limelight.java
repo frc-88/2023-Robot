@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightHelpers.Results;
 
 public class Limelight extends SubsystemBase {
 
@@ -19,9 +18,15 @@ public class Limelight extends SubsystemBase {
   }
 
   public InstantCommand llLocalize(SwerveDrive drive) {
-    return new InstantCommand (
-      () -> {drive.resetPosition(LimelightHelpers.getBotPose2d(Constants.LIMELIGHT_NAME));},
-      drive);
+    if (DriverStation.getAlliance() == Alliance.Red) {
+      return new InstantCommand (
+        () -> {drive.resetPosition(LimelightHelpers.getBotPose2d_wpiRed(Constants.LIMELIGHT_NAME));},
+        drive);
+    } else {
+      return new InstantCommand (
+        () -> {drive.resetPosition(LimelightHelpers.getBotPose2d_wpiBlue(Constants.LIMELIGHT_NAME));},
+        drive);
+    }
   }
 
 
