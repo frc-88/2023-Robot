@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -17,29 +20,27 @@ public class Limelight extends SubsystemBase {
 
   }
 
-  public InstantCommand llLocalize(SwerveDrive drive) {
+  public Pose2d getBotPose() {
     if (DriverStation.getAlliance() == Alliance.Red) {
-      return new InstantCommand (
-        () -> {drive.resetPosition(LimelightHelpers.getBotPose2d_wpiRed(Constants.LIMELIGHT_NAME));},
-        drive);
+      return LimelightHelpers.getBotPose2d_wpiRed(Constants.LIMELIGHT_NAME);
     } else {
-      return new InstantCommand (
-        () -> {drive.resetPosition(LimelightHelpers.getBotPose2d_wpiBlue(Constants.LIMELIGHT_NAME));},
-        drive);
+      return LimelightHelpers.getBotPose2d_wpiBlue(Constants.LIMELIGHT_NAME);
     }
+    
+  }
+
+  public InstantCommand llLocalize(SwerveDrive drive) {
+    return new InstantCommand (
+      () -> {drive.resetPosition(getBotPose());},
+      drive);
   }
 
 
   @Override
   public void periodic() {
-    // Results aprilTagResults = LimelightHelpers.getLatestResults(Constants.LIMELIGHT_NAME).targetingResults;
-    // Pose3d botPose3d = aprilTagResults.getBotPose3d();
-    // SmartDashboard.putNumber("LL:BotX", botPose3d.getX());
-    // SmartDashboard.putNumber("LL:BotY", botPose3d.getY());
-    // SmartDashboard.putNumber("LL:BotZ", botPose3d.getZ());
-    // SmartDashboard.putNumber("LL:BotRoll", Math.toDegrees(botPose3d.getRotation().getX()));
-    // SmartDashboard.putNumber("LL:BotPitch", Math.toDegrees(botPose3d.getRotation().getY()));
-    // SmartDashboard.putNumber("LL:BotYaw", Math.toDegrees(botPose3d.getRotation().getZ()));
-
+    Pose2d botPose = getBotPose();
+    SmartDashboard.putNumber("LL:BotX", Units.metersToFeet(botPose.getX()));
+    SmartDashboard.putNumber("LL:BotY", Units.metersToFeet(botPose.getY()));
+    SmartDashboard.putNumber("LL:BotYaw", botPose.getRotation().getDegrees());
   }
 }
