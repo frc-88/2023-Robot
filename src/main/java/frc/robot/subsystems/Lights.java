@@ -25,6 +25,7 @@ public class Lights extends SubsystemBase {
 
     private Animation m_toAnimate = null;
     private Animation m_lastAnimation = null;
+    private Animation m_strobe = null;
 
     public enum AnimationTypes {
         ColorFlow,
@@ -123,7 +124,8 @@ public class Lights extends SubsystemBase {
                 || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
             m_lastAnimation = m_toAnimate;
             strobe(255, 0, 0);
-        } else if (m_toAnimate.equals(new StrobeAnimation(255, 0, 0, 0, 0.2, LEDS_PER_ANIMATION, 0))
+            m_strobe = m_toAnimate;
+        } else if (m_toAnimate.equals(m_strobe)
          && m_lastAnimation != null) {
             m_toAnimate = m_lastAnimation;
         }
