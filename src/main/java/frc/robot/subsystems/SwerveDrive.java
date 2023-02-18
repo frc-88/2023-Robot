@@ -222,7 +222,7 @@ public class SwerveDrive extends SubsystemBase {
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
-                m_fieldOffset = startPose.getRotation().getDegrees();
+                m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
         }
 
         public void resetTrajectoryPose(Pose2d startPose) {
