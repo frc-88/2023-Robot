@@ -172,11 +172,11 @@ public class RobotContainer {
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_arm);
 
-    SmartDashboard.putData("Auto Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), true));
+    SmartDashboard.putData("Auto Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
     SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
     SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
 
-    SmartDashboard.putData("Reset Robot Pose", m_limelight.llLocalize(m_drive));
+    SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive));
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
   }
   

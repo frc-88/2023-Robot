@@ -24,7 +24,7 @@ public class Autonomous {
             candle.wantCubeFactory(),
             new ParallelRaceGroup(
                     intake.intakeFactory(),
-                    new FollowTrajectory(drive, TrajectoryHelper.generatePathWeaverTrajectory("Simple1.wpilib.json"), false)
+                    new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), false)
                 )
             );
     }
