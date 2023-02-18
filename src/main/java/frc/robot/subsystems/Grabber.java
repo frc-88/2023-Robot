@@ -260,10 +260,8 @@ public class Grabber extends SubsystemBase {
   public CommandBase setPivotBackwardsFactory() {
     return new InstantCommand(() -> {
       if (hasGamePiece()) {
-        System.out.println("Backwards");
         setPivotBackwards();
       } else {
-        System.out.println("Forwards");
         setPivotForwards();
       }
     });
