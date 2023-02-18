@@ -214,15 +214,24 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public void zeroOdometry() {
+                zeroDriveEncoders();
                 resetOdometry(new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d()),
                                 new Rotation2d());
         }
 
+        public void zeroDriveEncoders() {
+                m_frontLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_frontRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+        }
+
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
+                zeroDriveEncoders();
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
-                m_fieldOffset = startPose.getRotation().getDegrees();
+                m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
         }
 
         public void resetTrajectoryPose(Pose2d startPose) {
@@ -388,13 +397,9 @@ public class SwerveDrive extends SubsystemBase {
                 SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
-                SmartDashboard.putNumber("FLSteerCurrent", m_frontLeftModule.getSteerController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FRSteerCurrent", m_frontRightModule.getSteerController().getMotor().getStatorCurrent());               
-                SmartDashboard.putNumber("BLSteerCurrent", m_backLeftModule.getSteerController().getMotor().getStatorCurrent());               
-                SmartDashboard.putNumber("BRSteerCurrent", m_backRightModule.getSteerController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FLDriveCurrent", m_frontLeftModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FRDriveCurrent", m_frontRightModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("BLDriveCurrent", m_backLeftModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("BRDriveCurrent", m_backRightModule.getDriveController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("FLDrivePosition", m_frontLeftModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("FRDrivePosition", m_frontRightModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("BLDrivePosition", m_backLeftModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("BRDrivePosition", m_backRightModule.getDriveController().getMotor().getSelectedSensorPosition());
         }
 }
