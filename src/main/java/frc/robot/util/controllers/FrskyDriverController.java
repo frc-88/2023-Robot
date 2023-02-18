@@ -24,13 +24,8 @@ public class FrskyDriverController extends FrskyController implements DriverCont
     }
 
     @Override
-    public boolean getGyroReset() {
-        return isTopRightSwitchOn();
-    }
-
-    @Override
-    public Trigger getShootButton() {
-        return topLeftSwitch;
+    public Trigger getScoreButton() {
+        return topRightSwitch;
     }
     
 }

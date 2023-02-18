@@ -102,9 +102,9 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
       .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
-    m_buttonBox.scoreButton.or(m_driverController.getShootButton()).and(m_buttonBox.gamepieceSwitch)
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
       .whileTrue(m_grabber.dropConeFactory());
-    m_buttonBox.scoreButton.or(m_driverController.getShootButton()).and(m_buttonBox.gamepieceSwitch.negate())
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch.negate())
       .whileTrue(m_grabber.dropCubeFactory());
 
     m_drive.isFacingForwards().whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
