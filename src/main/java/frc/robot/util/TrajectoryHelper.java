@@ -61,7 +61,7 @@ public class TrajectoryHelper
     return TrajectoryGenerator.generateTrajectory(waypoints, config);
   }
 
-  public static Trajectory generatePathWeaverTrajectory(String trajectoryJSON) {
+  public static Trajectory generateJSONTrajectory(String trajectoryJSON) {
     trajectoryJSON = "output/" + trajectoryJSON;
     Trajectory trajectory = new Trajectory();
     try {
