@@ -214,11 +214,20 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public void zeroOdometry() {
+                zeroDriveEncoders();
                 resetOdometry(new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d()),
                                 new Rotation2d());
         }
 
+        public void zeroDriveEncoders() {
+                m_frontLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_frontRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+        }
+
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
+                zeroDriveEncoders();
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
