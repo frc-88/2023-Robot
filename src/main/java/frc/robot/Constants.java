@@ -73,7 +73,7 @@ public final class Constants {
     public static final int V5Button = XboxController.Button.kB.value;
     public static final int CurrentButton = XboxController.Button.kX.value;
     public static final int TemperatureButton = XboxController.Button.kY.value;
-    public static final double DANGER_ANGLE = 5.0;
+    public static final double DANGER_ANGLE = 7.5;
 	
     // Controllers
     // Arm
