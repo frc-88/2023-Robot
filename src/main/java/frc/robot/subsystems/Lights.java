@@ -44,10 +44,9 @@ public class Lights extends SubsystemBase {
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
         configAll.stripType = LEDStripType.GRB;
-        configAll.brightnessScalar = 0.1;
+        configAll.brightnessScalar = 1.0;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
-        rainbow();
     }
 
     public void wantCone() {
@@ -71,7 +70,7 @@ public class Lights extends SubsystemBase {
     }
 
     public void larsonColor(int r, int g, int b) {
-        m_toAnimate = new LarsonAnimation(r, g, b, 0, 0.2, LEDS_PER_ANIMATION, BounceMode.Front, 5, 0);
+        m_toAnimate = new LarsonAnimation(r, g, b, 0, 0.1, LEDS_PER_ANIMATION, BounceMode.Front, 5, 0);
         m_setAnim = true;
     }
 
