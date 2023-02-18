@@ -13,6 +13,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -62,6 +64,11 @@ public class Grabber extends SubsystemBase {
     new DoublePreferenceConstant("Grabber/Roller/Hold Cube Speed", -0.05);
   private DoublePreferenceConstant p_holdConeSpeed =
     new DoublePreferenceConstant("Grabber/Roller/Hold Cone Speed", 0.05);
+    
+  private DoublePreferenceConstant p_hasGamePieceDebounceTime =
+    new DoublePreferenceConstant("Grabber/Roller/Debounce", 0.5);
+
+  private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kBoth);
 
   public Grabber(BooleanSupplier coastMode) {
     m_coastMode = coastMode;
@@ -93,6 +100,7 @@ public class Grabber extends SubsystemBase {
     p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
 
     m_roller.configNeutralDeadband(0);
+    m_roller.overrideLimitSwitchesEnable(false);
 
     Consumer<Double> rollerHandler = (Double unused) -> {
       SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration(
@@ -120,7 +128,7 @@ public class Grabber extends SubsystemBase {
   }
 
   private void movePivot() {
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : 180));
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : -180));
   }
 
   private void lockPivot() {
@@ -140,7 +148,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 180) % 360. - 180;
+    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 180. + 360.*5.) % 360. - 180.;
   }
 
   public void zeroRelativePivot() {
@@ -180,7 +188,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean hasGamePiece() {
-    return m_roller.isFwdLimitSwitchClosed() > 0;
+    return m_hasGamePieceDebounce.calculate(m_roller.isFwdLimitSwitchClosed() > 0);
   }
 
   public Trigger hasGamePieceTrigger() {
@@ -252,8 +260,10 @@ public class Grabber extends SubsystemBase {
   public CommandBase setPivotBackwardsFactory() {
     return new InstantCommand(() -> {
       if (hasGamePiece()) {
+        System.out.println("Backwards");
         setPivotBackwards();
       } else {
+        System.out.println("Forwards");
         setPivotForwards();
       }
     });
