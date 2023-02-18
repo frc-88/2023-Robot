@@ -62,7 +62,7 @@ public class TrajectoryHelper
   }
 
   public static Trajectory generateJSONTrajectory(String trajectoryJSON) {
-    trajectoryJSON = "output/" + trajectoryJSON;
+    // trajectoryJSON = "pathplanner/generatedJSON/" + trajectoryJSON;
     Trajectory trajectory = new Trajectory();
     try {
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
