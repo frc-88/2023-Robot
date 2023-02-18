@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.robot.subsystems.Lights;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.PlaySong;
@@ -48,7 +49,7 @@ public class RobotContainer {
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final Lights m_candleSubsystem = new Lights();
-  private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
+  // private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
 
@@ -59,56 +60,64 @@ public class RobotContainer {
     configureSmartDashboardButtons();
   }
 
+  public void enableInit() {
+    if (m_drive.isFacingForwards().getAsBoolean()) {
+      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
+    } else if (m_drive.isFacingBackwards().getAsBoolean()) {
+      new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
+    }
+  }
+
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
-      .onTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).onTrue(m_grabber.grabConeFactory());
+      .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory()).onFalse(m_grabber.grabConeFactory().withTimeout(1));
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
-      .onTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).onTrue(m_grabber.grabCubeFactory());
+      .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory()).onFalse(m_grabber.grabCubeFactory().withTimeout(1));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-      .onTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.scoreButton.and(m_buttonBox.gamepieceSwitch)
-      .onTrue(m_grabber.grabConeFactory());
+      .whileTrue(m_grabber.grabConeFactory());
     m_buttonBox.scoreButton.and(m_buttonBox.gamepieceSwitch.negate())
-      .onTrue(m_grabber.grabCubeFactory());
+      .whileTrue(m_grabber.grabCubeFactory());
 
-    m_drive.isFacingForwards().onTrue(m_grabber.setPivotBackwardsFactory());
-    m_drive.isFacingBackwards().onTrue(m_grabber.setPivotForwardsFactory());
+    m_drive.isFacingForwards().whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
+    m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     // m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
     //   .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
 
     // // Test controller
-    m_testController.a().onTrue(m_intake.intakeFactory());
-    m_testController.x().onTrue(m_intake.holdFactory());
-    m_testController.rightBumper().onTrue(m_intake.outgestFactory());
-    m_testController.leftBumper().onTrue(m_intake.stowFactory());
+    // m_testController.a().onTrue(m_intake.intakeFactory());
+    // m_testController.x().onTrue(m_intake.holdFactory());
+    // m_testController.rightBumper().onTrue(m_intake.outgestFactory());
+    // m_testController.leftBumper().onTrue(m_intake.stowFactory());
   }
 
   private void configureDefaultCommands() {

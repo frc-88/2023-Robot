@@ -139,7 +139,7 @@ public class ArmJoint {
     }
 
     public Translation2d getPositionVector() {
-        return new Translation2d(m_length, new Rotation2d(getAngle()));
+        return new Translation2d(m_length, new Rotation2d(Math.toRadians(getAngle())));
     }
 
     public double getLength() {

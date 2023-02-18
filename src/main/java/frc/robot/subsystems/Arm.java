@@ -56,32 +56,59 @@ public class Arm extends SubsystemBase {
 
     public boolean isValidState(ArmState armState) {    
         Translation2d grabberPosition = getGrabberPosition(
-            new Translation2d(m_shoulder.getLength(), new Rotation2d(armState.getShoulderAngle())),
-            new Translation2d(m_elbow.getLength(), new Rotation2d(armState.getElbowAngle())),
-            new Translation2d(m_wrist.getLength(), new Rotation2d(armState.getWristAngle())));
-        if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) return false;
-        if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) return false;
-        if (armState.getShoulderAngle() < 0 || armState.getShoulderAngle() > 180) return false;
-        if (armState.getElbowAngle() < -360 || armState.getElbowAngle() > 360) return false;
-        if (armState.getWristAngle() < -360 || armState.getWristAngle() > 360) return false;
-        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) return false;
+            new Translation2d(m_shoulder.getLength(), new Rotation2d(Math.toRadians(armState.getShoulderAngle()))),
+            new Translation2d(m_elbow.getLength(), new Rotation2d(Math.toRadians(armState.getElbowAngle()))),
+            new Translation2d(m_wrist.getLength(), new Rotation2d(Math.toRadians(armState.getWristAngle()))));
+        
+        if (grabberPosition.getY() > 78) {
+            System.out.println("Exceeded height limit with position: " + grabberPosition);
+            return false;
+        }
+        if (grabberPosition.getY() < 0) {
+            System.out.println("Exceeded floor limit with position: " + grabberPosition);
+            return false;
+        }
+        if (grabberPosition.getX() > 48 + 27 || grabberPosition.getX() < -48) {
+            System.out.println("Exceeded extension limit with position: " + grabberPosition);
+            return false;
+        }
+        if (armState.getShoulderAngle() < 0 || armState.getShoulderAngle() > 180) {
+            System.out.println("Exceeded shoulder limit with angle: " + armState.getShoulderAngle());
+            return false;
+        }
+        if (armState.getElbowAngle() < -360 || armState.getElbowAngle() > 360) {
+            System.out.println("Exceeded elbow limit with angle: " + armState.getElbowAngle());
+            return false;
+        }
+        if (armState.getWristAngle() < -360 || armState.getWristAngle() > 360) {
+            System.out.println("Exceeded wrist limit with angle: " + armState.getWristAngle());
+            return false;
+        }
+        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) {
+            System.out.println("Exceeded chassis hit limit with position: " + grabberPosition);
+            return false;
+        }
         return true;
     }
 
     public void goToArmState(ArmState armState) {
-        if (!isValidState(armState)) {
-            System.out.println("Arm state invalid");
-            return;
-        }
+        if (!isValidState(armState)) return;
         targetArmState = armState;
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(armState.getShoulderAngle()-m_shoulder.getAngle()), 
             Math.abs(armState.getElbowAngle()-m_elbow.getAngle()), 
             Math.abs(armState.getWristAngle()-m_wrist.getAngle())}));
-        // Keep max velocities the same or change this
-        m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
-        m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
-        m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+
+        if (greatestAngle > 2) {
+            // Keep max velocities the same or change this
+            m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
+            m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
+            m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+        } else {
+            m_shoulder.setMotionMagic(armState.getShoulderAngle());
+            m_elbow.setMotionMagic(armState.getElbowAngle());
+            m_wrist.setMotionMagic(armState.getWristAngle());
+        }
     }
 
     public boolean isAtTarget() {
