@@ -54,10 +54,14 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.35); 
   // IR Sensor
-  private DoublePreferenceConstant irSensorMin =
-      new DoublePreferenceConstant("Intake/IR/Min", 0.35);
-  private DoublePreferenceConstant irSensorMax =
-      new DoublePreferenceConstant("Intake/IR/Max", 0.44);
+  private DoublePreferenceConstant irSensorConeMin =
+      new DoublePreferenceConstant("Intake/IR/Cone Min", 0.491);
+  private DoublePreferenceConstant irSensorConeMax =
+      new DoublePreferenceConstant("Intake/IR/Cone Max", 0.698);
+  private DoublePreferenceConstant irSensorCubeMin =
+      new DoublePreferenceConstant("Intake/IR/Cube Min", 0.491);
+  private DoublePreferenceConstant irSensorCubeMax =
+      new DoublePreferenceConstant("Intake/IR/Cube Max", 0.698);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
@@ -94,7 +98,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void intake() {
-      // if (!hasGamePiece()) {
+      if (!hasGamePiece()) {
         if (!coneMode) {
           m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
@@ -102,9 +106,9 @@ public class Intake extends SubsystemBase {
           m_innerRoller.set(innerRollerConeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerConeIntakeSpeed.getValue());
         }
-      // } else {
-      //   hold();
-      // }
+      } else {
+        hold();
+      }
     }
 
     public void outgest() {
@@ -118,7 +122,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      // if (hasGamePiece()) {
+      if (hasGamePiece()) {
         if (!coneMode) {
           m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
@@ -126,9 +130,9 @@ public class Intake extends SubsystemBase {
           m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
         }
-      // } else {
-      //   stopRollers();
-      // }
+      } else {
+        stopRollers();
+      }
     }
 
     public void armUp() {
@@ -157,7 +161,7 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean hasGamePiece() {
-      return m_irSensor.getAverageVoltage() > irSensorMin.getValue() && m_irSensor.getAverageVoltage() < irSensorMax.getValue();
+      return m_irSensor.getAverageVoltage() > (coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) && m_irSensor.getAverageVoltage() < (coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue());
     }
     
     public Trigger holdAndHasPiece() {
