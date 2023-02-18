@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm;
@@ -16,11 +18,11 @@ public class Handoff extends SequentialCommandGroup {
 
   public Handoff(Intake intake, Arm arm, Grabber grabber, boolean coneMode) {
     ArmState armDown = coneMode ? ArmStates.getConeFromIntake : ArmStates.getCubeFromIntake;
-    CommandBase grabCommand = coneMode ? grabber.grabConeFactory() : grabber.grabCubeFactory();
+    Supplier<CommandBase> grabCommand = () -> coneMode ? grabber.grabConeFactory() : grabber.grabCubeFactory();
     addCommands(
-      arm.sendArmToStateAndEnd(armDown).deadlineWith(grabCommand).deadlineWith(intake.holdFactory()),
-      arm.sendArmToState(armDown).alongWith(grabCommand).alongWith(intake.handoffFactory()).withTimeout(0.5),
-      arm.sendArmToStateAndEnd(ArmStates.stow).alongWith(grabCommand).alongWith(intake.stowFactory())
+      arm.sendArmToStateAndEnd(armDown).deadlineWith(grabCommand.get()).deadlineWith(intake.holdFactory()),
+      arm.sendArmToState(armDown).alongWith(grabCommand.get()).alongWith(intake.handoffFactory()).withTimeout(0.5),
+      arm.sendArmToStateAndEnd(ArmStates.stow).alongWith(grabCommand.get()).alongWith(intake.stowFactory())
     );
   }
 }
