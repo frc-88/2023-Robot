@@ -66,6 +66,11 @@ public class RobotContainer {
     } else if (m_drive.isFacingBackwards().getAsBoolean()) {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
     }
+    if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
+      m_candleSubsystem.wantConeFactory();
+    } else {
+      m_candleSubsystem.wantCubeFactory();
+    }
   }
 
   private void configureControllers() {
