@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -22,6 +23,7 @@ public class Lights extends SubsystemBase {
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
     private boolean m_animDirection = false;
     private boolean m_setAnim = false;
+    private DoublePreferenceConstant dangerAngle = new DoublePreferenceConstant("Danger Angle", 5.0);
 
     private Animation m_toAnimate = null;
     private Animation m_lastAnimation = null;
@@ -120,8 +122,8 @@ public class Lights extends SubsystemBase {
             // No default
         }
         
-        if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > Constants.DANGER_ANGLE
-                || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > Constants.DANGER_ANGLE) {
+        if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > dangerAngle.getValue()
+                || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > dangerAngle.getValue()) {
             m_lastAnimation = m_toAnimate;
             strobe(255, 0, 0);
             m_strobe = m_toAnimate;

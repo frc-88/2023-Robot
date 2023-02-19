@@ -39,7 +39,14 @@ public class Limelight extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Pose2d botPose = getBotPose();
+    Pose2d botPose;
+    
+    if(LimelightHelpers.getFiducialID(Constants.LIMELIGHT_NAME) > 0.0) {
+      botPose = getBotPose();
+    } else {
+      botPose = new Pose2d();
+    }
+
     SmartDashboard.putNumber("LL:BotX", Units.metersToFeet(botPose.getX()));
     SmartDashboard.putNumber("LL:BotY", Units.metersToFeet(botPose.getY()));
     SmartDashboard.putNumber("LL:BotYaw", botPose.getRotation().getDegrees());
