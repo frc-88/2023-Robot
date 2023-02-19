@@ -67,9 +67,9 @@ public class RobotContainer {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
-      m_candleSubsystem.wantConeFactory();
+      m_candleSubsystem.wantConeFactory().schedule();
     } else {
-      m_candleSubsystem.wantCubeFactory();
+      m_candleSubsystem.wantCubeFactory().schedule();
     }
   }
 
