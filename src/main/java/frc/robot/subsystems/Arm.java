@@ -117,8 +117,15 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
+    public boolean isAtTarget(ArmState state, double tolerance) {
+        if (!(m_shoulder.isOnTarget(state.getShoulderAngle(), tolerance))) return false;
+        if (!(m_elbow.isOnTarget(state.getElbowAngle(), tolerance))) return false;
+        if (!(m_wrist.isOnTarget(state.getWristAngle(), tolerance))) return false;
+        return true;
+    }
+
     public boolean isStowed() {
-        return targetArmState.getName().equals("Stow") && isAtTarget();
+        return targetArmState.getName().equals("Stow") && isAtTarget(targetArmState);
     }
 
     public boolean coastModeEnabled() {
@@ -141,12 +148,21 @@ public class Arm extends SubsystemBase {
 
     public CommandBase sendArmToState(ArmState armState) {
         CommandBase command = new RunCommand(() -> goToArmState(armState), this);
+        List<ArmState> intermediaries;
+        double tolerance;
         if (armState.getName().equals("Stow")) {
-            List<ArmState> intermediaries = targetArmState.getRetractIntermediaries();
-            for (ArmState intermediary : intermediaries) {
-                command = new RunCommand(() -> goToArmState(intermediary), this);
-            }
+            intermediaries = targetArmState.getRetractIntermediaries();
+            tolerance = targetArmState.getRetractIntermediaryTolerance();
+        } else {
+            intermediaries = armState.getDeployIntermediaries();
+            tolerance = armState.getDeployIntermediaryTolerance();
         }
+        for (ArmState intermediary : intermediaries) {
+            command = new RunCommand(() -> goToArmState(intermediary), this)
+                .until(() -> isAtTarget(intermediary, tolerance))
+                .andThen(command);
+        }
+        command = new InstantCommand(() -> {targetArmState = armState;}).alongWith(command);
         return command;
     }
 

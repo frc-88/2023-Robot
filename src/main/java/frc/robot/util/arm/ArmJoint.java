@@ -158,8 +158,12 @@ public class ArmJoint {
         return p_maxVelocity.getValue();
     }
 
+    public boolean isOnTarget(double targetAngle, double tolerance) {
+        return (Math.abs(getAngle()-targetAngle)) < tolerance;
+    }
+
     public boolean isOnTarget(double targetAngle) {
-        return (Math.abs(getAngle()-targetAngle)) < p_pid.getTolerance().getValue();
+        return isOnTarget(targetAngle, p_pid.getTolerance().getValue());
     }
 
     public boolean isCancoderPresent() {
