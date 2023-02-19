@@ -26,6 +26,7 @@ public class ArmJoint {
     private final double m_ratio;
     private final double m_length;
     private final boolean m_encoderInverted;
+    private final double m_wrapAngle;
 
     private boolean m_zeroed = false;
     private boolean m_braking = true;
@@ -39,11 +40,12 @@ public class ArmJoint {
     private final DoublePreferenceConstant p_encoderOffset;
     private final DoublePreferenceConstant p_gravityCompensation;
     
-    public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length) {
+    public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length, double wrapAngle) {
         m_name = name;
         m_ratio = ratio;
         m_length = length;
         m_encoderInverted = encoderInverted;
+        m_wrapAngle = wrapAngle;
         
         m_motor = new WPI_TalonFX(motorID, "1");
         m_cancoder = new WPI_CANCoder(encoderID, "1");
@@ -151,7 +153,7 @@ public class ArmJoint {
     }
 
     public double getAbsoluteAngle() {
-        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 540.) % 360. - 180.;
+        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 540.) % 360. - (360. - m_wrapAngle);
     }
 
     public double getMaxVelocity() {
@@ -171,12 +173,19 @@ public class ArmJoint {
                 || m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.Invalid_Unknown
                 || m_cancoder.getLastError() == ErrorCode.SensorNotPresent);
     }
+
+    private boolean isInStartingQuadrant() {
+        return (m_startingQuadrant == 0 && getAbsoluteAngle() > 0 && getAbsoluteAngle() < 90)
+                || (m_startingQuadrant == 1 && getAbsoluteAngle() > 90 && getAbsoluteAngle() < 180)
+                || (m_startingQuadrant == 2 && getAbsoluteAngle() > -180 && getAbsoluteAngle() < -90)
+                || (m_startingQuadrant == 3 && getAbsoluteAngle() > -90 && getAbsoluteAngle() < 0);
+    }
     
     public void zeroRelative() {
         if (m_motor.hasResetOccurred()) {
             m_zeroed = false;
         }
-        if (!m_zeroed && isCancoderPresent()) {
+        if (!m_zeroed && isCancoderPresent() && isInStartingQuadrant()) {
             SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;
