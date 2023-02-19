@@ -8,6 +8,23 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 
+
+/*
+    CHARGED UP 2023 FIELD
+        SCORING TABLE
+  RED                   BLUE
+|----------------------------|
+|-- 1                   8 -- |
+|              +Y            |
+|-- 2          |        7 -- |
+|              o--+X         |
+|-- 3                   6 -- |
+|                            |
+|-4                        5-|
+|----------------------------|
+*/
+
+
 public class SetGlobalPoseToTagGlobalPose extends CommandBase {
   private final ScorpionTable m_coprocessor;
   private boolean is_set = false;
