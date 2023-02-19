@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
-import frc.robot.util.drive.LockDrive;
 
 public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
