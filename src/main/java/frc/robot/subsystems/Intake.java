@@ -11,6 +11,7 @@ import com.ctre.phoenix.music.Orchestra;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -69,7 +70,7 @@ public class Intake extends SubsystemBase {
 
   private final AnalogInput m_irSensor = new AnalogInput(Constants.INTAKE_IR_ID);
 
-  private boolean coneMode = false;
+  private boolean m_coneMode = false;
 
   /** Creates a new Intake. */
   public Intake() {
@@ -90,16 +91,16 @@ public class Intake extends SubsystemBase {
     }
 
     public void setCube() {
-      coneMode = false;
+      m_coneMode = false;
     }
 
     public void setCone() {
-      coneMode = true;
+      m_coneMode = true;
     }
 
     public void intake() {
-      if (!hasGamePiece()) {
-        if (!coneMode) {
+      if (!hasGamePieceCentered()) {
+        if (!m_coneMode) {
           m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
         } else {
@@ -122,8 +123,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      if (hasGamePiece()) {
-        if (!coneMode) {
+      if (hasGamePieceCentered()) {
+        if (!m_coneMode) {
           m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
         } else {
@@ -160,12 +161,16 @@ public class Intake extends SubsystemBase {
       return m_arm.isFwdLimitSwitchClosed() > 0;
     }
 
+    private boolean hasGamePieceCentered() {
+      return m_irSensor.getAverageVoltage() > (m_coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) && m_irSensor.getAverageVoltage() < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue());
+    }
+
     private boolean hasGamePiece() {
-      return m_irSensor.getAverageVoltage() > (coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) && m_irSensor.getAverageVoltage() < (coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue());
+      return m_irSensor.getAverageVoltage() > 0.17;
     }
     
     public Trigger holdAndHasPiece() {
-      return new Trigger(() -> isArmUp() && hasGamePiece());
+      return new Trigger(() -> isArmUp() && hasGamePieceCentered());
     }
 
     ////////// Commands :) /////////
@@ -179,7 +184,18 @@ public class Intake extends SubsystemBase {
     }
     
     public CommandBase intakeFactory() {
-      return new RunCommand(() -> {intake(); armDown();}, this).withName("intake");
+      CommandBase coneCommand = new RunCommand(() -> {intake(); armDown();}, this)
+        .until(this::hasGamePiece)
+        .andThen(new RunCommand(() -> {intake(); armDown();}, this))
+        .withTimeout(0.4)
+        .andThen(new RunCommand(() -> {intake(); armUp();}, this))
+        .until(this::hasGamePieceCentered);
+      CommandBase cubeCommand = new RunCommand(() -> {intake(); armDown();}, this)
+        .until(this::hasGamePieceCentered)
+        .andThen(new RunCommand(() -> {hold(); armDown();}, this))
+        .withTimeout(0.4);
+      return new ConditionalCommand(coneCommand, cubeCommand, () -> m_coneMode)
+          .withName("intake");
     }
 
     public CommandBase holdFactory() {
@@ -200,15 +216,17 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Cone Mode", coneMode);
-    SmartDashboard.putBoolean("Cube Mode", !coneMode);
+    SmartDashboard.putBoolean("Cone Mode", m_coneMode);
+    SmartDashboard.putBoolean("Cube Mode", !m_coneMode);
     SmartDashboard.putBoolean("Arm Up", isArmUp());
     SmartDashboard.putBoolean("Arm Down", isArmDown());
     SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
     SmartDashboard.putNumber("Arm Outer Motor Current", m_outerRoller.getStatorCurrent());
 
     SmartDashboard.putNumber("IR Sensor value", m_irSensor.getAverageVoltage());
+    SmartDashboard.putBoolean("Has Game Piece Centered", hasGamePieceCentered());
     SmartDashboard.putBoolean("Has Game Piece", hasGamePiece());
+
 
   }
 }
