@@ -17,6 +17,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
+import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.commands.Handoff;
 import frc.robot.commands.PlaySong;
 import frc.robot.subsystems.Arm;
@@ -41,6 +42,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
+  private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -52,10 +54,11 @@ public class RobotContainer {
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
 
-  public RobotContainer() {
+  public RobotContainer(Robot robot) {
     configureControllers();
     configureDefaultCommands();
     configureSmartDashboardButtons();
+    configurePeriodics(robot);
 
     PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
     pdh.setSwitchableChannel(true);
@@ -168,6 +171,11 @@ public class RobotContainer {
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive));
   }
   
+  private void configurePeriodics(Robot robot) {
+    robot.addPeriodic(m_coprocessor::update, Constants.COPROCESSOR_UPDATE_DELAY, Constants.COPROCESSOR_UPDATE_DELAY_OFFSET);
+    robot.addPeriodic(m_coprocessor::updateSlow, Constants.COPROCESSOR_SLOW_UPDATE_DELAY, Constants.COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET);
+  }
+
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
