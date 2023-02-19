@@ -174,18 +174,11 @@ public class ArmJoint {
                 || m_cancoder.getLastError() == ErrorCode.SensorNotPresent);
     }
 
-    private boolean isInStartingQuadrant() {
-        return (m_startingQuadrant == 0 && getAbsoluteAngle() > 0 && getAbsoluteAngle() < 90)
-                || (m_startingQuadrant == 1 && getAbsoluteAngle() > 90 && getAbsoluteAngle() < 180)
-                || (m_startingQuadrant == 2 && getAbsoluteAngle() > -180 && getAbsoluteAngle() < -90)
-                || (m_startingQuadrant == 3 && getAbsoluteAngle() > -90 && getAbsoluteAngle() < 0);
-    }
-    
     public void zeroRelative() {
         if (m_motor.hasResetOccurred()) {
             m_zeroed = false;
         }
-        if (!m_zeroed && isCancoderPresent() && isInStartingQuadrant()) {
+        if (!m_zeroed && isCancoderPresent()) {
             SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;
