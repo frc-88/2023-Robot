@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
+import frc.robot.util.drive.LockDrive;
 
 public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
@@ -36,7 +37,7 @@ public class RobotContainer {
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-    
+    SmartDashboard.putData("Lock Drive", m_drive.lockDrive());
     SmartDashboard.putData(m_drive);
   }
 

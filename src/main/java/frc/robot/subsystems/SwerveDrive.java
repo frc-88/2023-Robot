@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.drive.GrantDriveCommand;
@@ -351,6 +352,20 @@ public class SwerveDrive extends SubsystemBase {
                 if (squared) value = Math.copySign(value * value, value);
 
                 return value;
+        }
+
+        public RunCommand lockDrive() {
+                return new RunCommand(
+                       () -> {
+                        SwerveModuleState[] states = {
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(135)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(45)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(45)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(135))};
+                                setModuleStates(states);
+                       } 
+                );
+                
         }
 
         @Override
