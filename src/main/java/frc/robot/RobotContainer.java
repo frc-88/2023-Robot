@@ -71,6 +71,10 @@ public class RobotContainer {
     }
   }
 
+  public void disableInit() {
+    m_candleSubsystem.rainbow();
+  }
+
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
