@@ -70,7 +70,7 @@ public class Arm extends SubsystemBase {
 
         double l1 = m_shoulder.getLength();
         double l2 = m_elbow.getLength();
-        double x = originalPosition.getX();
+        double x = originalPosition.getX() + m_aimX;
         double y = originalPosition.getY();
         double q1;
         double q2;
@@ -139,9 +139,9 @@ public class Arm extends SubsystemBase {
         double elbowAngle = armState.getElbowAngle();
         double wristAngle = armState.getWristAngle();
 
-        double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
-        shoulderAngle = aimedAngles[0];
-        elbowAngle = aimedAngles[1];
+        // double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
+        // shoulderAngle = aimedAngles[0];
+        // elbowAngle = aimedAngles[1];
 
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(shoulderAngle-m_shoulder.getAngle()), 
