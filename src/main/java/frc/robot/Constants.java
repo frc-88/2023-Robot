@@ -108,8 +108,8 @@ public final class Constants {
     // Coprocessor
     public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
     public static final int COPROCESSOR_PORT = 5800;
-    public static final double COPROCESSOR_UPDATE_DELAY = 1/30;
+    public static final double COPROCESSOR_UPDATE_DELAY = 1.0/30;
     public static final double COPROCESSOR_UPDATE_DELAY_OFFSET = 0.01;
-    public static final double COPROCESSOR_SLOW_UPDATE_DELAY = 1/5;
+    public static final double COPROCESSOR_SLOW_UPDATE_DELAY = 1.0/5;
     public static final double COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET = 0.02;
 }
