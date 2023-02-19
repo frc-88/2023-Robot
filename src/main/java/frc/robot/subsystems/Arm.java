@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ctre.phoenix.music.Orchestra;
-import com.fasterxml.jackson.databind.jsontype.impl.AsDeductionTypeDeserializer;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -118,6 +117,10 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
+    public boolean isStowed() {
+        return targetArmState.getName().equals("Stow") && isAtTarget();
+    }
+
     public boolean coastModeEnabled() {
         return DriverStation.isDisabled() && (!coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
     }
@@ -137,7 +140,14 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return new RunCommand(() -> goToArmState(armState), this);
+        CommandBase command = new RunCommand(() -> goToArmState(armState), this);
+        if (armState.getName().equals("Stow")) {
+            List<ArmState> intermediaries = targetArmState.getRetractIntermediaries();
+            for (ArmState intermediary : intermediaries) {
+                command = new RunCommand(() -> goToArmState(intermediary), this);
+            }
+        }
+        return command;
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {

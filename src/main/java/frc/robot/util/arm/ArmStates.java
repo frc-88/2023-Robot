@@ -2,8 +2,8 @@ package frc.robot.util.arm;
 
 public class ArmStates {
     public static final ArmState stow = new ArmState("Stow");
-    public static final ArmState getConeFromIntake = new ArmState("Get Cone From Intake");
-    public static final ArmState getCubeFromIntake = new ArmState("Get Cube From Intake");
+    public static final ArmState getConeFromIntake = new ArmState("Get Cone From Intake").addDeployIntermediaries(1);
+    public static final ArmState getCubeFromIntake = new ArmState("Get Cube From Intake").addDeployIntermediaries(1);
     public static final ArmState getConeFromShelf = new ArmState("Get Cone From Shelf");
     public static final ArmState getCubeFromShelf = new ArmState("Get Cube From Shelf");
     public static final ArmState scoreConeHigh = new ArmState("Score Cone High");
