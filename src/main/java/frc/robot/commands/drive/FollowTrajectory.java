@@ -16,7 +16,7 @@ public class FollowTrajectory extends CommandBase {
   private SwerveDrive m_drive;
   private Trajectory m_trajectory;
   private boolean m_resetOdometry;
-  private RamseteController m_controller = new RamseteController();
+  private RamseteController m_controller = new RamseteController(1.5, 0.7);
   private Timer m_timer = new Timer();
   private double m_duration;
   private int m_state;
