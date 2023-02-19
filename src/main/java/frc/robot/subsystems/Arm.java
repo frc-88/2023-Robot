@@ -22,35 +22,77 @@ import frc.robot.util.arm.ArmStates;
 
 public class Arm extends SubsystemBase {
     
-    private final DigitalInput coastButton;
+    private final DigitalInput m_coastButton;
 
     public final ArmJoint m_shoulder;
     public final ArmJoint m_elbow;
     public final ArmJoint m_wrist;
-    public final Translation2d shoulderPosition;
+    public final Translation2d m_shoulderPosition;
 
-    private ArmState targetArmState;
-    private List<ArmJoint> allJoints;
+    private ArmState m_targetArmState;
+    private List<ArmJoint> m_allJoints;
+
+    private double m_aimX = 0;
 
     public Arm() {
-        this.coastButton = new DigitalInput(0);
+        this.m_coastButton = new DigitalInput(0);
         SmartDashboard.putBoolean("Coast Arm", false);
 
         m_shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, true, true, (16./42.) * (1./49.), 19.5);
         m_elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, true, true, (16./42.) * (1./49.), 15.5);
         m_wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, true, (16./42.) * (1./49.), 25.5);
-        shoulderPosition = new Translation2d(3, 18.5);
+        m_shoulderPosition = new Translation2d(3, 18.5);
 
-        targetArmState = ArmStates.stow;
-        allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+        m_targetArmState = ArmStates.stow;
+        m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
-        return shoulderPosition.plus(shoulder).plus(elbow).plus(wrist);
+        return m_shoulderPosition.plus(shoulder).plus(elbow).plus(wrist);
     }
 
     public Translation2d getGrabberPosition() {
         return getGrabberPosition(m_shoulder.getPositionVector(), m_elbow.getPositionVector(), m_wrist.getPositionVector());
+    }
+
+    private Translation2d getWristPosition(double shoulderAngle, double elbowAngle) {
+        return new Translation2d(shoulderAngle, new Rotation2d(Math.toRadians(m_shoulder.getLength())))
+                .plus(new Translation2d(m_elbow.getLength(), new Rotation2d(Math.toRadians(elbowAngle))));
+    }
+
+    public double getMaxAim(double shoulderAngle, double elbowAngle) {
+        Translation2d position = getWristPosition(shoulderAngle, elbowAngle);
+        return Math.sqrt(Math.pow(m_shoulder.getLength() + m_elbow.getLength(), 2) - Math.pow(position.getY(), 2)) - position.getX();
+    }
+
+    private double[] getAimedAngles(double shoulderAngle, double elbowAngle) {
+        Translation2d originalPosition = getWristPosition(shoulderAngle, elbowAngle);
+
+        double l1 = m_shoulder.getLength();
+        double l2 = m_elbow.getLength();
+        double x = originalPosition.getX();
+        double y = originalPosition.getY();
+        double q1;
+        double q2;
+
+        double q2_interim = (x*x + y*y - l1*l1 - l2*l2) / (2.*l1*l2);
+        if (q2_interim > 1 || q2_interim < 0) {
+            return new double[]{shoulderAngle, elbowAngle};
+        }
+
+        if (elbowAngle > shoulderAngle) {
+            q2 = Math.acos(x);
+            q1 = Math.atan(y / x) - Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
+        } else {
+            q2 = -Math.acos(x);
+            q1 = Math.atan(y / x) + Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
+        }
+
+        return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2)};
+    }
+
+    public void setAim(double x) {
+        m_aimX = x;
     }
 
     public boolean isValidState(ArmState armState) {    
@@ -92,21 +134,29 @@ public class Arm extends SubsystemBase {
 
     public void goToArmState(ArmState armState) {
         if (!isValidState(armState)) return;
-        targetArmState = armState;
+
+        double shoulderAngle = armState.getShoulderAngle();
+        double elbowAngle = armState.getElbowAngle();
+        double wristAngle = armState.getWristAngle();
+
+        double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
+        shoulderAngle = aimedAngles[0];
+        elbowAngle = aimedAngles[1];
+
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
-            Math.abs(armState.getShoulderAngle()-m_shoulder.getAngle()), 
-            Math.abs(armState.getElbowAngle()-m_elbow.getAngle()), 
-            Math.abs(armState.getWristAngle()-m_wrist.getAngle())}));
+            Math.abs(shoulderAngle-m_shoulder.getAngle()), 
+            Math.abs(elbowAngle-m_elbow.getAngle()), 
+            Math.abs(wristAngle-m_wrist.getAngle())}));
 
         if (greatestAngle > 2) {
             // Keep max velocities the same or change this
-            m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
-            m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
-            m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+            m_shoulder.setMotionMagic(shoulderAngle, m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - shoulderAngle) / greatestAngle);
+            m_elbow.setMotionMagic(elbowAngle, m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - elbowAngle) / greatestAngle);
+            m_wrist.setMotionMagic(wristAngle, m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - wristAngle) / greatestAngle);
         } else {
-            m_shoulder.setMotionMagic(armState.getShoulderAngle());
-            m_elbow.setMotionMagic(armState.getElbowAngle());
-            m_wrist.setMotionMagic(armState.getWristAngle());
+            m_shoulder.setMotionMagic(shoulderAngle);
+            m_elbow.setMotionMagic(elbowAngle);
+            m_wrist.setMotionMagic(wristAngle);
         }
     }
 
@@ -125,11 +175,11 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return targetArmState.getName().equals("Stow") && isAtTarget(targetArmState);
+        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState);
     }
 
     public boolean coastModeEnabled() {
-        return DriverStation.isDisabled() && (!coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
+        return DriverStation.isDisabled() && (!m_coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
     }
 
     // COMMAND FACTORIES
@@ -151,8 +201,8 @@ public class Arm extends SubsystemBase {
         List<ArmState> intermediaries;
         double tolerance;
         if (armState.getName().equals("Stow")) {
-            intermediaries = targetArmState.getRetractIntermediaries();
-            tolerance = targetArmState.getRetractIntermediaryTolerance();
+            intermediaries = m_targetArmState.getRetractIntermediaries();
+            tolerance = m_targetArmState.getRetractIntermediaryTolerance();
         } else {
             intermediaries = armState.getDeployIntermediaries();
             tolerance = armState.getDeployIntermediaryTolerance();
@@ -162,7 +212,7 @@ public class Arm extends SubsystemBase {
                 .until(() -> isAtTarget(intermediary, tolerance))
                 .andThen(command);
         }
-        command = new InstantCommand(() -> {targetArmState = armState;}).alongWith(command);
+        command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
         return command;
     }
 
@@ -178,17 +228,17 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        allJoints.forEach(ArmJoint::zeroRelative);
+        m_allJoints.forEach(ArmJoint::zeroRelative);
         
         if (coastModeEnabled()) {
-            allJoints.forEach(ArmJoint::coast);
+            m_allJoints.forEach(ArmJoint::coast);
         }
         else {
-            allJoints.forEach(ArmJoint::brake);
+            m_allJoints.forEach(ArmJoint::brake);
         }
 
-        allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Angle", j.getAngle()));
-        allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
-        allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
+        m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Angle", j.getAngle()));
+        m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
+        m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
     }
 }
