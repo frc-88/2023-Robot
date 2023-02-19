@@ -110,10 +110,10 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    public boolean isAtTarget() {
-        if (!(m_shoulder.isOnTarget(targetArmState.getShoulderAngle()))) return false;
-        if (!(m_elbow.isOnTarget(targetArmState.getElbowAngle()))) return false;
-        if (!(m_wrist.isOnTarget(targetArmState.getWristAngle()))) return false;
+    public boolean isAtTarget(ArmState state) {
+        if (!(m_shoulder.isOnTarget(state.getShoulderAngle()))) return false;
+        if (!(m_elbow.isOnTarget(state.getElbowAngle()))) return false;
+        if (!(m_wrist.isOnTarget(state.getWristAngle()))) return false;
         return true;
     }
 
@@ -151,7 +151,7 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState).until(this::isAtTarget);
+        return sendArmToState(armState).until(() -> isAtTarget(armState));
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {
