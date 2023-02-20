@@ -38,24 +38,22 @@ public class RobotContainer {
 
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
-  private final Limelight m_limelight = new Limelight();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
+  private final Limelight m_limelight = new Limelight();
+  private final Lights m_candleSubsystem = new Lights();
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
   /////////////////////////////////////////////////////////////////////////////
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
-  private final Lights m_candleSubsystem = new Lights();
-  // private final CommandXboxController m_testController = new CommandXboxController(Constants.TEST_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
-
-
 
   public RobotContainer() {
     configureControllers();
     configureDefaultCommands();
+    configureTriggers();
     configureSmartDashboardButtons();
   }
 
@@ -76,62 +74,79 @@ public class RobotContainer {
     m_candleSubsystem.rainbow();
   }
 
+  public Command getAutonomousCommand() {
+    return Commands.print("No autonomous command configured");
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  //                              BUTTON BOX                                 //
+  /////////////////////////////////////////////////////////////////////////////
+
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
-      .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory()).onFalse(m_grabber.grabConeFactory().withTimeout(1));
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory())
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1));
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
-      .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory()).onFalse(m_grabber.grabCubeFactory().withTimeout(1));
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory())
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-      .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
-      .whileTrue(m_grabber.dropConeFactory());
+        .whileTrue(m_grabber.dropConeFactory());
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch.negate())
-      .whileTrue(m_grabber.dropCubeFactory());
+        .whileTrue(m_grabber.dropCubeFactory());
 
-    m_buttonBox.gamepieceSwitch.and(m_grabber.hasGamePieceTrigger().negate()).whileTrue(m_candleSubsystem.wantConeFactory());
+    m_buttonBox.gamepieceSwitch.and(m_grabber.hasGamePieceTrigger().negate())
+        .whileTrue(m_candleSubsystem.wantConeFactory());
     m_buttonBox.gamepieceSwitch.and(m_grabber.hasGamePieceTrigger()).whileTrue(m_candleSubsystem.holdingConeFactory());
-    m_buttonBox.gamepieceSwitch.negate().and(m_grabber.hasGamePieceTrigger().negate()).whileTrue(m_candleSubsystem.wantCubeFactory());
-    m_buttonBox.gamepieceSwitch.negate().and(m_grabber.hasGamePieceTrigger()).whileTrue(m_candleSubsystem.holdingCubeFactory());
+    m_buttonBox.gamepieceSwitch.negate().and(m_grabber.hasGamePieceTrigger().negate())
+        .whileTrue(m_candleSubsystem.wantCubeFactory());
+    m_buttonBox.gamepieceSwitch.negate().and(m_grabber.hasGamePieceTrigger())
+        .whileTrue(m_candleSubsystem.holdingCubeFactory());
+  }
 
+  /////////////////////////////////////////////////////////////////////////////
+  //                               TRIGGERS                                  //
+  /////////////////////////////////////////////////////////////////////////////
+
+  private void configureTriggers() {
     m_drive.isFacingForwards().whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
     m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
-      .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
-
-    // // Test controller
-    // m_testController.a().onTrue(m_intake.intakeFactory());
-    // m_testController.x().onTrue(m_intake.holdFactory());
-    // m_testController.rightBumper().onTrue(m_intake.outgestFactory());
-    // m_testController.leftBumper().onTrue(m_intake.stowFactory());
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  //                          DEFAULT COMMANDS                               //
+  /////////////////////////////////////////////////////////////////////////////
 
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
@@ -140,7 +155,16 @@ public class RobotContainer {
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  //                         SMARTDASHBOARD BUTTONS                          //
+  /////////////////////////////////////////////////////////////////////////////
+
   private void configureSmartDashboardButtons() {
+    // Subsystems
+    SmartDashboard.putData(m_drive);
+    SmartDashboard.putData(m_intake);
+    SmartDashboard.putData(m_arm);
+    SmartDashboard.putData(m_grabber);
 
     // Drive
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
@@ -148,12 +172,11 @@ public class RobotContainer {
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
 
     // CANdle
-
     SmartDashboard.putData("Want Cone", m_candleSubsystem.wantConeFactory());
     SmartDashboard.putData("Holding Cone", m_candleSubsystem.holdingConeFactory());
     SmartDashboard.putData("Want Cube", m_candleSubsystem.wantCubeFactory());
     SmartDashboard.putData("Holding Cube", m_candleSubsystem.holdingCubeFactory());
-  
+
     // Intake
     SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
     SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
@@ -167,7 +190,6 @@ public class RobotContainer {
     SmartDashboard.putData("!!Calibrate Shoulder Absolute!!", m_arm.calibrateShoulderFactory());
     SmartDashboard.putData("!!Calibrate Elbow Absolute!!", m_arm.calibrateElbowFactory());
     SmartDashboard.putData("!!Calibrate Wrist Absolute!!", m_arm.calibrateWristFactory());
-
     SmartDashboard.putData("Arm Stow", m_arm.sendArmToState(ArmStates.stow));
 
     // Grabber
@@ -180,24 +202,19 @@ public class RobotContainer {
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
 
-    // Subsystems
-    SmartDashboard.putData(m_drive);
-    SmartDashboard.putData(m_intake);
-    SmartDashboard.putData(m_arm);
+    // Limelight
+    SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
 
-    SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
-    SmartDashboard.putData("Auto Red Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1Red.wpilib.json"), true));
-    SmartDashboard.putData("Auto Drive 5 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(5), true));
-    SmartDashboard.putData("Auto Drive 10 Feet", new FollowTrajectory(m_drive, TrajectoryHelper.generateStraightTrajectory(10), true));
-    SmartDashboard.putData("Auto Red", Autonomous.simpleAuto(m_drive, m_intake, m_candleSubsystem));
-
+    // Combined
     SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.isConeSelected()));
 
-    SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
+    // Autonomous
+    SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
+    SmartDashboard.putData("Auto Red Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1Red.wpilib.json"), true));
+    SmartDashboard.putData("Auto Red", Autonomous.simpleAuto(m_drive, m_intake, m_candleSubsystem));
+
+    // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
   }
-  
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+
 }
