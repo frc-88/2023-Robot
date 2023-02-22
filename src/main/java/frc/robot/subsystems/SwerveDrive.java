@@ -35,10 +35,13 @@ import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyController;
+import frc.robot.util.coprocessor.BoundingBox;
+import frc.robot.util.coprocessor.ChassisInterface;
+import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
-public class SwerveDrive extends SubsystemBase {
+public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         /**
          * The maximum voltage that will be delivered to the drive motors.
          * 
@@ -390,5 +393,17 @@ public class SwerveDrive extends SubsystemBase {
                 SmartDashboard.putNumber("FRDriveCurrent", m_frontRightModule.getDriveController().getMotor().getStatorCurrent());
                 SmartDashboard.putNumber("BLDriveCurrent", m_backLeftModule.getDriveController().getMotor().getStatorCurrent());
                 SmartDashboard.putNumber("BRDriveCurrent", m_backRightModule.getDriveController().getMotor().getStatorCurrent());
+        }
+
+        @Override
+        public void drive(VelocityCommand command) {
+                // TODO Auto-generated method stub
+                
+        }
+
+        @Override
+        public BoundingBox getBoundingBox() {
+                // TODO Auto-generated method stub
+                return new BoundingBox(0, 0, 0, 0, 0, 0, 0);
         }
 }
