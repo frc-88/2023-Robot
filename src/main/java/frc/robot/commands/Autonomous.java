@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Intake;
@@ -23,8 +24,10 @@ public class Autonomous {
             candle.wantConeFactory(),
             new ParallelRaceGroup(
                     intake.intakeFactory(),
-                    new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("Simple1Red.wpilib.json"), true)
-                )
+                    new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg1.wpilib.json"), true)
+                ),
+                new WaitCommand(1.0),
+                new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg2.wpilib.json"), false)
             );
     }
 
