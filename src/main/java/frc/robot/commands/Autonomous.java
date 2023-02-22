@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.Lights;
@@ -29,7 +30,8 @@ public class Autonomous {
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive) {
         return new SequentialCommandGroup(
-            new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedEngage.wpilib.json"), true)
+            new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedEngage.wpilib.json"), true),
+            new RunCommand(()->{drive.stop();}, drive)
         );
     }
 }
