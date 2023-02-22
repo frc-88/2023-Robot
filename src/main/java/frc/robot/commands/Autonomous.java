@@ -27,4 +27,9 @@ public class Autonomous {
             );
     }
 
+    public static SequentialCommandGroup redEngage(SwerveDrive drive) {
+        return new SequentialCommandGroup(
+            new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedEngage.wpilib.json"), true)
+        );
+    }
 }
