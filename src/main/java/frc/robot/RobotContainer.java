@@ -220,7 +220,7 @@ public class RobotContainer {
     // Autonomous
     SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
     SmartDashboard.putData("Auto Red Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1Red.wpilib.json"), true));
-    SmartDashboard.putData("Auto Red", Autonomous.simpleAuto(m_drive, m_intake, m_candleSubsystem));
+    SmartDashboard.putData("Auto Red", Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem));
     SmartDashboard.putData("Auto Red Engage", Autonomous.redEngage(m_drive));
     SmartDashboard.putData("Auto Red Leg1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg1.wpilib.json"), true));
     SmartDashboard.putData("Auto Red Leg2", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg2.wpilib.json"), true));
