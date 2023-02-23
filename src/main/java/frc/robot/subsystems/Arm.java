@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
 import com.fasterxml.jackson.databind.jsontype.impl.AsDeductionTypeDeserializer;
@@ -137,11 +138,19 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return new RunCommand(() -> goToArmState(armState), this);
+        return sendArmToState(() -> armState);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState).until(() -> isAtTarget(armState));
+        return sendArmToStateAndEnd(() -> armState);
+    }
+
+    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+        return new RunCommand(() -> goToArmState(armState.get()), this);
+    }
+
+    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
+        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {

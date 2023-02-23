@@ -34,6 +34,7 @@ public class Grabber extends SubsystemBase {
 
   private boolean m_pivotForwards = true;
   private boolean m_pivotLocked = false;
+  private double m_lastPivotPosition = 0;
 
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
@@ -120,15 +121,18 @@ public class Grabber extends SubsystemBase {
   }
 
   public void setPivotForwards() {
-    m_pivotForwards = m_pivotLocked ? m_pivotForwards : true;
+    m_pivotForwards = true;
   }
 
   public void setPivotBackwards() {
-    m_pivotForwards = m_pivotLocked ? m_pivotForwards : false;
+    m_pivotForwards = false;
   }
 
   private void movePivot() {
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : -180));
+    if (!m_pivotLocked) {
+      m_lastPivotPosition = m_pivotForwards ? 0 : -180;
+    }
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition));
   }
 
   private void lockPivot() {
