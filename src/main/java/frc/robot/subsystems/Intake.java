@@ -198,10 +198,6 @@ public class Intake extends SubsystemBase {
           .withName("intake");
     }
 
-    public CommandBase holdFactory() {
-      return new RunCommand(() -> {hold(); armUp();}, this).withName("hold");
-    }
-
     public CommandBase outgestFactory() {
       return new RunCommand(() -> {outgest(); armDown();}, this).withName("outgest"); 
     }
