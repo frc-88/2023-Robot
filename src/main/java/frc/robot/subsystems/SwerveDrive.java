@@ -416,4 +416,16 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 // TODO Auto-generated method stub
                 return new BoundingBox(0, 0, 0, 0, 0, 0, 0);
         }
+
+        @Override
+        public void drive(VelocityCommand command) {
+                // TODO Auto-generated method stub
+                
+        }
+
+        @Override
+        public BoundingBox getBoundingBox() {
+                // TODO Auto-generated method stub
+                return new BoundingBox(0, 0, 0, 0, 0, 0, 0);
+        }
 }
