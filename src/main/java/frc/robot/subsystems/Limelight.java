@@ -23,12 +23,20 @@ public class Limelight extends SubsystemBase {
   }
 
   public Pose2d getBotPose() {
-    if (DriverStation.getAlliance() == Alliance.Red) {
-      return LimelightHelpers.getBotPose2d_wpiRed(m_name);
-    } else {
-      return LimelightHelpers.getBotPose2d_wpiBlue(m_name);
-    }
-    
+    // always use the blue coordinate system
+    //      CHARGED UP 2023 FIELD
+    //    BLUE                   RED
+    //  |----------------------------|
+    //  |- 5                      4 -|
+    //  |              +Y            |
+    //  |-- 6          |        3 -- |
+    //  |              o--+X         |
+    //  |-- 7                   2 -- |
+    //  |                            |
+    //  |-- 8                   1 -- |
+    //  |----------------------------|
+    //          SCORING TABLE
+    return LimelightHelpers.getBotPose2d_wpiBlue(m_name);
   }
 
   public InstantCommand llLocalize(SwerveDrive drive) {
