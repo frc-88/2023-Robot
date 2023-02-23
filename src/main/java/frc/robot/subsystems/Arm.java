@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
 
@@ -197,27 +198,35 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        CommandBase command = new RunCommand(() -> goToArmState(armState), this);
+        return sendArmToState(() -> armState);
+    }
+
+    public CommandBase sendArmToStateAndEnd(ArmState armState) {
+        return sendArmToStateAndEnd(() -> armState);
+    }
+
+    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+        CommandBase command = new RunCommand(() -> goToArmState(armState.get()), this);
         List<ArmState> intermediaries;
         double tolerance;
-        if (armState.isStow()) {
+        if (armState.get().isStow()) {
             intermediaries = m_targetArmState.getRetractIntermediaries();
             tolerance = m_targetArmState.getRetractIntermediaryTolerance();
         } else {
-            intermediaries = armState.getDeployIntermediaries();
-            tolerance = armState.getDeployIntermediaryTolerance();
+            intermediaries = armState.get().getDeployIntermediaries();
+            tolerance = armState.get().getDeployIntermediaryTolerance();
         }
         for (ArmState intermediary : intermediaries) {
             command = new RunCommand(() -> goToArmState(intermediary), this)
                 .until(() -> isAtTarget(intermediary, tolerance))
                 .andThen(command);
         }
-        command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
+        command = new InstantCommand(() -> {m_targetArmState = armState.get();}).alongWith(command);
         return command;
     }
 
-    public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState).until(() -> isAtTarget(armState));
+    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
+        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {

@@ -58,10 +58,10 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingForwards().getAsBoolean()) {
-      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
-    } else if (m_drive.isFacingBackwards().getAsBoolean()) {
+    if (m_drive.isFacingBackwards().getAsBoolean()) {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
+    } else {
+      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
@@ -119,7 +119,7 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.handoffButton
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
 
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
@@ -144,7 +144,7 @@ public class RobotContainer {
     m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ public class RobotContainer {
     SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
 
     // Combined
-    SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.isConeSelected()));
+    SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
 
     // Autonomous
     SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
