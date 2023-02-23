@@ -150,7 +150,7 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-    m_intake.setDefaultCommand(m_intake.holdFactory());
+    m_intake.setDefaultCommand(m_intake.stowFactory());
     m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stow));
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
@@ -181,7 +181,6 @@ public class RobotContainer {
     SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
     SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
     SmartDashboard.putData("Intake Game Piece", m_intake.intakeFactory());
-    SmartDashboard.putData("Hold Game Piece", m_intake.holdFactory());
     SmartDashboard.putData("Outgest", m_intake.outgestFactory());
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
