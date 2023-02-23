@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.music.Orchestra;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -70,6 +72,9 @@ public class Intake extends SubsystemBase {
 
   private final AnalogInput m_irSensor = new AnalogInput(Constants.INTAKE_IR_ID);
 
+  private final Debouncer m_hasGamePieceDebounce = new Debouncer(0.75, DebounceType.kBoth);
+  private final Debouncer m_hasGamePieceCenteredDebounce = new Debouncer(0.3, DebounceType.kBoth);
+
   private boolean m_coneMode = false;
 
   /** Creates a new Intake. */
@@ -82,7 +87,7 @@ public class Intake extends SubsystemBase {
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
 
-    m_irSensor.setAverageBits(12);
+    m_irSensor.setAverageBits(13);
   }
     public void addToOrchestra(Orchestra m_orchestra) {
       m_orchestra.addInstrument(m_arm);
@@ -162,11 +167,13 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean hasGamePieceCentered() {
-      return m_irSensor.getAverageVoltage() > (m_coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) && m_irSensor.getAverageVoltage() < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue());
+      return m_hasGamePieceCenteredDebounce.calculate(
+        m_irSensor.getAverageVoltage() > (m_coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) 
+        && m_irSensor.getAverageVoltage() < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue()));
     }
 
     private boolean hasGamePiece() {
-      return m_irSensor.getAverageVoltage() > 0.17;
+      return m_hasGamePieceDebounce.calculate(m_irSensor.getAverageVoltage() > 0.2);
     }
     
     public Trigger holdAndHasPiece() {

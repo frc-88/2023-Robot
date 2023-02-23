@@ -153,7 +153,7 @@ public class ArmJoint {
     }
 
     public double getAbsoluteAngle() {
-        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 540.) % 360. - (360. - m_wrapAngle);
+        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 720. - m_wrapAngle) % 360. - (360. - m_wrapAngle);
     }
 
     public double getMaxVelocity() {
