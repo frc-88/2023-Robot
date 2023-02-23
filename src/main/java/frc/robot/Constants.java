@@ -95,6 +95,8 @@ public final class Constants {
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
 
+    // Drive Train
+    public static final int CHARGE_STATION_LEVEL = 2;
 
     // Trajectory
     public static final double MAX_TRAJ_VELOCITY = 4;
