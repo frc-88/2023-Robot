@@ -40,7 +40,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
-  private final Limelight m_limelight = new Limelight();
+  private final Limelight m_limelight = new Limelight(Constants.LIMELIGHT_NAME);
   private final Lights m_candleSubsystem = new Lights();
 
   /////////////////////////////////////////////////////////////////////////////
