@@ -9,6 +9,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
@@ -37,6 +39,17 @@ public class ScorpionTable extends CoprocessorTable {
 
     public Pose2d getTagGlobalPose() {
         return tagGlobalPose;
+    }
+
+    public Pose2d getBotPose() {
+        Pose2d transformPose;
+        if (DriverStation.getAlliance() == Alliance.Blue) {
+            transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
+        } else  {
+            transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
+        }
+
+        return getTagGlobalPose().relativeTo(transformPose);
     }
 
     public boolean isTagGlobalPoseActive() {
