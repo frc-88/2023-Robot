@@ -200,7 +200,7 @@ public class Arm extends SubsystemBase {
         CommandBase command = new RunCommand(() -> goToArmState(armState), this);
         List<ArmState> intermediaries;
         double tolerance;
-        if (armState.getName().equals("Stow")) {
+        if (armState.isStow()) {
             intermediaries = m_targetArmState.getRetractIntermediaries();
             tolerance = m_targetArmState.getRetractIntermediaryTolerance();
         } else {

@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -72,8 +73,11 @@ public class Intake extends SubsystemBase {
 
   private final AnalogInput m_irSensor = new AnalogInput(Constants.INTAKE_IR_ID);
 
-  private final Debouncer m_hasGamePieceDebounce = new Debouncer(0.75, DebounceType.kBoth);
-  private final Debouncer m_hasGamePieceCenteredDebounce = new Debouncer(0.3, DebounceType.kBoth);
+  private final LinearFilter m_irFilter = LinearFilter.singlePoleIIR(0.25, 0.02);
+  private final Debouncer m_hasGamePieceDebounce = new Debouncer(0.25, DebounceType.kBoth);
+  private final Debouncer m_hasGamePieceCenteredDebounce = new Debouncer(0.25, DebounceType.kBoth);
+
+  private double m_irValue = 0;
 
   private boolean m_coneMode = false;
 
@@ -87,7 +91,7 @@ public class Intake extends SubsystemBase {
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
 
-    m_irSensor.setAverageBits(13);
+    m_irSensor.setAverageBits(8);
   }
     public void addToOrchestra(Orchestra m_orchestra) {
       m_orchestra.addInstrument(m_arm);
@@ -168,12 +172,12 @@ public class Intake extends SubsystemBase {
 
     private boolean hasGamePieceCentered() {
       return m_hasGamePieceCenteredDebounce.calculate(
-        m_irSensor.getAverageVoltage() > (m_coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) 
-        && m_irSensor.getAverageVoltage() < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue()));
+        m_irValue > (m_coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) 
+        && m_irValue < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue()));
     }
 
     private boolean hasGamePiece() {
-      return m_hasGamePieceDebounce.calculate(m_irSensor.getAverageVoltage() > 0.2);
+      return m_hasGamePieceDebounce.calculate(m_irValue > 0.2);
     }
     
     public Trigger holdAndHasPiece() {
@@ -219,6 +223,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    m_irValue = m_irFilter.calculate(m_irSensor.getAverageVoltage());
+
     SmartDashboard.putBoolean("Cone Mode", m_coneMode);
     SmartDashboard.putBoolean("Cube Mode", !m_coneMode);
     SmartDashboard.putBoolean("Arm Up", isArmUp());
@@ -226,7 +232,7 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Arm Inner Motor Current", m_innerRoller.getStatorCurrent());
     SmartDashboard.putNumber("Arm Outer Motor Current", m_outerRoller.getStatorCurrent());
 
-    SmartDashboard.putNumber("IR Sensor value", m_irSensor.getAverageVoltage());
+    SmartDashboard.putNumber("IR Sensor value", m_irValue);
     SmartDashboard.putBoolean("Has Game Piece Centered", hasGamePieceCentered());
     SmartDashboard.putBoolean("Has Game Piece", hasGamePiece());
 

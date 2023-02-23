@@ -8,10 +8,10 @@ import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class ArmState {
     private final String m_name;
+    private boolean m_isStow = false;
     private final DoublePreferenceConstant m_shoulderAngle;
     private final DoublePreferenceConstant m_elbowAngle;
     private final DoublePreferenceConstant m_wristAngle;
-    private List<ArmState> m_comboIntermediaries = new ArrayList<>();
     private List<ArmState> m_deployIntermediaries = new ArrayList<>();
     private List<ArmState> m_retractIntermediaries = new ArrayList<>();
     private DoublePreferenceConstant p_deployIntermediaryTolerance;
@@ -23,15 +23,6 @@ public class ArmState {
         m_shoulderAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Shoulder Angle", 0);
         m_elbowAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Elbow Angle", 0);
         m_wristAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Wrist Angle", 0);
-    }
-
-    public ArmState addComboIntermediaries(int numIntermediaries) {
-        for (int n = 1; n <= numIntermediaries; n++) {
-            m_comboIntermediaries.add(new ArmState(m_name + "/Combo " + n));
-        }
-        p_deployIntermediaryTolerance = new DoublePreferenceConstant("Arm/States/" + m_name + "/Deploy Tolerance", 2);
-        p_retractIntermediaryTolerance = new DoublePreferenceConstant("Arm/States/" + m_name + "/Retract Tolerance", 2);
-        return this;
     }
 
     public ArmState addDeployIntermediaries(int numIntermediaries) {
@@ -54,6 +45,15 @@ public class ArmState {
         return m_name;
     }
 
+    public ArmState makeStow() {
+        m_isStow = true;
+        return this;
+    }
+
+    public boolean isStow() {
+        return m_isStow;
+    }
+
     public double getShoulderAngle() {
         return m_shoulderAngle.getValue();
     }
@@ -67,19 +67,11 @@ public class ArmState {
     }
 
     public List<ArmState> getDeployIntermediaries() {
-        if (m_comboIntermediaries.size() > 0) {
-            return m_comboIntermediaries;
-        } else {
-            return m_deployIntermediaries;
-        }
+        return m_deployIntermediaries;
     }
 
     public List<ArmState> getRetractIntermediaries() {
-        if (m_comboIntermediaries.size() > 0) {
-            return m_comboIntermediaries;
-        } else {
-            return m_retractIntermediaries;
-        }
+        return m_retractIntermediaries;
     }
     
     public double getDeployIntermediaryTolerance() {
@@ -88,5 +80,10 @@ public class ArmState {
 
     public double getRetractIntermediaryTolerance() {
         return Objects.nonNull(p_retractIntermediaryTolerance) ? p_retractIntermediaryTolerance.getValue() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return m_name + " - Shoulder: " + m_shoulderAngle.getValue() + " - Elbow: " + m_elbowAngle.getValue() + " - Wrist: " + m_wristAngle.getValue();
     }
 }
