@@ -122,7 +122,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      if (hasGamePiece()) {
+      // if (hasGamePiece()) {
         if (!coneMode) {
           m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
@@ -130,9 +130,9 @@ public class Intake extends SubsystemBase {
           m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
         }
-      } else {
-        stopRollers();
-      }
+      // } else {
+      //   stopRollers();
+      // }
     }
 
     public void armUp() {
@@ -180,10 +180,6 @@ public class Intake extends SubsystemBase {
     
     public CommandBase intakeFactory() {
       return new RunCommand(() -> {intake(); armDown();}, this).withName("intake");
-    }
-
-    public CommandBase holdFactory() {
-      return new RunCommand(() -> {hold(); armUp();}, this).withName("hold");
     }
 
     public CommandBase outgestFactory() {

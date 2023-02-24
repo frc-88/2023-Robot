@@ -61,10 +61,10 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingForwards().getAsBoolean()) {
-      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
-    } else if (m_drive.isFacingBackwards().getAsBoolean()) {
+    if (m_drive.isFacingBackwards().getAsBoolean()) {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
+    } else {
+      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
@@ -121,6 +121,9 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
+    m_buttonBox.handoffButton
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
+
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch.negate())
@@ -144,7 +147,7 @@ public class RobotContainer {
     m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch.getAsBoolean()));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -153,7 +156,7 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
-    m_intake.setDefaultCommand(m_intake.holdFactory());
+    m_intake.setDefaultCommand(m_intake.stowFactory());
     m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stow));
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
@@ -184,7 +187,6 @@ public class RobotContainer {
     SmartDashboard.putData("Set Mode Cube", m_intake.setCubeFactory());
     SmartDashboard.putData("Set Mode Cone", m_intake.setConeFactory());
     SmartDashboard.putData("Intake Game Piece", m_intake.intakeFactory());
-    SmartDashboard.putData("Hold Game Piece", m_intake.holdFactory());
     SmartDashboard.putData("Outgest", m_intake.outgestFactory());
     SmartDashboard.putData("Stow Intake", m_intake.stowFactory());
     SmartDashboard.putData("Handoff Intake", m_intake.handoffFactory());
@@ -213,7 +215,7 @@ public class RobotContainer {
 
 
     // Combined
-    SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.isConeSelected()));
+    SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
 
     // Autonomous
     SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
