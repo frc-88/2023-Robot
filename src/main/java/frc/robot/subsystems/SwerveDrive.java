@@ -107,6 +107,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
         private Pose2d m_pose;
+        private boolean m_odometryReset = false;
 
         private Pose2d m_traj_pose;
         private Pose2d m_traj_reset_pose;
@@ -229,11 +230,11 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         }
 
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
-                zeroDriveEncoders();
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
                 m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
+                m_odometryReset = true;
         }
 
         public void resetTrajectoryPose(Pose2d startPose) {
@@ -390,13 +391,17 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                         module.zeroModule();
                 }
 
-                updateOdometry();
+                if (m_odometryReset) {
+                        m_odometryReset = false;
+                } else {
+                        updateOdometry();
+                }
 
                 SmartDashboard.putNumber("NavX.yaw", m_navx.getYaw());
                 SmartDashboard.putNumber("NavX.pitch", m_navx.getPitch());
                 SmartDashboard.putNumber("NavX.roll", m_navx.getRoll());
-                SmartDashboard.putNumber("odomX", Units.metersToFeet(m_pose.getX()));
-                SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
+                SmartDashboard.putNumber("odomX", m_pose.getX());
+                SmartDashboard.putNumber("odomY", m_pose.getY());
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
                 SmartDashboard.putNumber("FLDrivePosition", m_frontLeftModule.getDriveController().getMotor().getSelectedSensorPosition());

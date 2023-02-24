@@ -11,6 +11,8 @@ import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
@@ -52,6 +54,13 @@ public class ScorpionTable extends CoprocessorTable {
         return getTagGlobalPose().relativeTo(transformPose);
     }
 
+    public InstantCommand rosLocalize(SwerveDrive drive) {
+        return new InstantCommand (
+          () -> {
+            drive.resetPosition(getBotPose());},
+          drive);
+    }
+
     public boolean isTagGlobalPoseActive() {
         return tagGlobalPoseTimer.isActive();
     }
@@ -86,6 +95,17 @@ public class ScorpionTable extends CoprocessorTable {
             imu.getWorldLinearAccelY() * kGravity
         );
         updateTagGlobalPose();
+
+        Pose2d botPose = getTagGlobalPose();
+        SmartDashboard.putNumber("ROS:X",botPose.getX());
+        SmartDashboard.putNumber("ROS:Y",botPose.getY());
+        SmartDashboard.putNumber("ROS:Rotation",botPose.getRotation().getDegrees());
+
+        Pose2d botPoseTransform = getBotPose();
+        SmartDashboard.putNumber("nix:X",botPoseTransform.getX());
+        SmartDashboard.putNumber("nix:Y",botPoseTransform.getY());
+        SmartDashboard.putNumber("nix:Rotation",botPoseTransform.getRotation().getDegrees());
+
     }
 
     public void updateSlow() {

@@ -208,6 +208,10 @@ public class RobotContainer {
     // Limelight
     SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
 
+    // ROS
+    SmartDashboard.putData("ROS Localize", m_coprocessor.rosLocalize(m_drive).ignoringDisable(true));
+
+
     // Combined
     SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.isConeSelected()));
 
