@@ -39,18 +39,18 @@ public class Autonomous {
             ).withTimeout(0.5),
             new ParallelRaceGroup(
                     intake.intakeFactory(),
-                    new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg1.wpilib.json"), true),
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterLeg1.wpilib.json"), true),
                     arm.sendArmToState(ArmStates.stow),
                     grabber.holdConeFactory()
             ),
             new WaitCommand(1.0),
-            new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedCenterLeg2.wpilib.json"), false)
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterLeg2.wpilib.json"), false)
             );
     }
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive) {
         return new SequentialCommandGroup(
-            new FollowTrajectory(drive, TrajectoryHelper.generateJSONTrajectory("RedEngage.wpilib.json"), true),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), true),
             new RunCommand(()->{drive.stop();}, drive)
         );
     }
