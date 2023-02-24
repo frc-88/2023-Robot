@@ -34,22 +34,16 @@ public class AutoBalance extends CommandBase {
   @Override
   public void initialize() {
     m_heading = m_drive.getGyroscopeRotation();
-    if (m_heading.getDegrees() >= 180) {
-      m_degrees = m_heading.getDegrees() - 180;
-    } else {
-      m_degrees = m_heading.getDegrees();
-    }
-    m_drive.resetOdometry(m_drive.getOdometryPose(), m_heading);
+    m_degrees = m_heading.getDegrees();
+    m_drive.resetOdometry(new Pose2d(0,0,m_heading), m_heading);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_degrees = m_drive.getGyroscopeRotation().getDegrees();
     m_pitch = m_drive.getNavX().getPitch();
-    if (m_pitch > 180) {
-       m_pitch = 360 - m_pitch;
-       m_reverse = true;
-    }
+
     m_position_y = m_drive.getOdometryPose().getY();
     m_position_x = m_drive.getOdometryPose().getX();
 
@@ -57,7 +51,7 @@ public class AutoBalance extends CommandBase {
     //the robot can move only on y-axis
     if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
       if (m_pitch > Constants.CHARGE_STATION_LEVEL) {
-        m_drive.drive(-Math.cos(Math.toRadians(m_degrees))*Constants.MAX_TRAJ_ACCELERATION, Math.sin(Math.toRadians(m_degrees))*Constants.MAX_TRAJ_VELOCITY, 0);
+        m_drive.drive(-Math.cos(Math.toRadians(m_degrees))*Constants.MAX_TRAJ_VELOCITY, Math.sin(Math.toRadians(m_degrees))*Constants.MAX_TRAJ_VELOCITY, 0);
       } else {
         m_state = 1;
       }
