@@ -100,6 +100,10 @@ public class ArmJoint {
         m_motor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
+    public WPI_TalonFX getMotor() {
+        return m_motor;
+    }
+
     public void setMotionMagic(double angle, double speed) {
         if (!m_zeroed) {
             setPercentOutput(0);
@@ -135,7 +139,7 @@ public class ArmJoint {
     }
 
     public Translation2d getPositionVector() {
-        return new Translation2d(m_length, new Rotation2d(getAngle()));
+        return new Translation2d(m_length, new Rotation2d(Math.toRadians(getAngle())));
     }
 
     public double getLength() {

@@ -17,23 +17,6 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public final class Constants {
     ///////////////////////////////////////////////////////
-    // CANDLE
-    ///////////////////////////////////////////////////////
-    public static final int CANDLE_ID = 2;
-    public static final int JoystickId = 0;
-    public static final int ConeButton = XboxController.Button.kRightBumper.value;
-    public static final int CubeButton = XboxController.Button.kLeftBumper.value;
-    public static final int BlockButton = XboxController.Button.kStart.value;
-    public static final int MaxBrightnessAngle = 90;
-    public static final int MidBrightnessAngle = 180;
-    public static final int ZeroBrightnessAngle = 270;
-    public static final int ChangeDirectionAngle = 0;
-    public static final int VbatButton = XboxController.Button.kA.value;
-    public static final int V5Button = XboxController.Button.kB.value;
-    public static final int CurrentButton = XboxController.Button.kX.value;
-    public static final int TemperatureButton = XboxController.Button.kY.value;
-
-    ///////////////////////////////////////////////////////
     // DRIVETRAIN
     ///////////////////////////////////////////////////////
 
@@ -76,6 +59,22 @@ public final class Constants {
 	public static final int INTAKE_ARM_ID = 17;
     public static final int INTAKE_IR_ID = 0;
 
+    // Lights
+    public static final int CANDLE_ID = 0;
+    public static final int JoystickId = 0;
+    public static final int IncrementAnimButton = XboxController.Button.kRightBumper.value;
+    public static final int DecrementAnimButton = XboxController.Button.kLeftBumper.value;
+    public static final int BlockButton = XboxController.Button.kStart.value;
+    public static final int MaxBrightnessAngle = 90;
+    public static final int MidBrightnessAngle = 180;
+    public static final int ZeroBrightnessAngle = 270;
+    public static final int ChangeDirectionAngle = 0;
+    public static final int VbatButton = XboxController.Button.kA.value;
+    public static final int V5Button = XboxController.Button.kB.value;
+    public static final int CurrentButton = XboxController.Button.kX.value;
+    public static final int TemperatureButton = XboxController.Button.kY.value;
+	
+    // Controllers
     // Arm
     public static final int SHOULDER_ID = 4;
     public static final int ELBOW_ID = 3;
@@ -96,10 +95,23 @@ public final class Constants {
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
 
+    // Drive Train
+    public static final int CHARGE_STATION_LEVEL = 2;
 
     // Trajectory
     public static final double MAX_TRAJ_VELOCITY = 4;
     public static final double MAX_TRAJ_CENTRIP_ACC = 3;
     public static final double MAX_TRAJ_ACCELERATION = 3;
 	
+    // Limelight
+    public static final String LIMELIGHT_NAME = "limelight";
+
+
+    // Coprocessor
+    public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
+    public static final int COPROCESSOR_PORT = 5800;
+    public static final double COPROCESSOR_UPDATE_DELAY = 1.0/30;
+    public static final double COPROCESSOR_UPDATE_DELAY_OFFSET = 0.01;
+    public static final double COPROCESSOR_SLOW_UPDATE_DELAY = 1.0/5;
+    public static final double COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET = 0.02;
 }

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -53,10 +54,14 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant armDownMoveIntakeSpeed =
       new DoublePreferenceConstant("Intake/Arm/Down Move Speed", 0.35); 
   // IR Sensor
-  private DoublePreferenceConstant irSensorMin =
-      new DoublePreferenceConstant("Intake/IR/Min", 0.35);
-  private DoublePreferenceConstant irSensorMax =
-      new DoublePreferenceConstant("Intake/IR/Max", 0.44);
+  private DoublePreferenceConstant irSensorConeMin =
+      new DoublePreferenceConstant("Intake/IR/Cone Min", 0.491);
+  private DoublePreferenceConstant irSensorConeMax =
+      new DoublePreferenceConstant("Intake/IR/Cone Max", 0.698);
+  private DoublePreferenceConstant irSensorCubeMin =
+      new DoublePreferenceConstant("Intake/IR/Cube Min", 0.491);
+  private DoublePreferenceConstant irSensorCubeMax =
+      new DoublePreferenceConstant("Intake/IR/Cube Max", 0.698);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
@@ -71,17 +76,17 @@ public class Intake extends SubsystemBase {
     m_arm.setInverted(true);
     m_arm.overrideLimitSwitchesEnable(false);
 
-    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 20, 30, .1);
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 60, 60, .1);
 
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
 
     m_irSensor.setAverageBits(12);
   }
-
-    public WPI_TalonFX[] getMotors() {
-      WPI_TalonFX[] motors = {m_innerRoller, m_outerRoller, m_arm};
-      return motors;
+    public void addToOrchestra(Orchestra m_orchestra) {
+      m_orchestra.addInstrument(m_arm);
+      m_orchestra.addInstrument(m_innerRoller);
+      m_orchestra.addInstrument(m_outerRoller);
     }
 
     public void setCube() {
@@ -117,7 +122,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      if (hasGamePiece()) {
+      // if (hasGamePiece()) {
         if (!coneMode) {
           m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());
@@ -125,9 +130,9 @@ public class Intake extends SubsystemBase {
           m_innerRoller.set(innerRollerHoldConeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldConeIntakeSpeed.getValue());
         }
-      } else {
-        stopRollers();
-      }
+      // } else {
+      //   stopRollers();
+      // }
     }
 
     public void armUp() {
@@ -156,7 +161,7 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean hasGamePiece() {
-      return m_irSensor.getAverageVoltage() > irSensorMin.getValue() && m_irSensor.getAverageVoltage() < irSensorMax.getValue();
+      return m_irSensor.getAverageVoltage() > (coneMode ? irSensorConeMin.getValue() : irSensorCubeMin.getValue()) && m_irSensor.getAverageVoltage() < (coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue());
     }
     
     public Trigger holdAndHasPiece() {
@@ -175,10 +180,6 @@ public class Intake extends SubsystemBase {
     
     public CommandBase intakeFactory() {
       return new RunCommand(() -> {intake(); armDown();}, this).withName("intake");
-    }
-
-    public CommandBase holdFactory() {
-      return new RunCommand(() -> {hold(); armUp();}, this).withName("hold");
     }
 
     public CommandBase outgestFactory() {

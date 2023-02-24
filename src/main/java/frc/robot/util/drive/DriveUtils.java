@@ -47,6 +47,10 @@ public class DriveUtils{
         return (base < 0) ? (modulus - (Math.abs(base) % modulus)) % modulus : base % modulus;
     }
 
+    public static Pose2d redBlueTransform(Pose2d pose) {
+        return pose.relativeTo(new Pose2d(16.54, 8.02, Rotation2d.fromDegrees(180)));
+    }
+
     public static Pose2d relativeToReverse(Pose2d thisPose, Pose2d otherPose) {
         // Performs the reverse of Pose2d's relativeTo method
         // Pose2d.relativeTo applies a negative translation then negative rotation. 
