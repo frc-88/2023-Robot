@@ -95,6 +95,8 @@ public final class Constants {
 	public static final int BUTTON_BOX_ID = 1;
     public static final int TEST_CONTROLLER_ID = 2;
 
+    // Drive Train
+    public static final int CHARGE_STATION_LEVEL = 2;
 
     // Trajectory
     public static final double MAX_TRAJ_VELOCITY = 4;
@@ -103,4 +105,13 @@ public final class Constants {
 	
     // Limelight
     public static final String LIMELIGHT_NAME = "limelight";
+
+
+    // Coprocessor
+    public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
+    public static final int COPROCESSOR_PORT = 5800;
+    public static final double COPROCESSOR_UPDATE_DELAY = 1.0/30;
+    public static final double COPROCESSOR_UPDATE_DELAY_OFFSET = 0.01;
+    public static final double COPROCESSOR_SLOW_UPDATE_DELAY = 1.0/5;
+    public static final double COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET = 0.02;
 }
