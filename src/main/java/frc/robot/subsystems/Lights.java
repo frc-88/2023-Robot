@@ -17,7 +17,7 @@ import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
 public class Lights extends SubsystemBase {
-    private final int LEDS_PER_ANIMATION = 60;
+    private final int LEDS_PER_ANIMATION = 53;
     private int m_state = 0;
     private int counter = 0;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
@@ -124,11 +124,11 @@ public class Lights extends SubsystemBase {
         
         if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > dangerAngle.getValue()
                 || Math.abs(SmartDashboard.getNumber("NavX.roll", 0.0)) > dangerAngle.getValue()) {
-            if (m_lastAnimation == null) {
-                m_lastAnimation = m_toAnimate;
-            }
-            strobe(255, 0, 0);
-            m_strobe = m_toAnimate;
+            // if (m_lastAnimation == null) {
+            //     m_lastAnimation = m_toAnimate;
+            // }
+            // strobe(255, 0, 0);
+            // m_strobe = m_toAnimate;
         } else if (m_toAnimate.equals(m_strobe) && m_lastAnimation != null) {
             m_toAnimate = m_lastAnimation;
             m_setAnim = true;
