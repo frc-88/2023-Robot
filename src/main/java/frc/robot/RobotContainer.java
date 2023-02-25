@@ -16,6 +16,7 @@ import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
+import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
@@ -42,6 +43,7 @@ public class RobotContainer {
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
   private final Limelight m_limelight = new Limelight();
   private final Lights m_candleSubsystem = new Lights();
+  private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -50,11 +52,12 @@ public class RobotContainer {
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
-  public RobotContainer() {
+  public RobotContainer(Robot robot) {
     configureControllers();
     configureDefaultCommands();
     configureTriggers();
     configureSmartDashboardButtons();
+    configurePeriodics(robot);
   }
 
   public void enableInit() {
@@ -207,6 +210,10 @@ public class RobotContainer {
     // Limelight
     SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
 
+    // ROS
+    SmartDashboard.putData("ROS Localize", m_coprocessor.rosLocalize(m_drive).ignoringDisable(true));
+
+
     // Combined
     SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
 
@@ -217,6 +224,11 @@ public class RobotContainer {
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
+  }
+  
+  private void configurePeriodics(Robot robot) {
+    robot.addPeriodic(m_coprocessor::update, Constants.COPROCESSOR_UPDATE_DELAY, Constants.COPROCESSOR_UPDATE_DELAY_OFFSET);
+    robot.addPeriodic(m_coprocessor::updateSlow, Constants.COPROCESSOR_SLOW_UPDATE_DELAY, Constants.COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET);
   }
 
 }

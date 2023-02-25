@@ -70,7 +70,7 @@ public class Grabber extends SubsystemBase {
   private DoublePreferenceConstant p_hasGamePieceDebounceTime =
     new DoublePreferenceConstant("Grabber/Roller/Debounce", 0.5);
 
-  private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kBoth);
+  private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
   public Grabber(BooleanSupplier coastMode) {
     m_coastMode = coastMode;
@@ -167,12 +167,12 @@ public class Grabber extends SubsystemBase {
   }
 
   public void grabCube() {
-    if (!hasGamePiece()) m_roller.set(p_grabCubeSpeed.getValue());
+    if (!m_hasGamePieceDebounce.calculate(hasGamePiece())) m_roller.set(p_grabCubeSpeed.getValue());
     else holdCube();
   }
 
   public void grabCone() {
-    if (!hasGamePiece()) m_roller.set(p_grabConeSpeed.getValue());
+    if (!m_hasGamePieceDebounce.calculate(hasGamePiece())) m_roller.set(p_grabConeSpeed.getValue());
     else holdCone();
   }
 
@@ -193,7 +193,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean hasGamePiece() {
-    return m_hasGamePieceDebounce.calculate(m_roller.isFwdLimitSwitchClosed() > 0);
+    return m_roller.isFwdLimitSwitchClosed() > 0;
   }
 
   public Trigger hasGamePieceTrigger() {
@@ -259,6 +259,18 @@ public class Grabber extends SubsystemBase {
       }
       movePivot();
       unlockPivot();
+    }, this);
+  }
+
+  public CommandBase grabFactory(BooleanSupplier coneMode) {
+    return new RunCommand(() -> {
+      if (coneMode.getAsBoolean()) {
+        grabCone();
+      } else {
+        grabCube();
+      }
+      movePivot();
+      lockPivot();
     }, this);
   }
 
