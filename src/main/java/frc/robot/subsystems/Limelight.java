@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.BotPoseProvider;
 import frc.robot.util.LimelightHelpers;
 
-public class Limelight extends SubsystemBase {
+public class Limelight extends SubsystemBase implements BotPoseProvider {
 
   private String m_name;
 
@@ -41,8 +42,8 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
     Pose2d botPose = getBotPose();
 
-    SmartDashboard.putNumber("LL:" + m_name + ":BotX", Units.metersToFeet(botPose.getX()));
-    SmartDashboard.putNumber("LL:" + m_name + ":BotY", Units.metersToFeet(botPose.getY()));
+    SmartDashboard.putNumber("LL:" + m_name + ":BotX", botPose.getX());
+    SmartDashboard.putNumber("LL:" + m_name + ":BotY", botPose.getY());
     SmartDashboard.putNumber("LL:" + m_name + ":BotYaw", botPose.getRotation().getDegrees());
   }
 }

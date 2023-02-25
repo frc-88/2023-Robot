@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
+import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
@@ -212,11 +213,11 @@ public class RobotContainer {
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
 
     // Limelight
-    SmartDashboard.putData("LL Front Localize", m_limelight_front.llLocalize(m_drive).ignoringDisable(true));
-    SmartDashboard.putData("LL Back Localize", m_limelight_back.llLocalize(m_drive).ignoringDisable(true));
+    SmartDashboard.putData("LL Front Localize", new Localize(m_drive, m_limelight_front).ignoringDisable(true));
+    SmartDashboard.putData("LL Back Localize", new Localize(m_drive, m_limelight_back).ignoringDisable(true));
 
     // ROS
-    SmartDashboard.putData("ROS Localize", m_coprocessor.rosLocalize(m_drive).ignoringDisable(true));
+    SmartDashboard.putData("ROS Localize", new Localize(m_drive, m_coprocessor).ignoringDisable(true));
 
 
     // Combined

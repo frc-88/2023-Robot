@@ -14,11 +14,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.BotPoseProvider;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
 
 
-public class ScorpionTable extends CoprocessorTable {
+public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     private SwerveDrive swerve;
     private AHRS imu;
     protected Pose2d tagGlobalPose = new Pose2d();
@@ -96,16 +97,10 @@ public class ScorpionTable extends CoprocessorTable {
         );
         updateTagGlobalPose();
 
-        Pose2d botPose = getTagGlobalPose();
+        Pose2d botPose = getBotPose();
         SmartDashboard.putNumber("ROS:X",botPose.getX());
         SmartDashboard.putNumber("ROS:Y",botPose.getY());
         SmartDashboard.putNumber("ROS:Rotation",botPose.getRotation().getDegrees());
-
-        Pose2d botPoseTransform = getBotPose();
-        SmartDashboard.putNumber("nix:X",botPoseTransform.getX());
-        SmartDashboard.putNumber("nix:Y",botPoseTransform.getY());
-        SmartDashboard.putNumber("nix:Rotation",botPoseTransform.getRotation().getDegrees());
-
     }
 
     public void updateSlow() {
