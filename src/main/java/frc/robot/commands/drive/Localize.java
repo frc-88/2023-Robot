@@ -35,6 +35,8 @@ public class Localize extends CommandBase {
     if (sourcePose.getX()!=0 && sourcePose.getY() !=0) {
       m_drive.resetPosition(m_source.getBotPose());
     }
+
+    m_drive.updateOdometry();
   }
 
   // Called once the command ends or is interrupted.
