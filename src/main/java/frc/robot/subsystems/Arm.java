@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -30,8 +31,9 @@ public class Arm extends SubsystemBase {
     public final ArmJoint m_wrist;
     public final Translation2d m_shoulderPosition;
 
-    private ArmState m_targetArmState;
+    private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
+    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow), this);
 
     private double m_aimX = 0;
 
@@ -197,36 +199,50 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
+    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, double tolerance) {
+        CommandBase command = initialCommand;
+        for (ArmState intermediary : intermediaries) {
+            command = new RunCommand(() -> goToArmState(intermediary), this)
+                .until(() -> isAtTarget(intermediary, tolerance))
+                .andThen(command);
+        }
+        return command;
+    }
+
+    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+        if (armState.get().isStow()) {
+            return new ProxyCommand(() -> m_stowCommand);
+        } else {
+
+            ArmState state = armState.get();
+            CommandBase command = chainIntermediaries(
+                new RunCommand(() -> goToArmState(state), this),
+                state.getDeployIntermediaries(),
+                state.getDeployIntermediaryTolerance()
+            );
+            command = new InstantCommand(() -> {m_targetArmState = state;}).alongWith(command);
+
+            m_stowCommand = chainIntermediaries(
+                new RunCommand(() -> goToArmState(ArmStates.stow), this),
+                state.getRetractIntermediaries(),
+                state.getRetractIntermediaryTolerance()
+            );
+            m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(command);
+
+            return command;
+        }
+    }
+
+    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
+        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
+    }
+
     public CommandBase sendArmToState(ArmState armState) {
         return sendArmToState(() -> armState);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
         return sendArmToStateAndEnd(() -> armState);
-    }
-
-    public CommandBase sendArmToState(Supplier<ArmState> armState) {
-        CommandBase command = new RunCommand(() -> goToArmState(armState.get()), this);
-        List<ArmState> intermediaries;
-        double tolerance;
-        if (armState.get().isStow()) {
-            intermediaries = m_targetArmState.getRetractIntermediaries();
-            tolerance = m_targetArmState.getRetractIntermediaryTolerance();
-        } else {
-            intermediaries = armState.get().getDeployIntermediaries();
-            tolerance = armState.get().getDeployIntermediaryTolerance();
-        }
-        for (ArmState intermediary : intermediaries) {
-            command = new RunCommand(() -> goToArmState(intermediary), this)
-                .until(() -> isAtTarget(intermediary, tolerance))
-                .andThen(command);
-        }
-        command = new InstantCommand(() -> {m_targetArmState = armState.get();}).alongWith(command);
-        return command;
-    }
-
-    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
-        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {
