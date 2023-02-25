@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.IntPreferenceConstant;
 
@@ -30,6 +31,10 @@ public class Lights extends SubsystemBase {
     private Animation m_lastAnimation = null;
     private Animation m_strobe = null;
 
+    private SwerveDrive m_swerve;
+    private ScorpionTable m_coprocessor;
+    private Limelight m_limelight;
+
     public enum AnimationTypes {
         ColorFlow,
         Fire,
@@ -44,7 +49,10 @@ public class Lights extends SubsystemBase {
         Empty
     }
 
-    public Lights() {
+    public Lights(SwerveDrive swerve, ScorpionTable coprocessor, Limelight limelight) {
+        m_swerve = swerve;
+        m_coprocessor = coprocessor;
+        m_limelight = limelight;
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
@@ -94,23 +102,21 @@ public class Lights extends SubsystemBase {
         switch (m_state) {
             case 0:
                 larsonColor(255, 0, 0);
-                if (counter++ > 100) {
+                if (m_coprocessor.getBotPose() != null) {
                     m_state++;
-                    counter = 0;
                 }
                 break;
             case 1:
                 larsonColor(0, 255, 0);
-                if (counter++ > 100) {
+                if (m_limelight.getBotPose().equals(m_coprocessor.getBotPose())) {
                     m_state++;
-                    counter = 0;
                 }
                 break;
             case 2:
                 larsonColor(0, 0, 255);
-                if (counter++ > 100) {
+                if (m_swerve.getOdometryPose().equals(m_limelight.getBotPose()) 
+                    && m_swerve.getOdometryPose().equals(m_coprocessor.getBotPose())) {
                     m_state++;
-                    counter = 0;
                 }
                 break;
             case 3:

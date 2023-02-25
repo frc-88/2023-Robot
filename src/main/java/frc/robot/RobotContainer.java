@@ -42,8 +42,8 @@ public class RobotContainer {
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
   private final Limelight m_limelight = new Limelight();
-  private final Lights m_candleSubsystem = new Lights();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
