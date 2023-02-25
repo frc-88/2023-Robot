@@ -78,12 +78,10 @@ public class CoprocessorTable extends CoprocessorBase {
 
     private NetworkTable detectionsTable;
 
-    public CoprocessorTable(ChassisInterface chassis, String address, int port, double updateInterval) {
+    public CoprocessorTable(ChassisInterface chassis, double updateInterval) {
         super(chassis);
 
         instance = NetworkTableInstance.create();
-        instance.startClient3("coprocessor");
-        instance.setServer(address, port);
         this.updateInterval = updateInterval;
 
         rootTable = instance.getTable("ROS");
@@ -130,6 +128,12 @@ public class CoprocessorTable extends CoprocessorBase {
 
         detectionsTable = rootTable.getSubTable("detections");
     }
+
+    public void start(String address, int port) {
+        instance.startClient3("coprocessor");
+        instance.setServer(address, port);
+    }
+    
 
     private void updatePing() {
         TimestampedDouble ping = pingSub.getAtomic();
@@ -458,9 +462,6 @@ public class CoprocessorTable extends CoprocessorBase {
             DriverStation.getAlliance()
         );
     }
-
-    public StringPreferenceConstant coprocessorIPAddress =
-        new StringPreferenceConstant("Jetson IP Address", "10.0.88.44");
 
     public boolean isConnected() {
         return instance.isConnected();

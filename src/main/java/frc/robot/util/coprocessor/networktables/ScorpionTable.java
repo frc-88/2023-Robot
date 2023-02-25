@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
+import frc.robot.util.preferenceconstants.StringPreferenceConstant;
 
 
 public class ScorpionTable extends CoprocessorTable {
@@ -24,11 +25,14 @@ public class ScorpionTable extends CoprocessorTable {
     protected Pose2d tagGlobalPose = new Pose2d();
     protected MessageTimer tagGlobalPoseTimer = new MessageTimer(DEFAULT_MESSAGE_TIMEOUT);
     private DoubleArraySubscriber tagGlobalPoseSub;
+    private StringPreferenceConstant coprocessorIPAddress =
+        new StringPreferenceConstant("Jetson IP Address", "10.0.88.44");
 
     private final double kGravity = 9.81;
 
-    public ScorpionTable(SwerveDrive swerve, AHRS imu, String address, int port, double updateInterval) {
-        super((ChassisInterface)swerve, address, port, updateInterval);
+    public ScorpionTable(SwerveDrive swerve, AHRS imu, int port, double updateInterval) {
+        super((ChassisInterface)swerve, updateInterval);
+        start(coprocessorIPAddress.getValue(), port);
         this.swerve = swerve;
         this.imu = imu;
 

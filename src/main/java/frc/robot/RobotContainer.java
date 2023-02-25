@@ -16,7 +16,10 @@ import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
+import frc.robot.util.coprocessor.CoprocessorBase;
+import frc.robot.util.coprocessor.networktables.CoprocessorTable;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
+import frc.robot.util.preferenceconstants.StringPreferenceConstant;
 import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
@@ -43,7 +46,7 @@ public class RobotContainer {
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
   private final Limelight m_limelight = new Limelight();
   private final Lights m_candleSubsystem = new Lights();
-  private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -52,6 +55,7 @@ public class RobotContainer {
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
+  private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   public RobotContainer(Robot robot) {
     configureControllers();
     configureDefaultCommands();
