@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
@@ -124,10 +126,9 @@ public class GameObjectManager extends SubsystemBase {
     public void periodic() {
         Collection<Detection> detections = m_coprocessor.getAllDetections();
         for (Detection d : detections) {
-            Pose3d pos = d.getPose().transformBy(new Pose3d(m_coprocessor.getTagGlobalPose().getX(),
-                m_coprocessor.getTagGlobalPose().getY(), 0.0,
-                0.0,0.,0.,0.));
-            addGameObject(d.getName(), d.getPosition().x, d.getPosition().y, d.getPosition().z, 0);
+            Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
+            Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
+            addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
         }
         removeInactiveGameObjects();
         fillGridZones();
