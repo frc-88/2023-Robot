@@ -11,11 +11,13 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.FollowTrajectory;
+import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.BotPoseProvider;
 import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.arm.ArmStates;
 
@@ -48,8 +50,9 @@ public class Autonomous {
             );
     }
 
-    public static SequentialCommandGroup redEngage(SwerveDrive drive) {
+    public static SequentialCommandGroup redEngage(SwerveDrive drive, BotPoseProvider source) {
         return new SequentialCommandGroup(
+            new Localize(drive, source),
             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), true),
             new RunCommand(()->{drive.stop();}, drive)
         );

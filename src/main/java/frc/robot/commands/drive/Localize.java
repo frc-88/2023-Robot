@@ -4,6 +4,7 @@
 
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
@@ -29,7 +30,11 @@ public class Localize extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.resetPosition(m_source.getBotPose());
+    Pose2d sourcePose = m_source.getBotPose();
+
+    if (sourcePose.getX()!=0 && sourcePose.getY() !=0) {
+      m_drive.resetPosition(m_source.getBotPose());
+    }
   }
 
   // Called once the command ends or is interrupted.
