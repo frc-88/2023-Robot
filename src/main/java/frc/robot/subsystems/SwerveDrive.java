@@ -397,6 +397,20 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 return value;
         }
 
+        public RunCommand lockDrive() {
+                return new RunCommand(
+                       () -> {
+                        SwerveModuleState[] states = {
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(135)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(45)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(45)), 
+                                new SwerveModuleState(0, Rotation2d.fromDegrees(135))};
+                                setModuleStates(states);
+                       } 
+                );
+                
+        }
+
         @Override
         public void periodic() {
                 for (SwerveModule module : m_modules) {
