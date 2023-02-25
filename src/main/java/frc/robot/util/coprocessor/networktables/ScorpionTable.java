@@ -39,19 +39,29 @@ public class ScorpionTable extends CoprocessorTable {
     // Tag global pose
     // ---
 
+    // Red is to left, origin at center of field
     public Pose2d getTagGlobalPose() {
         return tagGlobalPose;
     }
 
+    public Pose2d getTagGlobalPoseInches() {
+        return tagGlobalPose.times(39.3701);
+    }
+
+    // Origin is at the right corner near the driver station from the persepective of the driver
     public Pose2d getBotPose() {
         Pose2d transformPose;
-        if (DriverStation.getAlliance() == Alliance.Blue) {
+        if (isBlue()) {
             transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
         } else  {
             transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
         }
 
         return getTagGlobalPose().relativeTo(transformPose);
+    }
+
+    public Pose2d getBotPoseInches() {
+        return getBotPose().times(39.3701);
     }
 
     public InstantCommand rosLocalize(SwerveDrive drive) {
@@ -63,6 +73,30 @@ public class ScorpionTable extends CoprocessorTable {
 
     public boolean isTagGlobalPoseActive() {
         return tagGlobalPoseTimer.isActive();
+    }
+
+    public boolean isInCommunity() {
+        Pose2d pos = getBotPoseInches();
+        double shortXLimit = 120;
+        double longXLimit = 178;
+        double communityYStartRed = 100;
+        double communityYBumpRed = 160;
+        double communityYStartBlue = switchYAlliance(communityYStartRed);
+        double communityYBumpBlue = switchYAlliance(communityYBumpRed);
+
+        if (isBlue()) {
+            return pos.getY() < communityYStartBlue
+                    && (pos.getX() < shortXLimit
+                        || (pos.getY() < communityYBumpBlue && pos.getX() < longXLimit));
+        } else {
+            return pos.getY() > communityYStartRed
+                    && (pos.getX() < shortXLimit
+                        || (pos.getY() > communityYBumpRed && pos.getX() < longXLimit));
+        }
+    }
+
+    public double switchYAlliance(double y) {
+        return 27.*12. - y;
     }
 
     private void updateTagGlobalPose() {
@@ -81,6 +115,10 @@ public class ScorpionTable extends CoprocessorTable {
         double theta = pose.value[4];
         tagGlobalPose = new Pose2d(x, y, new Rotation2d(theta));
         tagGlobalPoseTimer.reset();
+    }
+
+    private boolean isBlue() {
+        return DriverStation.getAlliance() == Alliance.Blue;
     }
 
     @Override

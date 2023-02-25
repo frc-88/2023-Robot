@@ -104,7 +104,8 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh))
+        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
@@ -116,7 +117,8 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh))
+        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));

@@ -221,6 +221,10 @@ public class Intake extends SubsystemBase {
       return new RunCommand (() -> {outgest(); armUp();}, this).withName("handoff");
     }
 
+    public CommandBase downFactory() {
+      return new RunCommand(() -> {hold(); armDown();}, this).withName("down");
+    }
+
   @Override
   public void periodic() {
     m_irValue = m_irFilter.calculate(m_irSensor.getAverageVoltage());
