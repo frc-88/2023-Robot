@@ -40,7 +40,7 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
-  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
+  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
   private final Limelight m_limelight = new Limelight();
   private final Lights m_candleSubsystem = new Lights();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);

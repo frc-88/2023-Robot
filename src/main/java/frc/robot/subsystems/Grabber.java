@@ -28,6 +28,7 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 public class Grabber extends SubsystemBase {
 
   private final BooleanSupplier m_coastMode;
+  private final BooleanSupplier m_armStowed;
 
   private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
@@ -72,8 +73,9 @@ public class Grabber extends SubsystemBase {
 
   private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
-  public Grabber(BooleanSupplier coastMode) {
+  public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
     m_coastMode = coastMode;
+    m_armStowed = armStowed;
 
     m_pivot.configFactoryDefault();
     m_roller.configFactoryDefault();
@@ -130,7 +132,7 @@ public class Grabber extends SubsystemBase {
   }
 
   private void movePivot() {
-    if (!m_pivotLocked) {
+    if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
     m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition  + m_aimAngle));
