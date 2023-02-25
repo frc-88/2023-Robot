@@ -16,7 +16,7 @@ public class FollowTrajectory extends CommandBase {
   private SwerveDrive m_drive;
   private Trajectory m_trajectory;
   private boolean m_resetOdometry;
-  private RamseteController m_controller = new RamseteController();
+  private RamseteController m_controller = new RamseteController(1.5, 0.7);
   private Timer m_timer = new Timer();
   private double m_duration;
   private int m_state;
@@ -49,6 +49,12 @@ public class FollowTrajectory extends CommandBase {
         if (m_resetOdometry) {
           m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
           // m_drive.resetOdometry(m_trajectory.getInitialPose(), m_drive.getGyroscopeRotation());
+        } else {
+          if (Math.sqrt(Math.pow((m_drive.getOdometryPose().getX() - m_trajectory.getInitialPose().getX()), 2) +
+            Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > .25) {
+              m_state = 3;
+              break;
+            }
         }
         m_state++;
         break;

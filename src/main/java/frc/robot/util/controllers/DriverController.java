@@ -10,8 +10,6 @@ public interface DriverController {
 
     public double getRotation();
 
-    public boolean getGyroReset();
-
-    public Trigger getShootButton();
+    public Trigger getScoreButton();
 
 }

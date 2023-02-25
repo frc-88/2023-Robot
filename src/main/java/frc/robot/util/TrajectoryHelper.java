@@ -61,8 +61,8 @@ public class TrajectoryHelper
     return TrajectoryGenerator.generateTrajectory(waypoints, config);
   }
 
-  public static Trajectory generatePathWeaverTrajectory(String trajectoryJSON) {
-    trajectoryJSON = "output/" + trajectoryJSON;
+  public static Trajectory generateJSONTrajectory(String trajectoryJSON) {
+    trajectoryJSON = "pathplanner/generatedJSON/" + trajectoryJSON;
     Trajectory trajectory = new Trajectory();
     try {
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);

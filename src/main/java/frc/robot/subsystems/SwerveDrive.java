@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.music.Orchestra;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -35,10 +35,13 @@ import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyController;
+import frc.robot.util.coprocessor.BoundingBox;
+import frc.robot.util.coprocessor.ChassisInterface;
+import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
-public class SwerveDrive extends SubsystemBase {
+public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         /**
          * The maximum voltage that will be delivered to the drive motors.
          * 
@@ -104,6 +107,7 @@ public class SwerveDrive extends SubsystemBase {
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
         private Pose2d m_pose;
+        private boolean m_odometryReset = false;
 
         private Pose2d m_traj_pose;
         private Pose2d m_traj_reset_pose;
@@ -213,15 +217,24 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         public void zeroOdometry() {
+                zeroDriveEncoders();
                 resetOdometry(new Pose2d(Units.feetToMeters(0.0), Units.feetToMeters(0.0), new Rotation2d()),
                                 new Rotation2d());
+        }
+
+        public void zeroDriveEncoders() {
+                m_frontLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_frontRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backLeftModule.getDriveController().getMotor().setSelectedSensorPosition(0);
+                m_backRightModule.getDriveController().getMotor().setSelectedSensorPosition(0);
         }
 
         public void resetOdometry(Pose2d startPose, Rotation2d startGyro) {
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
-                m_fieldOffset = startPose.getRotation().getDegrees();
+                m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
+                m_odometryReset = true;
         }
 
         public void resetTrajectoryPose(Pose2d startPose) {
@@ -335,12 +348,15 @@ public class SwerveDrive extends SubsystemBase {
                 return grantDrive;
         }
 
-        public TalonFX[] getMotors() {
-                TalonFX[] motors = {m_frontLeftModule.getDriveController().getMotor(), m_frontRightModule.getDriveController().getMotor(),
-                        m_backLeftModule.getDriveController().getMotor(), m_backRightModule.getDriveController().getMotor(),
-                        m_frontLeftModule.getSteerController().getMotor(), m_frontRightModule.getSteerController().getMotor(),
-                        m_backLeftModule.getSteerController().getMotor(), m_backRightModule.getSteerController().getMotor()};
-                return motors;
+        public void addToOrchestra(Orchestra m_orchestra) {
+                m_orchestra.addInstrument(m_frontLeftModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_frontRightModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_backLeftModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_backRightModule.getDriveController().getMotor());
+                m_orchestra.addInstrument(m_frontLeftModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_frontRightModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_backLeftModule.getSteerController().getMotor());
+                m_orchestra.addInstrument(m_backRightModule.getSteerController().getMotor());
         }
         public InstantCommand resetYawCommandFactory() {
                 return new InstantCommand(() -> {zeroGyroscope();});
@@ -375,20 +391,35 @@ public class SwerveDrive extends SubsystemBase {
                         module.zeroModule();
                 }
 
-                updateOdometry();
+                if (m_odometryReset) {
+                        m_odometryReset = false;
+                } else {
+                        updateOdometry();
+                }
 
                 SmartDashboard.putNumber("NavX.yaw", m_navx.getYaw());
-                SmartDashboard.putNumber("odomX", Units.metersToFeet(m_pose.getX()));
-                SmartDashboard.putNumber("odomY", Units.metersToFeet(m_pose.getY()));
+                SmartDashboard.putNumber("NavX.pitch", m_navx.getPitch());
+                SmartDashboard.putNumber("NavX.roll", m_navx.getRoll());
+                SmartDashboard.putNumber("odomX", m_pose.getX());
+                SmartDashboard.putNumber("odomY", m_pose.getY());
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
-                SmartDashboard.putNumber("FLSteerCurrent", m_frontLeftModule.getSteerController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FRSteerCurrent", m_frontRightModule.getSteerController().getMotor().getStatorCurrent());               
-                SmartDashboard.putNumber("BLSteerCurrent", m_backLeftModule.getSteerController().getMotor().getStatorCurrent());               
-                SmartDashboard.putNumber("BRSteerCurrent", m_backRightModule.getSteerController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FLDriveCurrent", m_frontLeftModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("FRDriveCurrent", m_frontRightModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("BLDriveCurrent", m_backLeftModule.getDriveController().getMotor().getStatorCurrent());
-                SmartDashboard.putNumber("BRDriveCurrent", m_backRightModule.getDriveController().getMotor().getStatorCurrent());
+                SmartDashboard.putNumber("FLDrivePosition", m_frontLeftModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("FRDrivePosition", m_frontRightModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("BLDrivePosition", m_backLeftModule.getDriveController().getMotor().getSelectedSensorPosition());
+                SmartDashboard.putNumber("BRDrivePosition", m_backRightModule.getDriveController().getMotor().getSelectedSensorPosition());
         }
+
+        @Override
+        public void drive(VelocityCommand command) {
+                // TODO Auto-generated method stub
+                
+        }
+
+        @Override
+        public BoundingBox getBoundingBox() {
+                // TODO Auto-generated method stub
+                return new BoundingBox(0, 0, 0, 0, 0, 0, 0);
+        }
+
 }

@@ -3,6 +3,10 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
+
+import com.ctre.phoenix.music.Orchestra;
+import com.fasterxml.jackson.databind.jsontype.impl.AsDeductionTypeDeserializer;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,7 +41,7 @@ public class Arm extends SubsystemBase {
         m_shoulder = new ArmJoint("Shoulder", Constants.SHOULDER_ID, Constants.SHOULDER_ENCODER_ID, true, true, (16./42.) * (1./49.), 19.5);
         m_elbow = new ArmJoint("Elbow", Constants.ELBOW_ID, Constants.ELBOW_ENCODER_ID, true, true, (16./42.) * (1./49.), 15.5);
         m_wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, true, (16./42.) * (1./49.), 25.5);
-        shoulderPosition = new Translation2d(18.5, 3);
+        shoulderPosition = new Translation2d(3, 18.5);
 
         targetArmState = ArmStates.stow;
         allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
@@ -53,38 +57,65 @@ public class Arm extends SubsystemBase {
 
     public boolean isValidState(ArmState armState) {    
         Translation2d grabberPosition = getGrabberPosition(
-            new Translation2d(m_shoulder.getLength(), new Rotation2d(armState.getShoulderAngle())),
-            new Translation2d(m_elbow.getLength(), new Rotation2d(armState.getElbowAngle())),
-            new Translation2d(m_wrist.getLength(), new Rotation2d(armState.getWristAngle())));
-        if (grabberPosition.getX() > 48 || grabberPosition.getY() > 78) return false;
-        if (grabberPosition.getX() < -48 || grabberPosition.getY() < 0) return false;
-        if (armState.getShoulderAngle() < 0 || armState.getShoulderAngle() > 180) return false;
-        if (armState.getElbowAngle() < -360 || armState.getElbowAngle() > 360) return false;
-        if (armState.getWristAngle() < -360 || armState.getWristAngle() > 360) return false;
-        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) return false;
+            new Translation2d(m_shoulder.getLength(), new Rotation2d(Math.toRadians(armState.getShoulderAngle()))),
+            new Translation2d(m_elbow.getLength(), new Rotation2d(Math.toRadians(armState.getElbowAngle()))),
+            new Translation2d(m_wrist.getLength(), new Rotation2d(Math.toRadians(armState.getWristAngle()))));
+        
+        if (grabberPosition.getY() > 78) {
+            System.out.println("Exceeded height limit with position: " + grabberPosition);
+            return false;
+        }
+        if (grabberPosition.getY() < 0) {
+            System.out.println("Exceeded floor limit with position: " + grabberPosition);
+            return false;
+        }
+        if (grabberPosition.getX() > 48 + 27 || grabberPosition.getX() < -48) {
+            System.out.println("Exceeded extension limit with position: " + grabberPosition);
+            return false;
+        }
+        if (armState.getShoulderAngle() < 0 || armState.getShoulderAngle() > 180) {
+            System.out.println("Exceeded shoulder limit with angle: " + armState.getShoulderAngle());
+            return false;
+        }
+        if (armState.getElbowAngle() < -360 || armState.getElbowAngle() > 360) {
+            System.out.println("Exceeded elbow limit with angle: " + armState.getElbowAngle());
+            return false;
+        }
+        if (armState.getWristAngle() < -360 || armState.getWristAngle() > 360) {
+            System.out.println("Exceeded wrist limit with angle: " + armState.getWristAngle());
+            return false;
+        }
+        if ((grabberPosition.getX() > -2.5 && grabberPosition.getX() < 29.5) && grabberPosition.getY() < 20) {
+            System.out.println("Exceeded chassis hit limit with position: " + grabberPosition);
+            return false;
+        }
         return true;
     }
 
     public void goToArmState(ArmState armState) {
-        if (!isValidState(armState)) {
-            System.out.println("Arm state invalid");
-            return;
-        }
+        if (!isValidState(armState)) return;
         targetArmState = armState;
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(armState.getShoulderAngle()-m_shoulder.getAngle()), 
             Math.abs(armState.getElbowAngle()-m_elbow.getAngle()), 
             Math.abs(armState.getWristAngle()-m_wrist.getAngle())}));
-        // Keep max velocities the same or change this
-        m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
-        m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
-        m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+
+        if (greatestAngle > 2) {
+            // Keep max velocities the same or change this
+            m_shoulder.setMotionMagic(armState.getShoulderAngle(), m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - armState.getShoulderAngle()) / greatestAngle);
+            m_elbow.setMotionMagic(armState.getElbowAngle(), m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - armState.getElbowAngle()) / greatestAngle);
+            m_wrist.setMotionMagic(armState.getWristAngle(), m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - armState.getWristAngle()) / greatestAngle);
+        } else {
+            m_shoulder.setMotionMagic(armState.getShoulderAngle());
+            m_elbow.setMotionMagic(armState.getElbowAngle());
+            m_wrist.setMotionMagic(armState.getWristAngle());
+        }
     }
 
-    public boolean isAtTarget() {
-        if (!(m_shoulder.isOnTarget(targetArmState.getShoulderAngle()))) return false;
-        if (!(m_elbow.isOnTarget(targetArmState.getElbowAngle()))) return false;
-        if (!(m_wrist.isOnTarget(targetArmState.getWristAngle()))) return false;
+    public boolean isAtTarget(ArmState state) {
+        if (!(m_shoulder.isOnTarget(state.getShoulderAngle()))) return false;
+        if (!(m_elbow.isOnTarget(state.getElbowAngle()))) return false;
+        if (!(m_wrist.isOnTarget(state.getWristAngle()))) return false;
         return true;
     }
 
@@ -107,11 +138,25 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return new RunCommand(() -> goToArmState(armState), this);
+        return sendArmToState(() -> armState);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState).until(this::isAtTarget);
+        return sendArmToStateAndEnd(() -> armState);
+    }
+
+    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+        return new RunCommand(() -> goToArmState(armState.get()), this);
+    }
+
+    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
+        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
+    }
+
+    public void addToOrchestra(Orchestra m_orchestra) {
+        m_orchestra.addInstrument(m_elbow.getMotor());
+        m_orchestra.addInstrument(m_shoulder.getMotor());
+        m_orchestra.addInstrument(m_wrist.getMotor());
     }
 
     @Override

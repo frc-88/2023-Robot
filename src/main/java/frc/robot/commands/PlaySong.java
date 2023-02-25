@@ -5,6 +5,7 @@ import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -13,29 +14,20 @@ public class PlaySong extends CommandBase {
     Orchestra m_orchestra = new Orchestra();
     Intake m_intake;
     SwerveDrive m_swerveDrive;
+    Arm m_arm;
 
-    public PlaySong(String filename, Intake intake, SwerveDrive swerveDrive) {
+    public PlaySong(String filename, Intake intake, SwerveDrive swerveDrive, Arm arm) {
         this.filename = filename;
-        addRequirements(intake);
+        addRequirements(intake, swerveDrive, arm);
         m_intake = intake;
         m_swerveDrive = swerveDrive;
+        m_arm = arm;
     }
 
     public void initialize() {
-        m_orchestra.addInstrument(m_intake.getMotors()[0]);
-        m_orchestra.addInstrument(m_intake.getMotors()[1]);
-        m_orchestra.addInstrument(m_intake.getMotors()[2]);
-        m_orchestra.addInstrument(new WPI_TalonFX(6, Constants.INTAKE_CANBUS));
-        m_orchestra.addInstrument(new WPI_TalonFX(12, Constants.INTAKE_CANBUS));
-        m_orchestra.addInstrument(new WPI_TalonFX(2, Constants.INTAKE_CANBUS));
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[0]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[1]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[2]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[3]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[4]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[5]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[6]);
-        m_orchestra.addInstrument(m_swerveDrive.getMotors()[7]);
+        m_intake.addToOrchestra(m_orchestra);
+        m_swerveDrive.addToOrchestra(m_orchestra);
+        m_arm.addToOrchestra(m_orchestra);
         m_orchestra.loadMusic(filename);
         m_orchestra.play();
     }

@@ -13,6 +13,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -31,7 +33,8 @@ public class Grabber extends SubsystemBase {
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private boolean m_pivotForwards = true;
-  private boolean m_pivotLocked = true;
+  private boolean m_pivotLocked = false;
+  private double m_lastPivotPosition = 0;
 
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
@@ -62,6 +65,11 @@ public class Grabber extends SubsystemBase {
     new DoublePreferenceConstant("Grabber/Roller/Hold Cube Speed", -0.05);
   private DoublePreferenceConstant p_holdConeSpeed =
     new DoublePreferenceConstant("Grabber/Roller/Hold Cone Speed", 0.05);
+    
+  private DoublePreferenceConstant p_hasGamePieceDebounceTime =
+    new DoublePreferenceConstant("Grabber/Roller/Debounce", 0.5);
+
+  private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
   public Grabber(BooleanSupplier coastMode) {
     m_coastMode = coastMode;
@@ -73,6 +81,7 @@ public class Grabber extends SubsystemBase {
     zeroRelativePivot();
 
     m_pivot.setInverted(true);
+    m_pivot.setSensorPhase(true);
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(4);
@@ -90,6 +99,9 @@ public class Grabber extends SubsystemBase {
     p_pivotPID.addChangeHandler(pivotHandler);
     p_pivotMaxVelocity.addChangeHandler(pivotHandler);
     p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
+
+    m_roller.configNeutralDeadband(0);
+    m_roller.overrideLimitSwitchesEnable(false);
 
     Consumer<Double> rollerHandler = (Double unused) -> {
       SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration(
@@ -109,15 +121,18 @@ public class Grabber extends SubsystemBase {
   }
 
   public void setPivotForwards() {
-    m_pivotForwards = m_pivotLocked ? m_pivotForwards : true;
+    m_pivotForwards = true;
   }
 
   public void setPivotBackwards() {
-    m_pivotForwards = m_pivotLocked ? m_pivotForwards : false;
+    m_pivotForwards = false;
   }
 
   private void movePivot() {
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_pivotForwards ? 0 : 180));
+    if (!m_pivotLocked) {
+      m_lastPivotPosition = m_pivotForwards ? 0 : -180;
+    }
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition));
   }
 
   private void lockPivot() {
@@ -125,7 +140,7 @@ public class Grabber extends SubsystemBase {
   }
 
   private void unlockPivot() {
-    m_pivotLocked = true;
+    m_pivotLocked = false;
   }
 
   public double getPivotAngle() {
@@ -137,11 +152,11 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue();
+    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 180. + 360.*5.) % 360. - 180.;
   }
 
   public void zeroRelativePivot() {
-    m_pivot.setSelectedSensorPosition(getPivotAbsoluteAngle());
+    m_pivot.setSelectedSensorPosition(convertActualPositionToSensorPosition(getPivotAbsoluteAngle()));
   }
 
   public void calibrateAbsolutePivot() {
@@ -151,11 +166,13 @@ public class Grabber extends SubsystemBase {
   }
 
   public void grabCube() {
-    m_roller.set(p_grabCubeSpeed.getValue());
+    if (!m_hasGamePieceDebounce.calculate(hasGamePiece())) m_roller.set(p_grabCubeSpeed.getValue());
+    else holdCube();
   }
 
   public void grabCone() {
-    m_roller.set(p_grabConeSpeed.getValue());
+    if (!m_hasGamePieceDebounce.calculate(hasGamePiece())) m_roller.set(p_grabConeSpeed.getValue());
+    else holdCone();
   }
 
   public void dropCube() {
@@ -240,17 +257,33 @@ public class Grabber extends SubsystemBase {
     }, this);
   }
 
+  public CommandBase grabFactory(BooleanSupplier coneMode) {
+    return new RunCommand(() -> {
+      if (coneMode.getAsBoolean()) {
+        grabCone();
+      } else {
+        grabCube();
+      }
+      movePivot();
+      lockPivot();
+    }, this);
+  }
+
   public CommandBase setPivotForwardsFactory() {
+    return new InstantCommand(this::setPivotForwards);
+  }
+
+  public CommandBase setPivotBackwardsFactory() {
     return new InstantCommand(() -> {
       if (hasGamePiece()) {
-        setPivotForwards();
-      } else {
         setPivotBackwards();
+      } else {
+        setPivotForwards();
       }
     });
   }
 
-  public CommandBase setPivotBackwardsFactory() {
+  public CommandBase forcePivotBackwardsFactory() {
     return new InstantCommand(this::setPivotBackwards);
   }
 
