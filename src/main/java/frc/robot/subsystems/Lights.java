@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
@@ -26,6 +27,8 @@ public class Lights extends SubsystemBase {
     private boolean m_animDirection = false;
     private boolean m_setAnim = false;
     private DoublePreferenceConstant dangerAngle = new DoublePreferenceConstant("Danger Angle", 5.0);
+    private double acceptableDifference = 0.05;
+    private double acceptableAngleDifference = 0.05;
 
     private Animation m_toAnimate = null;
     private Animation m_lastAnimation = null;
@@ -97,6 +100,15 @@ public class Lights extends SubsystemBase {
         m_setAnim = true;
     }
 
+    public boolean approximatelyEqual(Pose2d a, Pose2d b) {
+        if (a instanceof Pose2d && b instanceof Pose2d) {
+            return Math.abs(a.getX() - b.getX()) < acceptableDifference
+          && Math.abs(a.getY() - b.getY()) < acceptableDifference
+          && Math.abs(a.getRotation().getRadians()-b.getRotation().getRadians()) < acceptableAngleDifference;
+        }
+        return false;
+    }
+
     @Override
     public void periodic() {
         switch (m_state) {
@@ -108,14 +120,14 @@ public class Lights extends SubsystemBase {
                 break;
             case 1:
                 larsonColor(0, 255, 0);
-                if (m_limelight.getBotPose().equals(m_coprocessor.getBotPose())) {
+                if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose())) {
                     m_state++;
                 }
                 break;
             case 2:
                 larsonColor(0, 0, 255);
-                if (m_swerve.getOdometryPose().equals(m_limelight.getBotPose()) 
-                    && m_swerve.getOdometryPose().equals(m_coprocessor.getBotPose())) {
+                if (approximatelyEqual(m_swerve.getOdometryPose(), m_limelight.getBotPose()) 
+                    && approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose())) {
                     m_state++;
                 }
                 break;
