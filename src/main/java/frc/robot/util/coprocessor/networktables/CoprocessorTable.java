@@ -29,6 +29,7 @@ import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.coprocessor.ZoneInfo;
 import frc.robot.util.coprocessor.ZoneManager;
 import frc.robot.util.coprocessor.detections.Detection;
+import frc.robot.util.preferenceconstants.StringPreferenceConstant;
 import frc.robot.util.coprocessor.CoprocessorBase;
 
 public class CoprocessorTable extends CoprocessorBase {
@@ -457,6 +458,9 @@ public class CoprocessorTable extends CoprocessorBase {
             DriverStation.getAlliance()
         );
     }
+
+    public StringPreferenceConstant coprocessorIPAddress =
+        new StringPreferenceConstant("Jetson IP Address", "10.0.88.44");
 
     public boolean isConnected() {
         return instance.isConnected();
