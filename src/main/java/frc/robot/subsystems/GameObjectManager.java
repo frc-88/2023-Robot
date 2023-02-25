@@ -1,38 +1,45 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
+import frc.robot.util.coprocessor.detections.Detection;
+import frc.robot.util.coprocessor.detections.Pose3d;
+import frc.robot.util.coprocessor.networktables.ScorpionTable;
 
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
+    private ScorpionTable m_coprocessor;
 
-    public GameObjectManager() {
+    public GameObjectManager(ScorpionTable coprocessor) {
+        m_coprocessor = coprocessor;
         gameObjects = new ArrayList<>();
         gridZones = new ArrayList<>();
 
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 1.17));
+        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 1.17));
 
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.9));
+        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.9));
 
         gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
         gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
@@ -115,6 +122,13 @@ public class GameObjectManager extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Collection<Detection> detections = m_coprocessor.getAllDetections();
+        for (Detection d : detections) {
+            Pose3d pos = d.getPose().transformBy(new Pose3d(m_coprocessor.getTagGlobalPose().getX(),
+                m_coprocessor.getTagGlobalPose().getY(), 0.0,
+                0.0,0.,0.,0.));
+            addGameObject(d.getName(), d.getPosition().x, d.getPosition().y, d.getPosition().z, 0);
+        }
         removeInactiveGameObjects();
         fillGridZones();
     }

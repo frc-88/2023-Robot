@@ -19,6 +19,7 @@ import frc.robot.commands.Autonomous;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.GameObjectManager;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Limelight;
@@ -44,6 +45,7 @@ public class RobotContainer {
   private final Limelight m_limelight = new Limelight();
   private final Lights m_candleSubsystem = new Lights();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
