@@ -24,30 +24,31 @@ import frc.robot.util.arm.ArmStates;
 /** Add your docs here. */
 public class Autonomous {
 
-    public static SequentialCommandGroup simpleAuto(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle) {
+    public static SequentialCommandGroup simpleAuto(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            intake.setConeFactory(),
-            candle.wantConeFactory(),
-            grabber.forcePivotBackwardsFactory(),
-            new ParallelDeadlineGroup(
-                intake.stowFactory(),
-                arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh),
-                grabber.holdCubeFactory()
-            ),
-            new ParallelCommandGroup(
-                intake.stowFactory(),
-                arm.sendArmToState(ArmStates.scoreCubeHigh),
-                grabber.dropCubeFactory()
-            ).withTimeout(0.5),
-            new ParallelRaceGroup(
-                    intake.intakeFactory(),
-                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterLeg1.wpilib.json"), true),
-                    arm.sendArmToState(ArmStates.stow),
-                    grabber.holdConeFactory()
-            ),
+            new Localize(drive, source),
+            // intake.setConeFactory(),
+            // candle.wantConeFactory(),
+            // grabber.forcePivotBackwardsFactory(),
+            // new ParallelDeadlineGroup(
+            //     intake.stowFactory(),
+            //     arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh),
+            //     grabber.holdCubeFactory()
+            // ),
+            // new ParallelCommandGroup(
+            //     intake.stowFactory(),
+            //     arm.sendArmToState(ArmStates.scoreCubeHigh),
+            //     grabber.dropCubeFactory()
+            // ).withTimeout(0.5),
+            // new ParallelDeadlineGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterLeg1.wpilib.json"), false),
+                // intake.intakeFactory()
+                    // arm.sendArmToState(ArmStates.stow),
+                    // grabber.holdConeFactory()
+            // ),
             new WaitCommand(1.0),
             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterLeg2.wpilib.json"), false)
-            );
+        );
     }
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive, BotPoseProvider source) {
