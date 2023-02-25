@@ -53,7 +53,7 @@ public class Autonomous {
     public static SequentialCommandGroup redEngage(SwerveDrive drive, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new Localize(drive, source),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), true),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
             new RunCommand(()->{drive.stop();}, drive)
         );
     }
