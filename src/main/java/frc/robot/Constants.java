@@ -104,8 +104,8 @@ public final class Constants {
     public static final double MAX_TRAJ_ACCELERATION = 3;
 	
     // Limelight
-    public static final String LIMELIGHT_NAME = "limelight";
-
+    public static final String LIMELIGHT_FRONT_NAME = "limelight";
+    public static final String LIMELIGHT_BACK_NAME = "limelight-back";
 
     // Coprocessor
     public static final String COPROCESSOR_ADDRESS = "10.0.88.44";

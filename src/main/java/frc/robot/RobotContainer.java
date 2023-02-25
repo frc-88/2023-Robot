@@ -43,7 +43,8 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
-  private final Limelight m_limelight = new Limelight();
+  private final Limelight m_limelight_front = new Limelight(Constants.LIMELIGHT_FRONT_NAME);
+  private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final Lights m_candleSubsystem = new Lights();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
 
@@ -211,7 +212,8 @@ public class RobotContainer {
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
 
     // Limelight
-    SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
+    SmartDashboard.putData("LL Front Localize", m_limelight_front.llLocalize(m_drive).ignoringDisable(true));
+    SmartDashboard.putData("LL Back Localize", m_limelight_back.llLocalize(m_drive).ignoringDisable(true));
 
     // ROS
     SmartDashboard.putData("ROS Localize", m_coprocessor.rosLocalize(m_drive).ignoringDisable(true));

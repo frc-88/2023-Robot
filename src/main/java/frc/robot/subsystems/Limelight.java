@@ -11,43 +11,38 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.util.LimelightHelpers;
 
 public class Limelight extends SubsystemBase {
 
-  public Limelight() {
+  private String m_name;
 
+  public Limelight(String name) {
+    m_name = name;
   }
 
   public Pose2d getBotPose() {
-    if (DriverStation.getAlliance() == Alliance.Red) {
-      return LimelightHelpers.getBotPose2d_wpiRed(Constants.LIMELIGHT_NAME);
+    if (LimelightHelpers.getFiducialID(m_name) > 0.0) {
+      if (DriverStation.getAlliance() == Alliance.Red) {
+        return LimelightHelpers.getBotPose2d_wpiRed(m_name);
+      } else {
+        return LimelightHelpers.getBotPose2d_wpiBlue(m_name);
+      }
     } else {
-      return LimelightHelpers.getBotPose2d_wpiBlue(Constants.LIMELIGHT_NAME);
+      return new Pose2d();
     }
-    
   }
 
   public InstantCommand llLocalize(SwerveDrive drive) {
-    return new InstantCommand (
-      () -> {drive.resetPosition(getBotPose());},
-      drive);
+    return new InstantCommand(() -> {drive.resetPosition(getBotPose());}, drive);
   }
-
 
   @Override
   public void periodic() {
-    Pose2d botPose;
-    
-    if(LimelightHelpers.getFiducialID(Constants.LIMELIGHT_NAME) > 0.0) {
-      botPose = getBotPose();
-    } else {
-      botPose = new Pose2d();
-    }
+    Pose2d botPose = getBotPose();
 
-    SmartDashboard.putNumber("LL:BotX", Units.metersToFeet(botPose.getX()));
-    SmartDashboard.putNumber("LL:BotY", Units.metersToFeet(botPose.getY()));
-    SmartDashboard.putNumber("LL:BotYaw", botPose.getRotation().getDegrees());
+    SmartDashboard.putNumber("LL:" + m_name + ":BotX", Units.metersToFeet(botPose.getX()));
+    SmartDashboard.putNumber("LL:" + m_name + ":BotY", Units.metersToFeet(botPose.getY()));
+    SmartDashboard.putNumber("LL:" + m_name + ":BotYaw", botPose.getRotation().getDegrees());
   }
 }
