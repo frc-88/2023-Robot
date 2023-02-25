@@ -397,7 +397,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 return value;
         }
 
-        public RunCommand lockDrive() {
+        public RunCommand xModeCommandFactory() {
                 return new RunCommand(
                        () -> {
                         SwerveModuleState[] states = {
