@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
+import frc.robot.util.preferenceconstants.IntPreferenceConstant;
 
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -17,7 +18,7 @@ import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
 public class Lights extends SubsystemBase {
-    private final int LEDS_PER_ANIMATION = 70;
+    private IntPreferenceConstant numLEDs = new IntPreferenceConstant("Number of LEDs", 60);
     private int m_state = 0;
     private int counter = 0;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
@@ -54,37 +55,37 @@ public class Lights extends SubsystemBase {
     }
 
     public void wantCone() {
-        m_toAnimate = new StrobeAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_toAnimate = new StrobeAnimation(255, 200, 0, 0, 0.2, numLEDs.getValue(), 0);
         m_setAnim = true;
     }
 
     public void holdingCone() {
-        m_toAnimate = new ColorFlowAnimation(255, 200, 0, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+        m_toAnimate = new ColorFlowAnimation(255, 200, 0, 0, 0.2, numLEDs.getValue(), Direction.Forward);
         m_setAnim = true;
     }
 
     public void wantCube() {
-        m_toAnimate = new StrobeAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_toAnimate = new StrobeAnimation(100, 0, 120, 0, 0.2, numLEDs.getValue(), 0);
         m_setAnim = true;
     }
 
     public void holdingCube() {
-        m_toAnimate = new ColorFlowAnimation(100, 0, 120, 0, 0.2, LEDS_PER_ANIMATION, Direction.Forward);
+        m_toAnimate = new ColorFlowAnimation(100, 0, 120, 0, 0.2, numLEDs.getValue(), Direction.Forward);
         m_setAnim = true;
     }
 
     public void larsonColor(int r, int g, int b) {
-        m_toAnimate = new LarsonAnimation(r, g, b, 0, 0.1, LEDS_PER_ANIMATION, BounceMode.Front, 5, 0);
+        m_toAnimate = new LarsonAnimation(r, g, b, 0, 0.1, numLEDs.getValue(), BounceMode.Front, 5, 0);
         m_setAnim = true;
     }
 
     public void rainbow() {
-        m_toAnimate = new RainbowAnimation(1, 0.7, LEDS_PER_ANIMATION, m_animDirection, 0);
+        m_toAnimate = new RainbowAnimation(1, 0.7, numLEDs.getValue(), m_animDirection, 0);
         m_setAnim = true;
     }
 
     public void strobe(int r, int g, int b) {
-        m_toAnimate = new StrobeAnimation(r, g, b, 0, 0.2, LEDS_PER_ANIMATION, 0);
+        m_toAnimate = new StrobeAnimation(r, g, b, 0, 0.2, numLEDs.getValue(), 0);
         m_setAnim = true;
     }
 
