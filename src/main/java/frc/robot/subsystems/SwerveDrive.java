@@ -412,15 +412,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
 
         @Override
         public void periodic() {
-                for (SwerveModule module : m_modules) {
-                        module.zeroModule();
-                }
-
-                if (m_odometryReset) {
-                        m_odometryReset = false;
-                } else {
-                        updateOdometry();
-                }
+                updateOdometry();
 
                 SmartDashboard.putNumber("NavX.yaw", m_navx.getYaw());
                 SmartDashboard.putNumber("NavX.pitch", m_navx.getPitch());
