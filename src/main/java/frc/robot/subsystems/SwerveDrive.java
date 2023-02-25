@@ -27,7 +27,9 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
@@ -346,6 +348,16 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                         () -> -modifyAxis(((FrskyController) driverController).getLeftStickX(), false) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
                       );
                 return grantDrive;
+        }
+
+        public Command lockCommandFactory() {
+                SwerveModuleState [] lockStates = { new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+                        new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+                        new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+                        new SwerveModuleState(0, Rotation2d.fromDegrees(90))
+                };
+
+                return new RunCommand( () -> {setModuleStates(lockStates);}, this);
         }
 
         public void addToOrchestra(Orchestra m_orchestra) {

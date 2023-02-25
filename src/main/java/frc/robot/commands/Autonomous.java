@@ -54,7 +54,7 @@ public class Autonomous {
         return new SequentialCommandGroup(
             new Localize(drive, source),
             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
-            new RunCommand(()->{drive.stop();}, drive)
+            drive.lockCommandFactory()
         );
     }
 }
