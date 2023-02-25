@@ -12,6 +12,7 @@ import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.Aiming;
 import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
@@ -44,6 +45,7 @@ public class RobotContainer {
   private final Limelight m_limelight = new Limelight();
   private final Lights m_candleSubsystem = new Lights();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
