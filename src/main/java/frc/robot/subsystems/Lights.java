@@ -17,7 +17,7 @@ import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
 public class Lights extends SubsystemBase {
-    private final int LEDS_PER_ANIMATION = 53;
+    private final int LEDS_PER_ANIMATION = 70;
     private int m_state = 0;
     private int counter = 0;
     private final CANdle m_candle = new CANdle(Constants.CANDLE_ID);
