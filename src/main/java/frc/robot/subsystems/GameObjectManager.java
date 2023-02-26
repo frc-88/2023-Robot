@@ -1,20 +1,28 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
+import frc.robot.util.coprocessor.detections.Detection;
+import frc.robot.util.coprocessor.detections.Pose3d;
+import frc.robot.util.coprocessor.networktables.ScorpionTable;
 
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
-    public DriverStation driverStation; 
-    public GameObjectManager() {
-        if(driverStation.getAlliance() == Alliance.Blue) {
+    private ScorpionTable m_coprocessor;
+    public GameObjectManager(ScorpionTable coprocessor) {
+        m_coprocessor = coprocessor;
+        if(DriverStation.getAlliance() == Alliance.Blue) {
 
             gameObjects = new ArrayList<>();
             gridZones = new ArrayList<>();
@@ -49,7 +57,7 @@ public class GameObjectManager extends SubsystemBase {
             gridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
             gridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
         }
-        else if(driverStation.getAlliance() == Alliance.Red) {
+        else if(DriverStation.getAlliance() == Alliance.Red) {
             gameObjects = new ArrayList<>();
             gridZones = new ArrayList<>();
 
@@ -155,6 +163,12 @@ public class GameObjectManager extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Collection<Detection> detections = m_coprocessor.getAllDetections();
+        for (Detection d : detections) {
+            Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
+            Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
+            addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
+        }
         removeInactiveGameObjects();
         fillGridZones();
     }
