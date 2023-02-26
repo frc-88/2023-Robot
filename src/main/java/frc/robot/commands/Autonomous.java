@@ -4,6 +4,9 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -24,7 +27,40 @@ import frc.robot.util.arm.ArmStates;
 /** Add your docs here. */
 public class Autonomous {
 
-    public static SequentialCommandGroup simpleAuto(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+    public static ConditionalCommand engage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+        return new ConditionalCommand(redEngage(drive,grabber,source), 
+            blueEngage(drive,grabber,source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
+    public static ConditionalCommand center(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(redCenter(drive, intake, arm, grabber, candle, source), 
+            blueCenter(drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
+    public static SequentialCommandGroup redEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            // new ParallelDeadlineGroup(
+                new Localize(drive, source),
+                // grabber.holdCubeFactory()
+            // ),
+            // new ParallelDeadlineGroup(
+                new WaitCommand(1.0),
+                // grabber.dropCubeFactory()
+            // ),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
+            drive.lockCommandFactory()
+        );
+    }
+
+    public static SequentialCommandGroup blueEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            new WaitCommand(1)
+        );
+    }
+
+    public static SequentialCommandGroup redCenter(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new Localize(drive, source),
             // intake.setConeFactory(),
@@ -51,18 +87,10 @@ public class Autonomous {
         );
     }
 
-    public static SequentialCommandGroup redEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+    public static SequentialCommandGroup blueCenter(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            // new ParallelDeadlineGroup(
-                new Localize(drive, source),
-                // grabber.holdCubeFactory()
-            // ),
-            // new ParallelDeadlineGroup(
-                new WaitCommand(1.0),
-                // grabber.dropCubeFactory()
-            // ),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
-            drive.lockCommandFactory()
+            new Localize(drive, source),
+            new WaitCommand(1)
         );
     }
 }

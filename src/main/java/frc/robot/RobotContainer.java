@@ -98,12 +98,12 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
-      m_autoCommand = Autonomous.redEngage(m_drive, m_grabber, m_coprocessor);
+      m_autoCommand = Autonomous.engage(m_drive, m_grabber, m_coprocessor);
       m_autoCommandName = "Engage";
     }
 
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
-      m_autoCommand = Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "Center";
     }
 
@@ -259,8 +259,8 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false));
 
     // Autonomous
-    SmartDashboard.putData("AutoROS Red Center", Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Center", Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
+    SmartDashboard.putData("AutoROS Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_grabber, m_coprocessor));
     SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_grabber, m_limelight_back));
 
