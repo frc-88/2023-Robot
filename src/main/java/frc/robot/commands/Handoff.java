@@ -20,6 +20,7 @@ public class Handoff extends SequentialCommandGroup {
     addCommands(
       arm.sendArmToStateAndEnd(coneMode ? ArmStates.getConeFromIntake1 : ArmStates.getCubeFromIntake1).deadlineWith(grab.get(), intake.stowFactory()),
       arm.sendArmToStateAndEnd(coneMode ? ArmStates.getConeFromIntake2 : ArmStates.getCubeFromIntake2).deadlineWith(grab.get(), intake.handoffFactory()),
+      arm.holdTargetState().alongWith(grab.get(), intake.handoffFactory()).withTimeout(0.25),
       arm.sendArmToStateAndEnd(ArmStates.stow).deadlineWith(grab.get(), intake.handoffFactory())
     );
   }
