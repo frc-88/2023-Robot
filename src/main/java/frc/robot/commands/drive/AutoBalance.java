@@ -101,14 +101,14 @@ public class AutoBalance extends CommandBase {
             System.out.println("true angle is greater than level");
             if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
               System.out.println("robot has its pitch larger than the charge station level, it should drive");
-              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/32), 0, 0);
+              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/48), 0, 0);
             } 
             else if (m_pitch < -Constants.CHARGE_STATION_LEVEL-.2) {
               System.out.println("System has a pitch greater than negative charge station");
-              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/32), 0, 0);
+              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/48), 0, 0);
             } else if ((m_pitch > -Constants.CHARGE_STATION_LEVEL-.2) && (m_pitch < Constants.CHARGE_STATION_LEVEL)) {
               System.out.println("high roll");
-              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/32, 0, 0);
+              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/48, 0, 0);
             }
           } 
         }
