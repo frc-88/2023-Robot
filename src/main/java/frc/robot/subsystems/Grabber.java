@@ -272,18 +272,6 @@ public class Grabber extends SubsystemBase {
     }, this);
   }
 
-  public CommandBase grabFactory(BooleanSupplier coneMode) {
-    return new RunCommand(() -> {
-      if (coneMode.getAsBoolean()) {
-        grabCone();
-      } else {
-        grabCube();
-      }
-      movePivot();
-      lockPivot();
-    }, this);
-  }
-
   public CommandBase setPivotForwardsFactory() {
     return new InstantCommand(this::setPivotForwards);
   }

@@ -210,28 +210,26 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
-    private CommandBase sendArmToState(Supplier<ArmState> armState, BooleanSupplier until) {
-        if (armState.get().isStow()) {
+    private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
+        if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
             command.addRequirements(this);
             return command;
         } else {
 
-            ArmState state = armState.get();
-            CommandBase command = chainIntermediaries(
-                new RunCommand(() -> goToArmState(state), this).until(until),
-                state.getDeployIntermediaries(),
-                state.getDeployIntermediaryTolerance()
-            );
-            command = new InstantCommand(() -> {m_targetArmState = state;}).alongWith(command);
-
             m_stowCommand = chainIntermediaries(
                 new RunCommand(() -> goToArmState(ArmStates.stow)),
-                state.getRetractIntermediaries(),
-                state.getRetractIntermediaryTolerance()
+                armState.getRetractIntermediaries(),
+                armState.getRetractIntermediaryTolerance()
             );
             m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(m_stowCommand);
 
+            CommandBase command = chainIntermediaries(
+                new RunCommand(() -> goToArmState(armState), this).until(until),
+                armState.getDeployIntermediaries(),
+                armState.getDeployIntermediaryTolerance()
+            );
+            command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
             return command;
         }
     }
@@ -240,20 +238,12 @@ public class Arm extends SubsystemBase {
         return new RunCommand(() -> goToArmState(m_targetArmState), this);
     }
 
-    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+    public CommandBase sendArmToState(ArmState armState) {
         return sendArmToState(armState, () -> false);
     }
 
-    public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
-        return sendArmToState(armState, () -> isAtTarget(armState.get()));
-    }
-
-    public CommandBase sendArmToState(ArmState armState) {
-        return sendArmToState(() -> armState);
-    }
-
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToStateAndEnd(() -> armState);
+        return sendArmToState(armState, () -> isAtTarget(armState));
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {
