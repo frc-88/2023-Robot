@@ -28,12 +28,14 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 public class Grabber extends SubsystemBase {
 
   private final BooleanSupplier m_coastMode;
+  private final BooleanSupplier m_armStowed;
 
   private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
   private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
   private boolean m_pivotForwards = true;
   private boolean m_pivotLocked = false;
+  private double m_aimAngle = 0;
   private double m_lastPivotPosition = 0;
 
   private DoublePreferenceConstant p_pivotOffset = 
@@ -71,8 +73,9 @@ public class Grabber extends SubsystemBase {
 
   private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
-  public Grabber(BooleanSupplier coastMode) {
+  public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
     m_coastMode = coastMode;
+    m_armStowed = armStowed;
 
     m_pivot.configFactoryDefault();
     m_roller.configFactoryDefault();
@@ -129,10 +132,10 @@ public class Grabber extends SubsystemBase {
   }
 
   private void movePivot() {
-    if (!m_pivotLocked) {
+    if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition));
+    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition  + m_aimAngle));
   }
 
   private void lockPivot() {
@@ -175,6 +178,10 @@ public class Grabber extends SubsystemBase {
     else holdCone();
   }
 
+  public void centerCone() {
+    m_roller.set(p_grabConeSpeed.getValue());
+  }
+
   public void dropCube() {
     m_roller.set(p_dropCubeSpeed.getValue());
   }
@@ -215,6 +222,10 @@ public class Grabber extends SubsystemBase {
       return convertActualPositionToSensorPosition(actualVelocity) * 0.1;
   }
 
+  public void aim(double angle) {
+    m_aimAngle = 0;
+  }
+
   // COMMAND FACTORIES
 
   public CommandBase calibrateAbsolutePivotFactory() {
@@ -245,6 +256,10 @@ public class Grabber extends SubsystemBase {
     return new RunCommand(() -> {holdCube(); movePivot(); unlockPivot();}, this).withName("Hold Cube");
   }
 
+  public CommandBase centerConeFactory() {
+    return new RunCommand(() -> {centerCone(); movePivot(); unlockPivot();}, this).withTimeout(2);
+  }
+
   public CommandBase holdFactory(BooleanSupplier coneMode) {
     return new RunCommand(() -> {
       if (coneMode.getAsBoolean()) {
@@ -254,18 +269,6 @@ public class Grabber extends SubsystemBase {
       }
       movePivot();
       unlockPivot();
-    }, this);
-  }
-
-  public CommandBase grabFactory(BooleanSupplier coneMode) {
-    return new RunCommand(() -> {
-      if (coneMode.getAsBoolean()) {
-        grabCone();
-      } else {
-        grabCube();
-      }
-      movePivot();
-      lockPivot();
     }, this);
   }
 

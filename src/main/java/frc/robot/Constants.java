@@ -105,11 +105,11 @@ public final class Constants {
     public static final double MAX_TRAJ_ACCELERATION = 3;
 	
     // Limelight
-    public static final String LIMELIGHT_NAME = "limelight";
-
+    public static final String LIMELIGHT_FRONT_NAME = "limelight";
+    public static final String LIMELIGHT_BACK_NAME = "limelight-back";
 
     // Coprocessor
-    public static final String COPROCESSOR_ADDRESS = "10.0.88.44";
+    public static final String COPROCESSOR_ADDRESS = "10.0.88.35";
     public static final int COPROCESSOR_PORT = 5800;
     public static final double COPROCESSOR_UPDATE_DELAY = 1.0/30;
     public static final double COPROCESSOR_UPDATE_DELAY_OFFSET = 0.01;
