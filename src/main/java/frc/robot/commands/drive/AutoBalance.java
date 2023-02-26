@@ -25,6 +25,7 @@ public class AutoBalance extends CommandBase {
   private static double maxDistance = .5;
   private static int robotOrientation = 1;
   private static int m_counter = 0;
+  private static int robotNeededDirection = 1;
 
   private static int m_state;
   /** Creates a new AutoBalance. */
@@ -43,8 +44,11 @@ public class AutoBalance extends CommandBase {
     m_drive.resetOdometry(new Pose2d(0,0,m_heading), m_heading);
     m_pitch = m_drive.getNavX().getPitch();
     m_roll = m_drive.getNavX().getRoll();
-    if ((m_degrees > 90) || (m_degrees < -90)) {
+    if ((m_degrees > 95) || (m_degrees < -95)) {
       robotOrientation = -1;
+    }
+    if (m_degrees < 0) {
+      robotNeededDirection = -1;
     }
     if (onChargeStation) {
       m_state = 2;
@@ -96,35 +100,34 @@ public class AutoBalance extends CommandBase {
         //if the robot hasn't moved more than a maxmimum allotted distance, 
         //the robot can move only on y-axis
         if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
-          System.out.println("the robot is under its max distance");
-          System.out.println(true_angle);
-          System.out.println(m_degrees);
           if (true_angle > Constants.CHARGE_STATION_LEVEL) {
-            System.out.println("true angle is greater than level");
-            if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
-              System.out.println("robot has its pitch larger than the charge station level, it should drive");
-              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/48), 0, 0);
-            } 
-            else if (m_pitch < -Constants.CHARGE_STATION_LEVEL-.2) {
-              System.out.println("System has a pitch greater than negative charge station");
-              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/48), 0, 0);
-            } else if ((m_pitch > -Constants.CHARGE_STATION_LEVEL-.2) && (m_pitch < Constants.CHARGE_STATION_LEVEL)) {
-              System.out.println("high roll");
-              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/48, 0, 0);
+            if ((Math.abs(m_degrees) > 85) && (Math.abs(m_degrees) < 95)) {
+              m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotNeededDirection * m_roll/Math.abs(m_roll), 0, 0);
+            } else {
+                if (robotNeededDirection == 1) {
+                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)),0,0);
+              } else if (robotNeededDirection == -1) {
+                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)), 0, 0);
+              }
             }
           } else {
             m_state = m_state + 1;
           }
         }
+
+        if (m_pitch/Math.abs(m_pitch) != (m_drive.getNavX().getPitch())/(Math.abs(m_drive.getNavX().getPitch())) || 
+        m_roll/Math.abs(m_roll) != (m_drive.getNavX().getRoll())/(Math.abs(m_drive.getNavX().getRoll()))) {
+          m_state = m_state + 1;
+        }
+
       case 3:
+        m_drive.lockCommandFactory();
         m_counter = m_counter + 1;
         if (m_counter == 25) {
           m_state = m_state - 1;
         }
 
     }
-    
-    
     
   }
   // Called once the command ends or is interrupted.
