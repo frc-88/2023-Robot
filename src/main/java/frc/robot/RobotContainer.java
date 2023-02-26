@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.TrajectoryHelper;
@@ -17,6 +18,7 @@ import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
+import frc.robot.util.drive.DriveUtils;
 import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
@@ -176,6 +178,7 @@ public class RobotContainer {
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    SmartDashboard.putData("Auto Balance", new AutoBalance(m_drive, true));
 
     // CANdle
     SmartDashboard.putData("Want Cone", m_candleSubsystem.wantConeFactory());

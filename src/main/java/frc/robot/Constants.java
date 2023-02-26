@@ -96,6 +96,7 @@ public final class Constants {
     public static final int TEST_CONTROLLER_ID = 2;
 
     // Drive Train
+    public static final int ANGULAR_VELOCITY = 2;
     public static final int CHARGE_STATION_LEVEL = 2;
 
     // Trajectory
