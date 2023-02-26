@@ -63,7 +63,69 @@ public class AutoBalance extends CommandBase {
    * - Two-Headed Calf, by Laura Gilpin
    */
 
-  /*THE PREFACE
+  
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    switch (m_state) {
+      case 0:
+        m_drive.drive(Constants.MAX_TRAJ_VELOCITY, 0, 0);
+          if (Math.abs(m_drive.getNavX().getPitch()) > (Math.abs(m_pitch)+.01)) {
+            m_state = m_state + 1;
+          }
+          
+      case 1:
+        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/2, 0, 0);
+          if ((Math.abs(m_drive.getNavX().getPitch()) + Math.abs(m_drive.getNavX().getRoll())) < ((Math.abs(m_pitch) + Math.abs(m_roll))+.005)) {
+            m_state = m_state + 1;
+          }
+        m_pitch = m_drive.getNavX().getPitch();
+        m_roll = m_drive.getNavX().getRoll();
+    
+      //robot begins to automatically adjust its angle to 
+      case 2:
+        m_pitch = m_drive.getNavX().getPitch();
+        m_roll = m_drive.getNavX().getRoll();
+        true_angle = (Math.abs(m_pitch*(Math.pow(Math.cos(Math.toRadians(m_degrees)), 2))))+(Math.abs(m_roll* Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)));
+        m_position_y = m_drive.getOdometryPose().getY();
+        m_position_x = m_drive.getOdometryPose().getX();
+    
+        //if the robot hasn't moved more than a maxmimum allotted distance, 
+        //the robot can move only on y-axis
+        if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
+          System.out.println("the robot is under its max distance");
+          if (true_angle > Constants.CHARGE_STATION_LEVEL) {
+            if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
+              System.out.println("robot has its pitch larger than the charge station level, it should drive");
+              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/4), 0, 0);
+            } 
+            else if (m_pitch < -Constants.CHARGE_STATION_LEVEL-.2) {
+              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/4), 0, 0);
+            } else if ((m_pitch > -Constants.CHARGE_STATION_LEVEL-.2) && (m_pitch < Constants.CHARGE_STATION_LEVEL)) {
+              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY, 0, 0);
+            }
+          } 
+        }
+    }
+    
+    
+    
+  }
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    m_drive.stop();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}
+
+/*THE PREFACE
 
 The artist is the creator of beautiful things. To reveal art and conceal the artist is art’s aim. The critic is he who can translate into another manner or a new material his impression of beautiful things.
 
@@ -3107,61 +3169,3 @@ When they entered, they found hanging upon the wall a splendid portrait of their
 
 THE END
  */
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    switch (m_state) {
-      case 0:
-        m_drive.drive(Constants.MAX_TRAJ_VELOCITY, 0, 0);
-          if (Math.abs(m_drive.getNavX().getPitch()) > (Math.abs(m_pitch)+.01)) {
-            m_state = m_state + 1;
-          }
-          
-      case 1:
-        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/2, 0, 0);
-          if ((Math.abs(m_drive.getNavX().getPitch()) + Math.abs(m_drive.getNavX().getRoll())) < ((Math.abs(m_pitch) + Math.abs(m_roll))+.005)) {
-            m_state = m_state + 1;
-          }
-        m_pitch = m_drive.getNavX().getPitch();
-        m_roll = m_drive.getNavX().getRoll();
-    
-      //robot begins to automatically adjust its angle to 
-      case 2:
-        m_pitch = m_drive.getNavX().getPitch();
-        m_roll = m_drive.getNavX().getRoll();
-        true_angle = (Math.abs(m_pitch*(Math.pow(Math.cos(Math.toRadians(m_degrees)), 2))))+(Math.abs(m_roll* Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)));
-        m_position_y = m_drive.getOdometryPose().getY();
-        m_position_x = m_drive.getOdometryPose().getX();
-    
-        //if the robot hasn't moved more than a maxmimum allotted distance, 
-        //the robot can move only on y-axis
-        if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
-          if (true_angle > Constants.CHARGE_STATION_LEVEL) {
-            if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
-              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/4), 0, 0);
-            } 
-            else if (m_pitch < -Constants.CHARGE_STATION_LEVEL-.2) {
-              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/4), 0, 0);
-            } else if ((m_pitch > -Constants.CHARGE_STATION_LEVEL-.2) && (m_pitch < Constants.CHARGE_STATION_LEVEL)) {
-              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY, 0, 0);
-            }
-          } 
-        }
-    }
-    
-    
-    
-  }
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_drive.stop();
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
-}
