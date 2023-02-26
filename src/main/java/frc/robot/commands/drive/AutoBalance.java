@@ -91,8 +91,6 @@ public class AutoBalance extends CommandBase {
       //robot begins to automatically adjust its angle to 
       case 2:
         m_counter = 0;
-        m_pitch = m_drive.getNavX().getPitch();
-        m_roll = m_drive.getNavX().getRoll();
         true_angle = (Math.abs(m_pitch*(Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)))) + (Math.abs(m_roll* Math.pow(Math.cos(Math.toRadians(m_degrees)), 2)));
         m_position_y = m_drive.getOdometryPose().getY();
         m_position_x = m_drive.getOdometryPose().getX();
@@ -119,7 +117,8 @@ public class AutoBalance extends CommandBase {
         m_roll/Math.abs(m_roll) != (m_drive.getNavX().getRoll())/(Math.abs(m_drive.getNavX().getRoll()))) {
           m_state = m_state + 1;
         }
-
+        m_pitch = m_drive.getNavX().getPitch();
+        m_roll = m_drive.getNavX().getRoll();
       case 3:
         m_drive.lockCommandFactory();
         m_counter = m_counter + 1;
