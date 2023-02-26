@@ -184,7 +184,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState, 30);
+        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 45);
     }
 
     public boolean coastModeEnabled() {
@@ -222,15 +222,16 @@ public class Arm extends SubsystemBase {
             return command;
         } else {
 
-            m_stowCommand = chainIntermediaries(
-                new RunCommand(() -> goToArmState(ArmStates.stow)),
-                armState.getRetractIntermediaries(),
-                armState.getRetractIntermediaryTolerance()
+            CommandBase stow = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
+                chainIntermediaries(
+                    new RunCommand(() -> goToArmState(ArmStates.stow)),
+                    armState.getRetractIntermediaries(),
+                    armState.getRetractIntermediaryTolerance()
+                )
             );
-            m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(m_stowCommand);
 
             CommandBase command = chainIntermediaries(
-                new RunCommand(() -> goToArmState(armState), this).until(until),
+                new InstantCommand(() -> m_stowCommand = stow).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance()
             );

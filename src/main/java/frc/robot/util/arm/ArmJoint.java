@@ -56,7 +56,7 @@ public class ArmJoint {
         m_motor.setInverted(motorInverted);
         m_motor.setNeutralMode(NeutralMode.Brake);
         m_motor.configNeutralDeadband(0);
-        m_motor.configMotionSCurveStrength(1);
+        m_motor.configMotionSCurveStrength(2);
 
         p_triggerCurrent = new DoublePreferenceConstant("Arm/" + name + "/Trigger Current", 120);
         p_triggerDuration = new DoublePreferenceConstant("Arm/" + name + "/Trigger Duration", 0.002);
