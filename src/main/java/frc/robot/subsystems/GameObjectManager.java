@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
@@ -9,40 +12,77 @@ import frc.robot.util.coprocessor.GridZone;
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
-
+    public DriverStation driverStation; 
     public GameObjectManager() {
-        gameObjects = new ArrayList<>();
-        gridZones = new ArrayList<>();
+        if(driverStation.getAlliance() == Alliance.Blue) {
 
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gameObjects = new ArrayList<>();
+            gridZones = new ArrayList<>();
 
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
-        gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
+            gridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
 
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
-        gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
+
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
+        }
+        else if(driverStation.getAlliance() == Alliance.Red) {
+            gameObjects = new ArrayList<>();
+            gridZones = new ArrayList<>();
+
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "HIGH", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "HIGH", 0., 0., 0.));
+
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CUBE", "MIDDLE", 0., 0., 0.));
+            gridZones.add(new GridZone("CONE", "MIDDLE", 0., 0., 0.));
+
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+            gridZones.add(new GridZone("EITHER", "LOW", 0., 0., 0.));
+        }
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
