@@ -179,7 +179,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState);
+        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState, 20);
     }
 
     public boolean coastModeEnabled() {
