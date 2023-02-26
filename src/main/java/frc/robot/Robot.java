@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     pdh.setSwitchableChannel(true);
+    m_robotContainer.disabledPeriodic();
   }
 
   @Override

@@ -2,6 +2,8 @@ package frc.robot.util.coprocessor.networktables;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -25,6 +27,8 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     protected Pose2d tagGlobalPose = new Pose2d();
     protected MessageTimer tagGlobalPoseTimer = new MessageTimer(DEFAULT_MESSAGE_TIMEOUT);
     private DoubleArraySubscriber tagGlobalPoseSub;
+
+    private Debouncer inCommunityDebouncer = new Debouncer(.75, DebounceType.kRising);
 
     private final double kGravity = 9.81;
 
@@ -78,22 +82,25 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
 
     public boolean isInCommunity() {
         Pose2d pos = getBotPoseInches();
-        double shortXLimit = 120;
-        double longXLimit = 178;
+        double shortXLimit = 106;
+        double longXLimit = 164;
         double communityYStartRed = 100;
         double communityYBumpRed = 160;
         double communityYStartBlue = switchYAlliance(communityYStartRed);
         double communityYBumpBlue = switchYAlliance(communityYBumpRed);
 
+        boolean result;
         if (isBlue()) {
-            return pos.getY() < communityYStartBlue
+            result = pos.getY() < communityYStartBlue
                     && (pos.getX() < shortXLimit
                         || (pos.getY() < communityYBumpBlue && pos.getX() < longXLimit));
         } else {
-            return pos.getY() > communityYStartRed
+            result = pos.getY() > communityYStartRed
                     && (pos.getX() < shortXLimit
                         || (pos.getY() > communityYBumpRed && pos.getX() < longXLimit));
         }
+
+        return inCommunityDebouncer.calculate(result);
     }
 
     public static double switchYAlliance(double y) {
