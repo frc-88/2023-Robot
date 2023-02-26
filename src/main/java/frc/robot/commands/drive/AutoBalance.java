@@ -70,13 +70,13 @@ public class AutoBalance extends CommandBase {
   public void execute() {
     switch (m_state) {
       case 0:
-        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/2, 0, 0);
+        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/32, 0, 0);
           if (Math.abs(m_drive.getNavX().getPitch()) > (Math.abs(m_pitch)+.01)) {
             m_state = m_state + 1;
           }
           
       case 1:
-        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/4, 0, 0);
+        m_drive.drive(Constants.MAX_TRAJ_VELOCITY/32, 0, 0);
           if ((Math.abs(m_drive.getNavX().getPitch()) + Math.abs(m_drive.getNavX().getRoll())) < ((Math.abs(m_pitch) + Math.abs(m_roll))+.005)) {
             m_state = m_state + 1;
           }
@@ -101,14 +101,14 @@ public class AutoBalance extends CommandBase {
             System.out.println("true angle is greater than level");
             if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
               System.out.println("robot has its pitch larger than the charge station level, it should drive");
-              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/8), 0, 0);
+              m_drive.drive((robotOrientation * Constants.MAX_TRAJ_VELOCITY/32), 0, 0);
             } 
             else if (m_pitch < -Constants.CHARGE_STATION_LEVEL-.2) {
               System.out.println("System has a pitch greater than negative charge station");
-              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/8), 0, 0);
+              m_drive.drive((-robotOrientation * Constants.MAX_TRAJ_VELOCITY/32), 0, 0);
             } else if ((m_pitch > -Constants.CHARGE_STATION_LEVEL-.2) && (m_pitch < Constants.CHARGE_STATION_LEVEL)) {
               System.out.println("high roll");
-              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/8, 0, 0);
+              m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/32, 0, 0);
             }
           } 
         }
