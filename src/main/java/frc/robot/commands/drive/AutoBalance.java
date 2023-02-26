@@ -5,9 +5,7 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrive;
@@ -119,6 +117,7 @@ public class AutoBalance extends CommandBase {
         }
         m_pitch = m_drive.getNavX().getPitch();
         m_roll = m_drive.getNavX().getRoll();
+
       case 3:
         m_drive.lockCommandFactory();
         m_counter = m_counter + 1;
