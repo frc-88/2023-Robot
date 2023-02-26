@@ -53,14 +53,14 @@ public class Autonomous {
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            new ParallelDeadlineGroup(
+            // new ParallelDeadlineGroup(
                 new Localize(drive, source),
-                grabber.holdCubeFactory()
-            ),
-            new ParallelDeadlineGroup(
+                // grabber.holdCubeFactory()
+            // ),
+            // new ParallelDeadlineGroup(
                 new WaitCommand(1.0),
-                grabber.dropCubeFactory()
-            ),
+                // grabber.dropCubeFactory()
+            // ),
             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
             drive.lockCommandFactory()
         );
