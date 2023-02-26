@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.util.Aiming;
 import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
@@ -40,9 +42,10 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
-  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled);
+  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
   private final Limelight m_limelight = new Limelight();
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor);
   private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -68,8 +71,10 @@ public class RobotContainer {
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
+      m_intake.setCone();
     } else {
       m_candleSubsystem.wantCubeFactory().schedule();
+      m_intake.setCube();
     }
   }
 
@@ -102,7 +107,8 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh))
+        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
@@ -114,7 +120,8 @@ public class RobotContainer {
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh))
+        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
@@ -148,6 +155,9 @@ public class RobotContainer {
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
+
+    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed)
+        .whileTrue(m_grabber.centerConeFactory());
   }
 
   /////////////////////////////////////////////////////////////////////////////

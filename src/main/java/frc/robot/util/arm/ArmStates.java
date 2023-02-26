@@ -1,19 +1,19 @@
 package frc.robot.util.arm;
 
 public class ArmStates {
-    public static final ArmState stow = new ArmState("Stow");
-    public static final ArmState getConeFromIntake = new ArmState("Get Cone From Intake");
-    public static final ArmState getCubeFromIntake = new ArmState("Get Cube From Intake");
-    public static final ArmState getConeFromShelf = new ArmState("Get Cone From Shelf");
-    public static final ArmState getCubeFromShelf = new ArmState("Get Cube From Shelf");
-    public static final ArmState scoreConeHigh = new ArmState("Score Cone High");
-    public static final ArmState scoreConeMiddle = new ArmState("Score Cone Middle");
-    public static final ArmState scoreConeLow = new ArmState("Score Cone Low");
-    public static final ArmState scoreConeMiddleFront = new ArmState("Score Cone Middle Front");
-    public static final ArmState scoreConeLowFront = new ArmState("Score Cone Low Front");
-    public static final ArmState scoreCubeHigh = new ArmState("Score Cube High");
-    public static final ArmState scoreCubeMiddle = new ArmState("Score Cube Middle");
-    public static final ArmState scoreCubeLow = new ArmState("Score Cube Low");
-    public static final ArmState scoreCubeMiddleFront = new ArmState("Score Cube Middle Front");
-    public static final ArmState scoreCubeLowFront = new ArmState("Score Cube Low Front");
+    public static final ArmState stow = new ArmState("Stow", 80, -80, 70).makeStow();
+    public static final ArmState getConeFromIntake = new ArmState("Get Cone From Intake", 65.6, -125.5, 0).addDeployIntermediaries(1);
+    public static final ArmState getCubeFromIntake = new ArmState("Get Cube From Intake", 53.2, -120.3, 0).addDeployIntermediaries(1);
+    public static final ArmState getConeFromShelf = new ArmState("Get Cone From Shelf", 85.3, 14, 34);
+    public static final ArmState getCubeFromShelf = new ArmState("Get Cube From Shelf", 77.6, 4, 31.7);
+    public static final ArmState scoreConeHigh = new ArmState("Score Cone High", 132.2, -237.3, 149.2);
+    public static final ArmState scoreConeMiddle = new ArmState("Score Cone Middle", 54.4, -202.5, 165.9);
+    public static final ArmState scoreConeLow = new ArmState("Score Cone Low", 56.3, -87.4, 156.8);
+    public static final ArmState scoreConeMiddleFront = new ArmState("Score Cone Middle Front", 80, -80, 70);
+    public static final ArmState scoreConeLowFront = new ArmState("Score Cone Low Front", 80, -80, 70);
+    public static final ArmState scoreCubeHigh = new ArmState("Score Cube High", 131, -198.9, 135.9);
+    public static final ArmState scoreCubeMiddle = new ArmState("Score Cube Middle", 78.2, -151.9, 149.5);
+    public static final ArmState scoreCubeLow = new ArmState("Score Cube Low", 64.3, -118.8, 160.7);
+    public static final ArmState scoreCubeMiddleFront = new ArmState("Score Cube Middle Front", 80, -80, 70);
+    public static final ArmState scoreCubeLowFront = new ArmState("Score Cube Low Front", 80, -80, 70);
 }
