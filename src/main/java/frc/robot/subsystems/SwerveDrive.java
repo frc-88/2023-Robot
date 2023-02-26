@@ -331,7 +331,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                                                 * MAX_VELOCITY_METERS_PER_SECOND,
                                 () -> modifyAxis(filterX.calculate(driverController.getTranslationX()), true)
                                                 * MAX_VELOCITY_METERS_PER_SECOND,
-                                () -> modifyAxis(driverController.getRotation(), false)
+                                () -> -modifyAxis(driverController.getRotation(), false)
                                                 * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
                 return swerveDrive;
         }
