@@ -28,8 +28,8 @@ public class Lights extends SubsystemBase {
     private boolean m_animDirection = false;
     private boolean m_setAnim = false;
     private DoublePreferenceConstant dangerAngle = new DoublePreferenceConstant("Danger Angle", 5.0);
-    private double acceptableDifference = 0.05;
-    private double acceptableAngleDifference = 0.05;
+    private double acceptableDifference = 0.15;
+    private double acceptableAngleDifference = 0.15;
 
     private Animation m_toAnimate = null;
     private Animation m_lastAnimation = null;
