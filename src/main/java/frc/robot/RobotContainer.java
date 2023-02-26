@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
+import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.Aiming;
 import frc.robot.util.TrajectoryHelper;
@@ -43,10 +46,11 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
-  private final Limelight m_limelight = new Limelight();
+  private final Limelight m_limelight_front = new Limelight(Constants.LIMELIGHT_FRONT_NAME);
+  private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight_back);
   private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor);
-  private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              CONTROLLERS                                //
@@ -54,6 +58,7 @@ public class RobotContainer {
 
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
+
 
   public RobotContainer(Robot robot) {
     configureControllers();
@@ -217,20 +222,19 @@ public class RobotContainer {
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
 
-    // Limelight
-    SmartDashboard.putData("LL Localize", m_limelight.llLocalize(m_drive).ignoringDisable(true));
-
-    // ROS
-    SmartDashboard.putData("ROS Localize", m_coprocessor.rosLocalize(m_drive).ignoringDisable(true));
-
+    // Localization
+    SmartDashboard.putData("LL Front Localize", new Localize(m_drive, m_limelight_front).ignoringDisable(true));
+    SmartDashboard.putData("LL Back Localize", new Localize(m_drive, m_limelight_back).ignoringDisable(true));
+    SmartDashboard.putData("ROS Localize", new Localize(m_drive, m_coprocessor).ignoringDisable(true));
 
     // Combined
     SmartDashboard.putData("Handoff", new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
 
     // Autonomous
-    SmartDashboard.putData("Auto Blue Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1.wpilib.json"), true));
-    SmartDashboard.putData("Auto Red Simple1", new FollowTrajectory(m_drive, TrajectoryHelper.generateJSONTrajectory("Simple1Red.wpilib.json"), true));
-    SmartDashboard.putData("Auto Red", Autonomous.simpleAuto(m_drive, m_intake, m_candleSubsystem));
+    SmartDashboard.putData("AutoROS Red Center", Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Center", Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
+    SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_limelight_back));
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));

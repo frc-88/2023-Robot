@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
@@ -111,34 +112,38 @@ public class Lights extends SubsystemBase {
 
     @Override
     public void periodic() {
-        switch (m_state) {
-            case 0:
-                larsonColor(255, 0, 0);
-                if (m_coprocessor.getBotPose() != null) {
-                    m_state++;
-                }
-                break;
-            case 1:
-                larsonColor(0, 255, 0);
-                if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose())) {
-                    m_state++;
-                }
-                break;
-            case 2:
-                larsonColor(0, 0, 255);
-                if (approximatelyEqual(m_swerve.getOdometryPose(), m_limelight.getBotPose()) 
-                    && approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose())) {
-                    m_state++;
-                }
-                break;
-            case 3:
-                rainbow();
-                if (counter++ > 100) {
-                    m_state++;
-                    counter = 0;
-                }
-                break;
-            // No default
+        if (DriverStation.isDisabled()) {
+            switch (m_state) {
+                case 0:
+                    larsonColor(255, 0, 0);
+                    if (m_coprocessor.getBotPose() != null) {
+                        m_state++;
+                    }
+                    break;
+                case 1:
+                    larsonColor(0, 255, 0);
+                    if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose())) {
+                        m_state++;
+                    }
+                    break;
+                case 2:
+                    larsonColor(0, 0, 255);
+                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_limelight.getBotPose()) 
+                        && approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose())) {
+                        m_state++;
+                    }
+                    break;
+                case 3:
+                    rainbow();
+                    if (counter++ > 100) {
+                        m_state++;
+                        counter = 0;
+                    }
+                    break;
+                default:
+                    rainbow();
+                    break;
+            }
         }
         
         if (Math.abs(SmartDashboard.getNumber("NavX.pitch", 0.0)) > dangerAngle.getValue()

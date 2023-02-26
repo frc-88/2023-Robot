@@ -44,7 +44,6 @@ public class CoprocessorBase {
 
     public CoprocessorBase(ChassisInterface chassis) {
         this.chassis = chassis;
-        laserObstacles.setBoundingBox(chassis.getBoundingBox());
     }
 
     public void update() {
