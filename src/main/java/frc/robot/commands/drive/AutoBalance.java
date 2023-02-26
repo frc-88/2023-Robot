@@ -87,7 +87,7 @@ public class AutoBalance extends CommandBase {
       case 2:
         m_pitch = m_drive.getNavX().getPitch();
         m_roll = m_drive.getNavX().getRoll();
-        true_angle = (Math.abs(m_pitch*(Math.pow(Math.cos(Math.toRadians(m_degrees)), 2))))+(Math.abs(m_roll* Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)));
+        true_angle = (Math.abs(m_pitch*(Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)))) + (Math.abs(m_roll* Math.pow(Math.cos(Math.toRadians(m_degrees)), 2)));
         m_position_y = m_drive.getOdometryPose().getY();
         m_position_x = m_drive.getOdometryPose().getX();
     
@@ -95,6 +95,8 @@ public class AutoBalance extends CommandBase {
         //the robot can move only on y-axis
         if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
           System.out.println("the robot is under its max distance");
+          System.out.println(true_angle);
+          System.out.println(m_degrees);
           if (true_angle > Constants.CHARGE_STATION_LEVEL) {
             System.out.println("true angle is greater than level");
             if (m_pitch > Constants.CHARGE_STATION_LEVEL+.2) {
