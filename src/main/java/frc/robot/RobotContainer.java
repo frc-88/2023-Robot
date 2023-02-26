@@ -4,20 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
-import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.Aiming;
-import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
@@ -59,6 +56,13 @@ public class RobotContainer {
   private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
+  /////////////////////////////////////////////////////////////////////////////
+  //                              AUTONOMOUS                                 //
+  /////////////////////////////////////////////////////////////////////////////
+
+  private CommandBase m_autoCommand = new WaitCommand(15);
+  private String m_autoCommandName = "Wait";
+
 
   public RobotContainer(Robot robot) {
     configureControllers();
@@ -87,8 +91,27 @@ public class RobotContainer {
     m_candleSubsystem.rainbow();
   }
 
+  public void disabledPeriodic() {
+    if (m_buttonBox.intakeButton.getAsBoolean() && !m_autoCommandName.equals("Wait")) {
+      m_autoCommand = new WaitCommand(15);
+      m_autoCommandName = "Wait";
+    }
+
+    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
+      m_autoCommand = Autonomous.redEngage(m_drive, m_grabber, m_coprocessor);
+      m_autoCommandName = "Engage";
+    }
+
+    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
+      m_autoCommand = Autonomous.simpleAuto(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center";
+    }
+
+    SmartDashboard.putString("Auto", m_autoCommandName);
+  }
+
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return m_autoCommand;
   }
 
   /////////////////////////////////////////////////////////////////////////////
