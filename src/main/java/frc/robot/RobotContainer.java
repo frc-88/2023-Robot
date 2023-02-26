@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.FollowTrajectory;
@@ -70,8 +71,10 @@ public class RobotContainer {
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
+      m_intake.setCone();
     } else {
       m_candleSubsystem.wantCubeFactory().schedule();
+      m_intake.setCube();
     }
   }
 
@@ -152,6 +155,9 @@ public class RobotContainer {
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate())
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, m_buttonBox.gamepieceSwitch));
+
+    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed)
+        .whileTrue(m_grabber.centerConeFactory());
   }
 
   /////////////////////////////////////////////////////////////////////////////

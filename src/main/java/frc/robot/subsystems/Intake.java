@@ -66,6 +66,8 @@ public class Intake extends SubsystemBase {
       new DoublePreferenceConstant("Intake/IR/Cube Min", 0.491);
   private DoublePreferenceConstant irSensorCubeMax =
       new DoublePreferenceConstant("Intake/IR/Cube Max", 0.698);
+  private DoublePreferenceConstant irSensorHasPiece =
+      new DoublePreferenceConstant("Intake/IR/Has Piece", 0.25);
 
   private final WPI_TalonFX m_innerRoller = new WPI_TalonFX(Constants.INTAKE_INNER_ROLLER_ID, Constants.INTAKE_CANBUS);
   private final WPI_TalonFX m_outerRoller = new WPI_TalonFX(Constants.INTAKE_OUTER_ROLLER_ID, Constants.INTAKE_CANBUS);
@@ -177,7 +179,7 @@ public class Intake extends SubsystemBase {
     }
 
     private boolean hasGamePiece() {
-      return m_hasGamePieceDebounce.calculate(m_irValue > 0.2);
+      return m_hasGamePieceDebounce.calculate(m_irValue > irSensorHasPiece.getValue());
     }
     
     public Trigger holdAndHasPiece() {
@@ -197,14 +199,14 @@ public class Intake extends SubsystemBase {
     public CommandBase intakeFactory() {
       CommandBase coneCommand = new RunCommand(() -> {intake(); armDown();}, this)
         .until(this::hasGamePiece)
-        .andThen(new RunCommand(() -> {intake(); armDown();}, this))
-        .withTimeout(0.4)
-        .andThen(new RunCommand(() -> {intake(); armUp();}, this))
-        .until(this::hasGamePieceCentered);
+        .andThen(new RunCommand(() -> {intake(); armDown();}, this)
+          .withTimeout(0.4)
+          .andThen(new RunCommand(() -> {intake(); armUp();}, this)
+            .until(this::hasGamePieceCentered)));
       CommandBase cubeCommand = new RunCommand(() -> {intake(); armDown();}, this)
         .until(this::hasGamePieceCentered)
-        .andThen(new RunCommand(() -> {hold(); armDown();}, this))
-        .withTimeout(0.4);
+        .andThen(new RunCommand(() -> {hold(); armDown();}, this)
+          .withTimeout(0.4));
       return new ConditionalCommand(coneCommand, cubeCommand, () -> m_coneMode)
           .withName("intake");
     }

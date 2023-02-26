@@ -178,6 +178,10 @@ public class Grabber extends SubsystemBase {
     else holdCone();
   }
 
+  public void centerCone() {
+    m_roller.set(p_grabConeSpeed.getValue());
+  }
+
   public void dropCube() {
     m_roller.set(p_dropCubeSpeed.getValue());
   }
@@ -250,6 +254,10 @@ public class Grabber extends SubsystemBase {
 
   public CommandBase holdCubeFactory() {
     return new RunCommand(() -> {holdCube(); movePivot(); unlockPivot();}, this).withName("Hold Cube");
+  }
+
+  public CommandBase centerConeFactory() {
+    return new RunCommand(() -> {centerCone(); movePivot(); unlockPivot();}, this).withTimeout(2);
   }
 
   public CommandBase holdFactory(BooleanSupplier coneMode) {

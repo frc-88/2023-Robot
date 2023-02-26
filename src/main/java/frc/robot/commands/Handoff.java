@@ -7,7 +7,6 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Grabber;
@@ -21,7 +20,7 @@ public class Handoff extends SequentialCommandGroup {
     Supplier<ArmState> armDown = () -> coneMode.getAsBoolean() ? ArmStates.getConeFromIntake : ArmStates.getCubeFromIntake;
     addCommands(
       arm.sendArmToStateAndEnd(armDown).deadlineWith(grabber.grabFactory(coneMode).alongWith(intake.stowFactory())),
-      arm.sendArmToState(armDown).alongWith(grabber.grabFactory(coneMode)).alongWith(intake.handoffFactory()).withTimeout(0.75),
+      arm.holdTargetState().alongWith(grabber.grabFactory(coneMode)).alongWith(intake.handoffFactory()).withTimeout(0.5),
       arm.sendArmToStateAndEnd(ArmStates.stow).deadlineWith(grabber.grabFactory(coneMode).alongWith(intake.handoffFactory()))
     );
   }

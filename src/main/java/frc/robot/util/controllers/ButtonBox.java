@@ -6,15 +6,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class ButtonBox extends Joystick {
 	
-    private static int INTAKE = 2;
-    private static int OUTGEST = 3;
-    private static int HANDOFF = 4;
-    private static int GRAB_FROM_SHELF = 5;
-    private static int SET_LOW = 10;
-    private static int SET_MIDDLE = 11;
-    private static int SET_HIGH = 12;
-    private static int SCORE = 14;
-    private static int GAMEPIECE_SWITCH = 16;
+    private static int INTAKE = 10;
+    private static int OUTGEST = 18;
+    private static int HANDOFF = 8;
+    private static int GRAB_FROM_SHELF = 6;
+    private static int SET_LOW = 11;
+    private static int SET_MIDDLE = 2;
+    private static int SET_HIGH = 15;
+    private static int SCORE = 20;
+    private static int GAMEPIECE_SWITCH = 17;
 
 	public ButtonBox(int port) {
 		super(port);

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
@@ -33,7 +34,7 @@ public class Arm extends SubsystemBase {
 
     private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
-    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow), this);
+    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow));
 
     private double m_aimX = 0;
 
@@ -209,32 +210,42 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
-    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+    private CommandBase sendArmToState(Supplier<ArmState> armState, BooleanSupplier until) {
         if (armState.get().isStow()) {
-            return new ProxyCommand(() -> m_stowCommand);
+            CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
+            command.addRequirements(this);
+            return command;
         } else {
 
             ArmState state = armState.get();
             CommandBase command = chainIntermediaries(
-                new RunCommand(() -> goToArmState(state), this),
+                new RunCommand(() -> goToArmState(state), this).until(until),
                 state.getDeployIntermediaries(),
                 state.getDeployIntermediaryTolerance()
             );
             command = new InstantCommand(() -> {m_targetArmState = state;}).alongWith(command);
 
             m_stowCommand = chainIntermediaries(
-                new RunCommand(() -> goToArmState(ArmStates.stow), this),
+                new RunCommand(() -> goToArmState(ArmStates.stow)),
                 state.getRetractIntermediaries(),
                 state.getRetractIntermediaryTolerance()
             );
-            m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(command);
+            m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(m_stowCommand);
 
             return command;
         }
     }
 
+    public CommandBase holdTargetState() {
+        return new RunCommand(() -> goToArmState(m_targetArmState), this);
+    }
+
+    public CommandBase sendArmToState(Supplier<ArmState> armState) {
+        return sendArmToState(armState, () -> false);
+    }
+
     public CommandBase sendArmToStateAndEnd(Supplier<ArmState> armState) {
-        return sendArmToState(armState).until(() -> isAtTarget(armState.get()));
+        return sendArmToState(armState, () -> isAtTarget(armState.get()));
     }
 
     public CommandBase sendArmToState(ArmState armState) {
