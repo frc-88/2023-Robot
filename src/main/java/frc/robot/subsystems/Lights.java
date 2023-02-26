@@ -128,6 +128,7 @@ public class Lights extends SubsystemBase {
                     break;
                 case 2:
                     larsonColor(0, 0, 255);
+                    m_swerve.resetPosition(m_coprocessor.getBotPose());
                     if (approximatelyEqual(m_swerve.getOdometryPose(), m_limelight.getBotPose()) 
                         && approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose())) {
                         m_state++;
