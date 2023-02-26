@@ -24,6 +24,7 @@ public class AutoBalance extends CommandBase {
   private static double m_position_y;
   private static double maxDistance = .5;
   private static int robotOrientation = 1;
+  private static int m_counter = 0;
 
   private static int m_state;
   /** Creates a new AutoBalance. */
@@ -85,6 +86,7 @@ public class AutoBalance extends CommandBase {
     
       //robot begins to automatically adjust its angle to 
       case 2:
+        m_counter = 0;
         m_pitch = m_drive.getNavX().getPitch();
         m_roll = m_drive.getNavX().getRoll();
         true_angle = (Math.abs(m_pitch*(Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)))) + (Math.abs(m_roll* Math.pow(Math.cos(Math.toRadians(m_degrees)), 2)));
@@ -110,8 +112,16 @@ public class AutoBalance extends CommandBase {
               System.out.println("high roll");
               m_drive.drive((m_degrees/Math.abs(m_degrees)) * (m_roll/Math.abs(m_roll)) * Constants.MAX_TRAJ_VELOCITY/48, 0, 0);
             }
-          } 
+          } else {
+            m_state = m_state + 1;
+          }
         }
+      case 3:
+        m_counter = m_counter + 1;
+        if (m_counter == 25) {
+          m_state = m_state - 1;
+        }
+
     }
     
     
