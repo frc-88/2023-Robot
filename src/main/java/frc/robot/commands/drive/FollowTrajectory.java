@@ -51,8 +51,8 @@ public class FollowTrajectory extends CommandBase {
           // m_drive.resetOdometry(m_trajectory.getInitialPose(), m_drive.getGyroscopeRotation());
         } else {
           if (Math.sqrt(Math.pow((m_drive.getOdometryPose().getX() - m_trajectory.getInitialPose().getX()), 2) +
-            Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > .25) {
-              System.out.println("Trajectory Error: Distance > 0.25.");
+            Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > 3) {
+              System.out.println("Trajectory Error: Distance > 3.");
               System.out.println("Trajectory Start X: " + m_trajectory.getInitialPose().getX());
               System.out.println("Trajectory Start Y: " + m_trajectory.getInitialPose().getY());
               m_state = 3;

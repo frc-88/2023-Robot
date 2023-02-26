@@ -215,23 +215,24 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
+    public CommandBase stowFrom(ArmState from) {
+        return new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
+            chainIntermediaries(
+                new RunCommand(() -> goToArmState(ArmStates.stow)),
+                from.getRetractIntermediaries(),
+                from.getRetractIntermediaryTolerance()
+            )
+        );
+    }
+
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
         if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
             command.addRequirements(this);
             return command;
         } else {
-
-            CommandBase stow = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
-                chainIntermediaries(
-                    new RunCommand(() -> goToArmState(ArmStates.stow)),
-                    armState.getRetractIntermediaries(),
-                    armState.getRetractIntermediaryTolerance()
-                )
-            );
-
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stow).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance()
             );

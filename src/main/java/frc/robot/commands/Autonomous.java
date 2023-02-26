@@ -7,10 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.FollowTrajectory;
@@ -22,13 +19,14 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.TrajectoryHelper;
+import frc.robot.util.arm.ArmState;
 import frc.robot.util.arm.ArmStates;
 
 /** Add your docs here. */
 public class Autonomous {
 
-    public static ConditionalCommand engage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
-        return new ConditionalCommand(redEngage(drive,grabber,source), 
+    public static ConditionalCommand engage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
+        return new ConditionalCommand(redEngage(drive,arm,grabber,source), 
             blueEngage(drive,grabber,source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
@@ -39,18 +37,15 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-    public static SequentialCommandGroup redEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+    public static SequentialCommandGroup redEngage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            // new ParallelDeadlineGroup(
-                new Localize(drive, source),
-                // grabber.holdCubeFactory()
-            // ),
-            // new ParallelDeadlineGroup(
-                new WaitCommand(1.0),
-                // grabber.dropCubeFactory()
-            // ),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false),
-            drive.lockCommandFactory()
+            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()),
+            grabber.forcePivot(),
+            arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
+            arm.holdTargetState().alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
+            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
+            drive.lockCommandFactory().alongWith(arm.holdTargetState(), grabber.holdCubeFactory())
         );
     }
 
