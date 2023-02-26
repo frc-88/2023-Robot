@@ -165,7 +165,7 @@ public class RobotContainer {
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate())
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
 
-    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed)
+    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.centerConeFactory());
   }
 

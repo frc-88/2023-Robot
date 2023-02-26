@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
@@ -171,15 +172,19 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
-    public boolean isAtTarget(ArmState state, double tolerance) {
-        if (!(m_shoulder.isOnTarget(state.getShoulderAngle(), tolerance))) return false;
-        if (!(m_elbow.isOnTarget(state.getElbowAngle(), tolerance))) return false;
-        if (!(m_wrist.isOnTarget(state.getWristAngle(), tolerance))) return false;
+    public boolean isAtTarget(ArmState state, DoubleSupplier tolerance) {
+        if (!(m_shoulder.isOnTarget(state.getShoulderAngle(), tolerance.getAsDouble()))) return false;
+        if (!(m_elbow.isOnTarget(state.getElbowAngle(), tolerance.getAsDouble()))) return false;
+        if (!(m_wrist.isOnTarget(state.getWristAngle(), tolerance.getAsDouble()))) return false;
         return true;
     }
 
+    public boolean isAtTarget(ArmState state, double tolerance) {
+        return isAtTarget(state, () -> tolerance);
+    }
+
     public boolean isStowed() {
-        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState, 20);
+        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState, 30);
     }
 
     public boolean coastModeEnabled() {
@@ -200,7 +205,7 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
-    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, double tolerance) {
+    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance) {
         CommandBase command = initialCommand;
         for (ArmState intermediary : intermediaries) {
             command = new RunCommand(() -> goToArmState(intermediary), this)

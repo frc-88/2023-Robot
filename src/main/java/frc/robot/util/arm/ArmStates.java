@@ -2,8 +2,10 @@ package frc.robot.util.arm;
 
 public class ArmStates {
     public static final ArmState stow = new ArmState("Stow", 80, -80, 70).makeStow();
-    public static final ArmState getConeFromIntake = new ArmState("Get Cone From Intake", 65.6, -125.5, 0).addDeployIntermediaries(1);
-    public static final ArmState getCubeFromIntake = new ArmState("Get Cube From Intake", 53.2, -120.3, 0).addDeployIntermediaries(1);
+    public static final ArmState getConeFromIntake2 = new ArmState("Get Cone From Intake 1", 40, -180.8, 0);
+    public static final ArmState getConeFromIntake1 = new ArmState("Get Cone From Intake 2", 65.6, -125.5, 0);
+    public static final ArmState getCubeFromIntake1 = new ArmState("Get Cube From Intake 1", 53.2, -120.3, 0);
+    public static final ArmState getCubeFromIntake2 = new ArmState("Get Cube From Intake 2", 53.2, -120.3, 0);
     public static final ArmState getConeFromShelf = new ArmState("Get Cone From Shelf", 85.3, 14, 34);
     public static final ArmState getCubeFromShelf = new ArmState("Get Cube From Shelf", 77.6, 4, 31.7);
     public static final ArmState scoreConeHigh = new ArmState("Score Cone High", 132.2, -237.3, 149.2);
