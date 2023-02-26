@@ -96,7 +96,7 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         }
     }
 
-    public double switchYAlliance(double y) {
+    public static double switchYAlliance(double y) {
         return 27.*12. - y;
     }
 
