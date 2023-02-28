@@ -85,6 +85,7 @@ public class RobotContainer {
       m_candleSubsystem.wantCubeFactory().schedule();
       m_intake.setCube();
     }
+    m_arm.resetStow();
   }
 
   public void disableInit() {
