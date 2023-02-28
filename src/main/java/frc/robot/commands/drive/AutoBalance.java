@@ -101,15 +101,15 @@ public class AutoBalance extends CommandBase {
         if ((m_position_y < maxDistance) || (m_position_x < maxDistance)) {
           if (true_angle > Constants.CHARGE_STATION_LEVEL) {
             if ((Math.abs(m_degrees) > 85) && (Math.abs(m_degrees) < 95)) {
-              m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotNeededDirection * m_roll/Math.abs(m_roll), 0, 0);
-              driveDirection = robotNeededDirection * m_roll/Math.abs(m_roll);
+              m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotNeededDirection * Math.signum(m_roll), 0, 0);
+              driveDirection = robotNeededDirection * Math.signum(m_roll);
             } else {
                 if (robotNeededDirection == 1) {
-                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)),0,0);
-                  driveDirection = robotOrientation*(m_pitch/Math.abs(m_pitch));
+                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation * Math.signum(m_pitch),0,0);
+                  driveDirection = robotOrientation * Math.signum(m_pitch);
               } else if (robotNeededDirection == -1) {
-                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)), 0, 0);
-                  driveDirection = robotOrientation*(m_pitch/Math.abs(m_pitch));
+                  m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation * Math.signum(m_pitch), 0, 0);
+                  driveDirection = robotOrientation * Math.signum(m_pitch);
               }
             }
           } else {
@@ -117,8 +117,8 @@ public class AutoBalance extends CommandBase {
           }
         }
 
-        if (m_pitch/Math.abs(m_pitch) != (m_drive.getNavX().getPitch())/(Math.abs(m_drive.getNavX().getPitch())) || 
-        m_roll/Math.abs(m_roll) != (m_drive.getNavX().getRoll())/(Math.abs(m_drive.getNavX().getRoll()))) {
+        if (Math.signum(m_pitch) != (Math.signum(m_drive.getNavX().getPitch())) || 
+        Math.signum(m_roll) != (Math.signum(m_drive.getNavX().getRoll()))) {
           m_state = m_state + 1;
         }
         m_pitch = m_drive.getNavX().getPitch();
