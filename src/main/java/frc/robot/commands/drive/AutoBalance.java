@@ -24,6 +24,8 @@ public class AutoBalance extends CommandBase {
   private static int robotOrientation = 1;
   private static int m_counter = 0;
   private static int robotNeededDirection = 1;
+  private static double driveDirection;
+  private static int m_counter2 = 0;
 
   private static int m_state;
   /** Creates a new AutoBalance. */
@@ -89,6 +91,7 @@ public class AutoBalance extends CommandBase {
       //robot begins to automatically adjust its angle to 
       case 2:
         m_counter = 0;
+        m_counter2 = 0;
         true_angle = (Math.abs(m_pitch*(Math.pow(Math.sin(Math.toRadians(m_degrees)), 2)))) + (Math.abs(m_roll* Math.pow(Math.cos(Math.toRadians(m_degrees)), 2)));
         m_position_y = m_drive.getOdometryPose().getY();
         m_position_x = m_drive.getOdometryPose().getX();
@@ -99,11 +102,14 @@ public class AutoBalance extends CommandBase {
           if (true_angle > Constants.CHARGE_STATION_LEVEL) {
             if ((Math.abs(m_degrees) > 85) && (Math.abs(m_degrees) < 95)) {
               m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotNeededDirection * m_roll/Math.abs(m_roll), 0, 0);
+              driveDirection = robotNeededDirection * m_roll/Math.abs(m_roll);
             } else {
                 if (robotNeededDirection == 1) {
                   m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)),0,0);
+                  driveDirection = robotOrientation*(m_pitch/Math.abs(m_pitch));
               } else if (robotNeededDirection == -1) {
                   m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * robotOrientation*(m_pitch/Math.abs(m_pitch)), 0, 0);
+                  driveDirection = robotOrientation*(m_pitch/Math.abs(m_pitch));
               }
             }
           } else {
@@ -119,9 +125,12 @@ public class AutoBalance extends CommandBase {
         m_roll = m_drive.getNavX().getRoll();
 
       case 3:
-        m_drive.lockCommandFactory();
         m_counter = m_counter + 1;
-        if (m_counter == 25) {
+        m_counter2 = m_counter2 +1;
+        if (m_counter == 10) {
+          m_drive.drive(Constants.MAX_TRAJ_VELOCITY/64 * driveDirection * -1, 0, 0);
+        }
+        if (m_counter == 50) {
           m_state = m_state - 1;
         }
 
