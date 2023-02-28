@@ -43,6 +43,12 @@ import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
+/*
+ * north south east or west
+ * which direction is the best?
+ * it's sideways, of course!
+ */
+
 public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         /**
          * The maximum voltage that will be delivered to the drive motors.
