@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
 
     private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
-    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow));
+    private CommandBase m_stowCommand;
 
     private double m_aimX = 0;
 
@@ -50,6 +50,12 @@ public class Arm extends SubsystemBase {
 
         m_targetArmState = ArmStates.stow;
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+
+        resetStow();
+    }
+
+    public void resetStow() {
+        m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow)).alongWith(new InstantCommand(() -> m_targetArmState = ArmStates.stow));
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {

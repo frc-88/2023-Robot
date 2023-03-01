@@ -164,11 +164,11 @@ public class Intake extends SubsystemBase {
       
     }
 
-    private boolean isArmUp() {
+    public boolean isArmUp() {
       return m_arm.isRevLimitSwitchClosed() > 0;
     }
 
-    private boolean isArmDown() {
+    public boolean isArmDown() {
       return m_arm.isFwdLimitSwitchClosed() > 0;
     }
 
