@@ -3,9 +3,7 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.detections.Detection;
-import frc.robot.util.coprocessor.detections.Pose3d;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 
 public class GameObjectManager extends SubsystemBase {
@@ -128,7 +125,27 @@ public class GameObjectManager extends SubsystemBase {
     public int bestPlace() {
         ArrayList<Integer> links = getLinkIndices();
         if (links.size() > 0) {
+            for (Integer i : links) {
+                if (gridZones.get(i).getLevel() == "HIGH") {
+                    return i;
+                }
+            }
+            for (Integer i : links) {
+                if (gridZones.get(i).getLevel() == "MIDDLE") {
+                    return i;
+                }
+            }
             return links.get(0);
+        }
+        for (int i = 0; i < gridZones.size(); i++) {
+            if (!gridZones.get(i).filled && gridZones.get(i).getType() == "HIGH") {
+                return i;
+            }
+        }
+        for (int i = 0; i < gridZones.size(); i++) {
+            if (!gridZones.get(i).filled && gridZones.get(i).getType() == "MIDDLE") {
+                return i;
+            }
         }
         for (int i = 0; i < gridZones.size(); i++) {
             if (!gridZones.get(i).filled) {
