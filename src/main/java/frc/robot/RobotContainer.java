@@ -92,6 +92,7 @@ public class RobotContainer {
 
   public void disableInit() {
     m_candleSubsystem.rainbow();
+    m_arm.resetStow();
   }
 
   public void disabledPeriodic() {
