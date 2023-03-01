@@ -91,7 +91,9 @@ public class Autonomous {
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh).deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
-            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.25)
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.4),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedCenterEngage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdConeFactory(), intake.stowFactory()),
+            arm.holdTargetState().alongWith(grabber.holdConeFactory(), intake.stowFactory())
         );
     }
 
