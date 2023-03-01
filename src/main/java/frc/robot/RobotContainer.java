@@ -110,6 +110,11 @@ public class RobotContainer {
       m_autoCommandName = "Center";
     }
 
+    if (m_buttonBox.setMiddle .getAsBoolean() && !m_autoCommandName.equals("Over")) {
+      m_autoCommand = Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Over";
+    }
+
     SmartDashboard.putString("Auto", m_autoCommandName);
   }
 
