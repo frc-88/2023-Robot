@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -181,15 +182,15 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private void configureTriggers() {
-    m_drive.isFacingForwards().whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
-    m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
+    m_drive.isFacingForwards().and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
+    m_drive.isFacingBackwards().and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch)
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate())
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
 
-    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch)
+    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .whileTrue(m_grabber.centerConeFactory());
   }
 

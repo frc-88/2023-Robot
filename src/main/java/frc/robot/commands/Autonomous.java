@@ -64,11 +64,10 @@ public class Autonomous {
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true),
-                    arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle).deadlineWith(intake.stowFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                    arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh).deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
-            arm.holdTargetState().alongWith(grabber.dropConeFactory()).withTimeout(0.5),
-            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.5)
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.25)
         );
     }
 
@@ -84,8 +83,7 @@ public class Autonomous {
             new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()),
             grabber.forcePivot(),
             arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
-            arm.holdTargetState().alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
-            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.5)
+            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.25)
         );
     }
 }
