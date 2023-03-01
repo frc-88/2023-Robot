@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.FollowTrajectory;
@@ -35,6 +36,35 @@ public class Autonomous {
         return new ConditionalCommand(redCenter(drive, intake, arm, grabber, candle, source), 
             blueCenter(drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
+    public static SequentialCommandGroup upAndOver(SwerveDrive drive, Arm arm, Grabber grabber, Intake intake, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()),
+            grabber.forcePivot(),
+            arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
+            arm.holdTargetState().alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
+            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
+            new ConditionalCommand(
+                new ParallelDeadlineGroup(
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageOver.wpilib.json"), false),
+                    arm.holdTargetState(),
+                    grabber.holdCubeFactory(),
+                     new SequentialCommandGroup(
+                        new WaitCommand(3.25),
+                        intake.intakeFactory()
+                     )
+                ),
+                new ParallelDeadlineGroup(
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageOver.wpilib.json"), false),
+                    arm.holdTargetState(),
+                    grabber.holdCubeFactory(),
+                    new SequentialCommandGroup(
+                       new WaitCommand(3.0),
+                       intake.intakeFactory()
+                    )),
+                () -> {return DriverStation.getAlliance() == Alliance.Red;})
+        );
     }
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
