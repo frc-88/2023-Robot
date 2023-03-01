@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
@@ -34,7 +35,7 @@ public class Arm extends SubsystemBase {
 
     private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
-    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow));
+    private CommandBase m_stowCommand;
 
     private double m_aimX = 0;
 
@@ -49,6 +50,12 @@ public class Arm extends SubsystemBase {
 
         m_targetArmState = ArmStates.stow;
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+
+        resetStow();
+    }
+
+    public void resetStow() {
+        m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow)).alongWith(new InstantCommand(() -> m_targetArmState = ArmStates.stow));
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
@@ -171,15 +178,19 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
-    public boolean isAtTarget(ArmState state, double tolerance) {
-        if (!(m_shoulder.isOnTarget(state.getShoulderAngle(), tolerance))) return false;
-        if (!(m_elbow.isOnTarget(state.getElbowAngle(), tolerance))) return false;
-        if (!(m_wrist.isOnTarget(state.getWristAngle(), tolerance))) return false;
+    public boolean isAtTarget(ArmState state, DoubleSupplier tolerance) {
+        if (!(m_shoulder.isOnTarget(state.getShoulderAngle(), tolerance.getAsDouble()))) return false;
+        if (!(m_elbow.isOnTarget(state.getElbowAngle(), tolerance.getAsDouble()))) return false;
+        if (!(m_wrist.isOnTarget(state.getWristAngle(), tolerance.getAsDouble()))) return false;
         return true;
     }
 
+    public boolean isAtTarget(ArmState state, double tolerance) {
+        return isAtTarget(state, () -> tolerance);
+    }
+
     public boolean isStowed() {
-        return m_targetArmState.getName().equals("Stow") && isAtTarget(m_targetArmState, 20);
+        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 45);
     }
 
     public boolean coastModeEnabled() {
@@ -200,7 +211,7 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
-    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, double tolerance) {
+    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance) {
         CommandBase command = initialCommand;
         for (ArmState intermediary : intermediaries) {
             command = new RunCommand(() -> goToArmState(intermediary), this)
@@ -210,22 +221,24 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
+    public CommandBase stowFrom(ArmState from) {
+        return new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
+            chainIntermediaries(
+                new RunCommand(() -> goToArmState(ArmStates.stow)),
+                from.getRetractIntermediaries(),
+                from.getRetractIntermediaryTolerance()
+            )
+        );
+    }
+
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
         if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
             command.addRequirements(this);
             return command;
         } else {
-
-            m_stowCommand = chainIntermediaries(
-                new RunCommand(() -> goToArmState(ArmStates.stow)),
-                armState.getRetractIntermediaries(),
-                armState.getRetractIntermediaryTolerance()
-            );
-            m_stowCommand = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(m_stowCommand);
-
             CommandBase command = chainIntermediaries(
-                new RunCommand(() -> goToArmState(armState), this).until(until),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance()
             );
@@ -254,6 +267,9 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (DriverStation.isDisabled()) {
+            m_allJoints.forEach(ArmJoint::checkZero);
+        }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
         if (coastModeEnabled()) {

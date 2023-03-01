@@ -15,6 +15,9 @@ public class ButtonBox extends Joystick {
     private static int SET_HIGH = 15;
     private static int SCORE = 20;
     private static int GAMEPIECE_SWITCH = 17;
+    private static int FORCE_PIVOT_FORWARDS = 25;
+    private static int FORCE_PIVOT_BACKWARDS = 24;
+
 
 	public ButtonBox(int port) {
 		super(port);
@@ -29,6 +32,8 @@ public class ButtonBox extends Joystick {
     public Trigger setHigh = new JoystickButton(this, SET_HIGH);    
     public Trigger scoreButton = new JoystickButton(this, SCORE);
     public Trigger gamepieceSwitch = new JoystickButton(this, GAMEPIECE_SWITCH);
+    public Trigger forcePivotForwardsSwitch = new JoystickButton(this, FORCE_PIVOT_FORWARDS);
+    public Trigger forcePivotBackwardsSwitch = new JoystickButton(this, FORCE_PIVOT_BACKWARDS);
 
 	public boolean isIntakeButtonPressed() {
 		return intakeButton.getAsBoolean();

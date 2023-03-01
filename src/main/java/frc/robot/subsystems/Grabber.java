@@ -290,6 +290,10 @@ public class Grabber extends SubsystemBase {
     return new InstantCommand(this::setPivotBackwards);
   }
 
+  public CommandBase forcePivot() {
+    return new InstantCommand(() -> m_lastPivotPosition = m_pivotForwards ? 0 : -180);
+  }
+
   @Override
   public void periodic() {
     if (m_pivot.hasResetOccurred()) {

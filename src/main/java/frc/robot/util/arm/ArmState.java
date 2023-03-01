@@ -3,6 +3,7 @@ package frc.robot.util.arm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.DoubleSupplier;
 
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -74,12 +75,12 @@ public class ArmState {
         return m_retractIntermediaries;
     }
     
-    public double getDeployIntermediaryTolerance() {
-        return Objects.nonNull(p_deployIntermediaryTolerance) ? p_deployIntermediaryTolerance.getValue() : 0;
+    public DoubleSupplier getDeployIntermediaryTolerance() {
+        return Objects.nonNull(p_deployIntermediaryTolerance) ? p_deployIntermediaryTolerance::getValue : () -> 9;
     }
 
-    public double getRetractIntermediaryTolerance() {
-        return Objects.nonNull(p_retractIntermediaryTolerance) ? p_retractIntermediaryTolerance.getValue() : 0;
+    public DoubleSupplier getRetractIntermediaryTolerance() {
+        return Objects.nonNull(p_retractIntermediaryTolerance) ? p_retractIntermediaryTolerance::getValue : () -> 0;
     }
 
     @Override
