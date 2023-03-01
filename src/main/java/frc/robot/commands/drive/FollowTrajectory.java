@@ -21,6 +21,9 @@ public class FollowTrajectory extends CommandBase {
   private double m_duration;
   private int m_state;
 
+  private static boolean forceResetOdometry = false;
+  private static boolean ignoreLocalizationErrors = false;
+
   public FollowTrajectory(final SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
     m_drive = drive;
     m_resetOdometry = resetOdometry;
@@ -46,11 +49,12 @@ public class FollowTrajectory extends CommandBase {
 
     switch (m_state) {
       case 0: // Zero drive
-        if (m_resetOdometry) {
+        if (m_resetOdometry || forceResetOdometry) {
+          forceResetOdometry = false;
           m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
           // m_drive.resetOdometry(m_trajectory.getInitialPose(), m_drive.getGyroscopeRotation());
         } else {
-          if (Math.sqrt(Math.pow((m_drive.getOdometryPose().getX() - m_trajectory.getInitialPose().getX()), 2) +
+          if (!ignoreLocalizationErrors && Math.sqrt(Math.pow((m_drive.getOdometryPose().getX() - m_trajectory.getInitialPose().getX()), 2) +
             Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > 3) {
               System.out.println("Trajectory Error: Distance > 3.");
               System.out.println("Trajectory Start X: " + m_trajectory.getInitialPose().getX());
@@ -93,5 +97,10 @@ public class FollowTrajectory extends CommandBase {
   @Override
   public boolean isFinished() {
     return m_state > 2;
+  }
+
+  public static void forceResetOdometry() {
+    forceResetOdometry = true;
+    ignoreLocalizationErrors = true;
   }
 }

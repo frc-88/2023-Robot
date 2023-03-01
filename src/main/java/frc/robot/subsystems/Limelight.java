@@ -34,6 +34,10 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
     }
   }
 
+  public boolean isConnected() {
+    return LimelightHelpers.getFiducialID(m_name) > 0.0;
+  }
+
   public InstantCommand llLocalize(SwerveDrive drive) {
     return new InstantCommand(() -> {drive.resetPosition(getBotPose());}, drive);
   }

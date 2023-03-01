@@ -267,6 +267,9 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (DriverStation.isDisabled()) {
+            m_allJoints.forEach(ArmJoint::checkZero);
+        }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
         if (coastModeEnabled()) {

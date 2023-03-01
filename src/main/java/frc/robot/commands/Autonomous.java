@@ -80,7 +80,7 @@ public class Autonomous {
 
     private static CommandBase initialScoreCubeHigh(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()),
+            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()).withTimeout(0.5),
             grabber.forcePivot(),
             arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
             arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.25)

@@ -189,6 +189,12 @@ public class ArmJoint {
         return m_zeroed;
     }
 
+    public void checkZero() {
+        if (Math.abs(getSpeed()) < 2. && Math.abs(getAbsoluteAngle() - getAngle()) > 4.) {
+            m_zeroed = false;
+        }
+    }
+
     public void calibrateAbsolute(double angle) {
         p_encoderOffset.setValue(0.);
         p_encoderOffset.setValue(getAbsoluteAngle() - angle);
