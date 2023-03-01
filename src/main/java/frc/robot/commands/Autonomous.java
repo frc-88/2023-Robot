@@ -40,32 +40,26 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-    public static SequentialCommandGroup upAndOver(SwerveDrive drive, Arm arm, Grabber grabber, Intake intake, BotPoseProvider source) {
+    public static SequentialCommandGroup upAndOver(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory()),
-            grabber.forcePivot(),
-            arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
-            arm.holdTargetState().alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
-            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.5),
+            initialScoreCubeHigh(drive, arm, grabber, source)
+                .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
             new ConditionalCommand(
-                new ParallelDeadlineGroup(
-                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageOver.wpilib.json"), false),
-                    arm.holdTargetState(),
-                    grabber.holdCubeFactory(),
-                     new SequentialCommandGroup(
-                        new WaitCommand(3.25),
-                        intake.intakeFactory()
-                     )
-                ),
-                new ParallelDeadlineGroup(
-                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageOver.wpilib.json"), false),
-                    arm.holdTargetState(),
-                    grabber.holdCubeFactory(),
-                    new SequentialCommandGroup(
-                       new WaitCommand(3.0),
-                       intake.intakeFactory()
-                    )),
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageOver.wpilib.json"), false),
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageOver.wpilib.json"), false),
                 () -> {return DriverStation.getAlliance() == Alliance.Red;})
+               .deadlineWith(new WaitCommand(3.5).andThen(intake.intakeFactory()), arm.holdTargetState(), grabber.holdConeFactory(), grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new WaitCommand(0.5),
+            new SequentialCommandGroup(
+                intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                new Handoff(intake, arm, grabber, true),
+                new ConditionalCommand(
+                            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageBack.wpilib.json"), false),
+                            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageBack.wpilib.json"), false),
+                            () -> {return DriverStation.getAlliance() == Alliance.Red;}),
+                arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle).deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+            )
+            // arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.25)
         );
     }
 
