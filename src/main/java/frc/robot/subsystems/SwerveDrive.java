@@ -65,7 +65,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                         SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                         SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;*/
 
-        public static final double MAX_VELOCITY_METERS_PER_SECOND = 0.9;
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.97;
 
         /**
          * The maximum angular velocity of the robot in radians per second.
