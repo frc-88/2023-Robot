@@ -4,10 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Lights;
@@ -87,10 +89,12 @@ public class RobotContainer {
       m_candleSubsystem.wantCubeFactory().schedule();
       m_intake.setCube();
     }
+    m_arm.resetStow();
   }
 
   public void disableInit() {
     m_candleSubsystem.rainbow();
+    m_arm.resetStow();
   }
 
   public void disabledPeriodic() {
@@ -99,14 +103,34 @@ public class RobotContainer {
       m_autoCommandName = "Wait";
     }
 
-    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
-      m_autoCommand = Autonomous.engage(m_drive, m_grabber, m_coprocessor);
+    if (m_buttonBox.setHigh.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
+      m_autoCommand = Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor);
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
-      m_autoCommand = Autonomous.center(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center";
+    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2")) {
+      m_autoCommand = Autonomous.center2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2";
+    }
+
+    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
+      m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2Balance";
+    }
+
+    if (m_buttonBox.setLow.getAsBoolean() && !m_autoCommandName.equals("Center3")) {
+      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center3";
+    }
+
+    if (m_buttonBox.scoreButton.getAsBoolean() && !m_autoCommandName.equals("Center3Balance")) {
+      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center3Balance";
+    }
+
+    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Over")) {
+      m_autoCommand = Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Over";
     }
 
     SmartDashboard.putString("Auto", m_autoCommandName);
@@ -194,15 +218,16 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private void configureTriggers() {
-    m_drive.isFacingForwards().whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
-    m_drive.isFacingBackwards().whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
+    m_drive.isFacingForwards().and(m_buttonBox.forcePivotForwardsSwitch.negate()).and(m_buttonBox.forcePivotBackwardsSwitch.negate()).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
+    m_buttonBox.forcePivotBackwardsSwitch.and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.forcePivotBackwardsFactory()));
+    m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch)
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate())
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
 
-    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch)
+    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .whileTrue(m_grabber.centerConeFactory());
   }
 
@@ -273,10 +298,12 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false));
 
     // Autonomous
-    SmartDashboard.putData("AutoROS Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
-    SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_grabber, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_grabber, m_limelight_back));
+    SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
+    SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_limelight_back));
+    SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+    SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));

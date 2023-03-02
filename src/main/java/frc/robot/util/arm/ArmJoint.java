@@ -56,6 +56,7 @@ public class ArmJoint {
         m_motor.setInverted(motorInverted);
         m_motor.setNeutralMode(NeutralMode.Brake);
         m_motor.configNeutralDeadband(0);
+        m_motor.configClosedloopRamp(0.25);
         m_motor.configMotionSCurveStrength(2);
 
         p_triggerCurrent = new DoublePreferenceConstant("Arm/" + name + "/Trigger Current", 120);
@@ -187,6 +188,12 @@ public class ArmJoint {
 
     public boolean isZeroed() {
         return m_zeroed;
+    }
+
+    public void checkZero() {
+        if (Math.abs(getSpeed()) < 2. && Math.abs(getAbsoluteAngle() - getAngle()) > 4.) {
+            m_zeroed = false;
+        }
     }
 
     public void calibrateAbsolute(double angle) {

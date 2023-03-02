@@ -32,8 +32,10 @@ public class Localize extends CommandBase {
   public void execute() {
     Pose2d sourcePose = m_source.getBotPose();
 
-    if (sourcePose.getX()!=0 && sourcePose.getY() !=0) {
+    if (m_source.isConnected() && sourcePose.getX()!=0 && sourcePose.getY() !=0) {
       m_drive.resetPosition(m_source.getBotPose());
+    } else {
+      FollowTrajectory.forceResetOdometry();
     }
 
     m_drive.updateOdometry();

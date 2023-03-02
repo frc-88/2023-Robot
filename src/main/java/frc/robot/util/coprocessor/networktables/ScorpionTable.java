@@ -54,6 +54,7 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     }
 
     // Origin is at the right corner near the driver station from the persepective of the driver
+    @Override
     public Pose2d getBotPose() {
         Pose2d transformPose;
         if (isBlue()) {
@@ -76,7 +77,8 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
           drive);
     }
 
-    public boolean isTagGlobalPoseActive() {
+    @Override
+    public boolean isConnected() {
         return tagGlobalPoseTimer.isActive();
     }
 
@@ -146,6 +148,7 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         SmartDashboard.putNumber("ROS:X",botPose.getX());
         SmartDashboard.putNumber("ROS:Y",botPose.getY());
         SmartDashboard.putNumber("ROS:Rotation",botPose.getRotation().getDegrees());
+        SmartDashboard.putBoolean("ROS:TagGlobalPoseActive", isConnected());
     }
 
     public void updateSlow() {

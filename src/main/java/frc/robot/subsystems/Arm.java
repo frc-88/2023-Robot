@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
 
     private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
-    private CommandBase m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow));
+    private CommandBase m_stowCommand;
 
     private double m_aimX = 0;
 
@@ -50,6 +50,12 @@ public class Arm extends SubsystemBase {
 
         m_targetArmState = ArmStates.stow;
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+
+        resetStow();
+    }
+
+    public void resetStow() {
+        m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow)).alongWith(new InstantCommand(() -> m_targetArmState = ArmStates.stow));
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
@@ -215,23 +221,24 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
+    public CommandBase stowFrom(ArmState from) {
+        return new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
+            chainIntermediaries(
+                new RunCommand(() -> goToArmState(ArmStates.stow)),
+                from.getRetractIntermediaries(),
+                from.getRetractIntermediaryTolerance()
+            )
+        ).andThen(new InstantCommand(this::resetStow));
+    }
+
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
         if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
             command.addRequirements(this);
             return command;
         } else {
-
-            CommandBase stow = new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
-                chainIntermediaries(
-                    new RunCommand(() -> goToArmState(ArmStates.stow)),
-                    armState.getRetractIntermediaries(),
-                    armState.getRetractIntermediaryTolerance()
-                )
-            );
-
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stow).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance()
             );
@@ -260,6 +267,9 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (DriverStation.isDisabled()) {
+            m_allJoints.forEach(ArmJoint::checkZero);
+        }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
         if (coastModeEnabled()) {

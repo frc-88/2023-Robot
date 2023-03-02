@@ -142,7 +142,7 @@ public class Lights extends SubsystemBase {
                     }
                     break;
                 default:
-                    rainbow();
+                    // rainbow();
                     break;
             }
         }
