@@ -6,14 +6,10 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.commands.drive.Localize;
@@ -24,7 +20,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.TrajectoryHelper;
-import frc.robot.util.arm.ArmState;
 import frc.robot.util.arm.ArmStates;
 
 /** Add your docs here. */
@@ -45,6 +40,18 @@ public class Autonomous {
     public static ConditionalCommand center2Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Balance("Red", drive, intake, arm, grabber, candle, source), 
             center2Balance("Blue", drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
+    public static ConditionalCommand center3(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(center3("Red", drive, intake, arm, grabber, candle, source), 
+            center3("Blue", drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
+    public static ConditionalCommand center3Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(center3Balance("Red", drive, intake, arm, grabber, candle, source), 
+            center3Balance("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
@@ -84,6 +91,36 @@ public class Autonomous {
     public static SequentialCommandGroup blueEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new WaitCommand(1)
+        );
+    }
+
+    public static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            center3(alliance, drive, intake, arm, grabber, candle, source),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterEngage.wpilib.json"), false)
+                .deadlineWith(arm.holdTargetState().until(() -> arm.isAtTarget(ArmStates.stow)).andThen(arm.sendArmToState(ArmStates.flat)), 
+                    grabber.holdConeFactory(), intake.stowFactory()),
+            arm.holdTargetState().alongWith(grabber.holdConeFactory(), intake.stowFactory())
+        );
+    }
+
+    public static SequentialCommandGroup center3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            centerBase(alliance, drive, intake, arm, grabber, candle, source, "CenterPiece1ToGrid1.wpilib.json"),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid3"), false),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true),
+                    arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
+                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                )
+            ),
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.5)
         );
     }
 

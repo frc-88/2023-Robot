@@ -106,14 +106,24 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.intakeButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
+    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2")) {
       m_autoCommand = Autonomous.center2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "Center2";
     }
 
-    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
+    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
       m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "Center2Balance";
+    }
+
+    if (m_buttonBox.setLow.getAsBoolean() && !m_autoCommandName.equals("Center3")) {
+      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center3";
+    }
+
+    if (m_buttonBox.scoreButton.getAsBoolean() && !m_autoCommandName.equals("Center3Balance")) {
+      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center3Balance";
     }
 
     if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Over")) {
