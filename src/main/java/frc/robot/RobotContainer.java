@@ -106,12 +106,17 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
-      m_autoCommand = Autonomous.center(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center";
+    if (m_buttonBox.intakeButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
+      m_autoCommand = Autonomous.center2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2";
     }
 
-    if (m_buttonBox.setMiddle .getAsBoolean() && !m_autoCommandName.equals("Over")) {
+    if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center")) {
+      m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2Balance";
+    }
+
+    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Over")) {
       m_autoCommand = Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "Over";
     }
@@ -269,8 +274,8 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false));
 
     // Autonomous
-    SmartDashboard.putData("AutoROS Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Center", Autonomous.redCenter(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
+    SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+    SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_coprocessor));
     SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_limelight_back));
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
