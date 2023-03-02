@@ -70,15 +70,15 @@ public class GameObjectManager extends SubsystemBase {
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        gameObjects.add(new GameObject(name, x, y, z, yaw));
+        // gameObjects.add(new GameObject(name, x, y, z, yaw));
     }
 
     public void removeInactiveGameObjects() {
-        for (GameObject gameObject : gameObjects) {
-            if (!gameObject.isValid()) {
-                gameObjects.remove(gameObject);
-            }
-        }
+        // for (GameObject gameObject : gameObjects) {
+        //     if (!gameObject.isValid()) {
+        //         gameObjects.remove(gameObject);
+        //     }
+        // }
     }
 
     public void fillGridZones() {
