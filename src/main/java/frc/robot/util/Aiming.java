@@ -42,7 +42,7 @@ public class Aiming {
         return closestZone;
     }
     public void giveWristAim() {
-        double aimAngle = Math.atan2(1., getNearestScorePoint().getY()-m_ros.getBotPoseInches().getY());
+        double aimAngle = Math.atan((getNearestScorePoint().getY()-m_ros.getBotPoseInches().getY()) / 8.);
         m_grabber.aim(aimAngle); 
     }
     public CommandBase aimGrabberFactory() {
