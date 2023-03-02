@@ -195,9 +195,11 @@ public class RobotContainer {
         .whileTrue(m_aiming.aimGrabberFactory());
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true))
+        .whileTrue(m_aiming.noGrabberAimFactory());
         m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch.negate())
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false))
+        .whileTrue(m_aiming.noGrabberAimFactory());
 
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
