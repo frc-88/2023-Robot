@@ -65,10 +65,10 @@ public class GameObjectManager extends SubsystemBase {
             gridZones = blueGridZones;
         }
         else if(DriverStation.getAlliance() == Alliance.Red) { 
-            gridZones = blueGridZones;
+            gridZones = redGridZones;
         }
     }
-    
+
     public void addGameObject(String name, double x, double y, double z, double yaw) {
         gameObjects.add(new GameObject(name, x, y, z, yaw));
     }
