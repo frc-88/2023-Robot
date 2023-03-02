@@ -97,10 +97,7 @@ public class Autonomous {
     public static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             center3(alliance, drive, intake, arm, grabber, candle, source),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterEngage.wpilib.json"), false)
-                .deadlineWith(arm.holdTargetState().until(() -> arm.isAtTarget(ArmStates.stow)).andThen(arm.sendArmToState(ArmStates.flat)), 
-                    grabber.holdConeFactory(), intake.stowFactory()),
-            arm.holdTargetState().alongWith(grabber.holdConeFactory(), intake.stowFactory())
+            centerBalance(alliance, drive, intake, arm, grabber, candle, source)
         );
     }
 
@@ -127,10 +124,7 @@ public class Autonomous {
     public static SequentialCommandGroup center2Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             centerBase(alliance, drive, intake, arm, grabber, candle, source, "CenterPiece1ToGrid3.wpilib.json"),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterEngage.wpilib.json"), false)
-                .deadlineWith(arm.holdTargetState().until(() -> arm.isAtTarget(ArmStates.stow)).andThen(arm.sendArmToState(ArmStates.flat)), 
-                    grabber.holdConeFactory(), intake.stowFactory()),
-            arm.holdTargetState().alongWith(grabber.holdConeFactory(), intake.stowFactory())
+            centerBalance(alliance, drive, intake, arm, grabber, candle, source)
         );
     }
 
@@ -156,6 +150,14 @@ public class Autonomous {
                 )
             ),
             arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.5)
+        );
+    }
+
+    private static SequentialCommandGroup centerBalance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterEngage.wpilib.json"), false)
+                .deadlineWith(arm.holdTargetState().until(() -> arm.isAtTarget(ArmStates.stow)).andThen(arm.sendArmToState(ArmStates.flat)), 
+                    grabber.holdConeFactory(), intake.stowFactory()),
+            arm.holdTargetState().alongWith(grabber.holdConeFactory(), intake.stowFactory())
         );
     }
 
