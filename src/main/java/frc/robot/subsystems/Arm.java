@@ -228,7 +228,7 @@ public class Arm extends SubsystemBase {
                 from.getRetractIntermediaries(),
                 from.getRetractIntermediaryTolerance()
             )
-        );
+        ).andThen(new InstantCommand(this::resetStow));
     }
 
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
