@@ -179,6 +179,9 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+    
+    m_buttonBox.setFlat
+        .whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
