@@ -10,5 +10,4 @@ public interface ChassisInterface {
     public void resetPosition(Pose2d pose);
     public Pose2d getOdometryPose();
     public ChassisSpeeds getChassisSpeeds();
-    public BoundingBox getBoundingBox();
 }

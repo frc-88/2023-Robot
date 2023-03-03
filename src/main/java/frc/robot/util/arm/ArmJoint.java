@@ -26,6 +26,7 @@ public class ArmJoint {
     private final double m_ratio;
     private final double m_length;
     private final boolean m_encoderInverted;
+    private final double m_wrapAngle;
 
     private boolean m_zeroed = false;
     private boolean m_braking = true;
@@ -39,11 +40,12 @@ public class ArmJoint {
     private final DoublePreferenceConstant p_encoderOffset;
     private final DoublePreferenceConstant p_gravityCompensation;
     
-    public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length) {
+    public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length, double wrapAngle) {
         m_name = name;
         m_ratio = ratio;
         m_length = length;
         m_encoderInverted = encoderInverted;
+        m_wrapAngle = wrapAngle;
         
         m_motor = new WPI_TalonFX(motorID, "1");
         m_cancoder = new WPI_CANCoder(encoderID, "1");
@@ -54,7 +56,8 @@ public class ArmJoint {
         m_motor.setInverted(motorInverted);
         m_motor.setNeutralMode(NeutralMode.Brake);
         m_motor.configNeutralDeadband(0);
-        m_motor.configMotionSCurveStrength(4);
+        m_motor.configClosedloopRamp(0.05);
+        m_motor.configMotionSCurveStrength(2);
 
         p_triggerCurrent = new DoublePreferenceConstant("Arm/" + name + "/Trigger Current", 120);
         p_triggerDuration = new DoublePreferenceConstant("Arm/" + name + "/Trigger Duration", 0.002);
@@ -151,15 +154,19 @@ public class ArmJoint {
     }
 
     public double getAbsoluteAngle() {
-        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 540.) % 360. - 180.;
+        return ((m_cancoder.getAbsolutePosition() * (m_encoderInverted ? -1. : 1.) - p_encoderOffset.getValue()) + 720. - m_wrapAngle) % 360. - (360. - m_wrapAngle);
     }
 
     public double getMaxVelocity() {
         return p_maxVelocity.getValue();
     }
 
+    public boolean isOnTarget(double targetAngle, double tolerance) {
+        return (Math.abs(getAngle()-targetAngle)) < tolerance;
+    }
+
     public boolean isOnTarget(double targetAngle) {
-        return (Math.abs(getAngle()-targetAngle)) < p_pid.getTolerance().getValue();
+        return isOnTarget(targetAngle, p_pid.getTolerance().getValue());
     }
 
     public boolean isCancoderPresent() {
@@ -167,7 +174,7 @@ public class ArmJoint {
                 || m_cancoder.getMagnetFieldStrength() == MagnetFieldStrength.Invalid_Unknown
                 || m_cancoder.getLastError() == ErrorCode.SensorNotPresent);
     }
-    
+
     public void zeroRelative() {
         if (m_motor.hasResetOccurred()) {
             m_zeroed = false;
@@ -181,6 +188,12 @@ public class ArmJoint {
 
     public boolean isZeroed() {
         return m_zeroed;
+    }
+
+    public void checkZero() {
+        if (Math.abs(getSpeed()) < 2. && Math.abs(getAbsoluteAngle() - getAngle()) > 4.) {
+            m_zeroed = false;
+        }
     }
 
     public void calibrateAbsolute(double angle) {

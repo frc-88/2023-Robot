@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.constraint.TrajectoryConstraint;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 
 public class TrajectoryHelper
@@ -61,7 +62,7 @@ public class TrajectoryHelper
     return TrajectoryGenerator.generateTrajectory(waypoints, config);
   }
 
-  public static Trajectory generateJSONTrajectory(String trajectoryJSON) {
+  public static Trajectory loadJSONTrajectory(String trajectoryJSON) {
     trajectoryJSON = "pathplanner/generatedJSON/" + trajectoryJSON;
     Trajectory trajectory = new Trajectory();
     try {
@@ -69,6 +70,11 @@ public class TrajectoryHelper
       trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
     } catch (IOException ex) {
       DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
+
+    // PathPlanner Trajectories are always in the Blue coordinate system...so, flip it if we're Red.
+    if (DriverStation.getAlliance() == Alliance.Red) {
+      trajectory = trajectory.relativeTo(new Pose2d(16.54, 8.02, Rotation2d.fromDegrees(180)));
     }
 
     return trajectory;
