@@ -11,12 +11,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
+import frc.robot.util.preferenceconstants.IntPreferenceConstant;
 
 public class AutoBalanceSimple extends CommandBase {
   /** Creates a new AutoBalanceSimple. */
   private SwerveDrive m_drive;
   private Pose2d m_startPose;
   private double m_lastAngle;
+  private int m_lockedCounter;
+  private int m_driveCounter;
+  private boolean m_driving= false;
+
   private final SwerveModuleState [] LOCK_STATES = { 
     new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
     new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
@@ -24,8 +29,10 @@ public class AutoBalanceSimple extends CommandBase {
     new SwerveModuleState(0, Rotation2d.fromDegrees(90))
   };
 
+  private final DoublePreferenceConstant m_rollOffset = new DoublePreferenceConstant("Auto/Balance/Roll Offset", 2.0);
   private final DoublePreferenceConstant m_levelThreshold = new DoublePreferenceConstant("Auto/Balance/Level Theshold", 2.0);
   private final DoublePreferenceConstant m_movingThreshold = new DoublePreferenceConstant("Auto/Balance/Moving Theshold", 0.5);
+  private final IntPreferenceConstant m_lockMin = new IntPreferenceConstant("Auto/Balance/Lock Min", 10);
   private final DoublePreferenceConstant m_climbSpeed = new DoublePreferenceConstant("Auto/Balance/Climb Speed", 0.1);
   private final DoublePreferenceConstant m_climbMaxDistance = new DoublePreferenceConstant("Auto/Balance/Climb Max", 1.0);
 
@@ -48,22 +55,39 @@ public class AutoBalanceSimple extends CommandBase {
     double deltaAngle = currentAngle - m_lastAngle;
     m_lastAngle = currentAngle;
     
-    SmartDashboard.putNumber("Auto/currentAngle", currentAngle);
-    SmartDashboard.putNumber("Auto/deltaAngle", deltaAngle);
+    SmartDashboard.putNumber("Auto:currentAngle", currentAngle);
+    SmartDashboard.putNumber("Auto:deltaAngle", deltaAngle);
+
+    if (m_driving) m_driveCounter++;
 
     if (Math.abs(currentAngle) < m_levelThreshold.getValue()) {
       // if the angle is level, lock in place
-      m_drive.setModuleStates(LOCK_STATES);
-    } else if (Math.abs(deltaAngle) > m_movingThreshold.getValue()) {
+      SmartDashboard.putNumber("Auto:condition", 0);
+      m_lockedCounter = 0;
+      lock();
+    } else if (Math.abs(deltaAngle) > m_movingThreshold.getValue() && m_driving && m_driveCounter > 15) {
       // if the angle is moving, lock in place
-      m_drive.setModuleStates(LOCK_STATES);
+      SmartDashboard.putNumber("Auto:condition", 1);
+      m_lockedCounter = 0;
+      lock();
     } else if (m_drive.getOdometryPose().getTranslation().getDistance(m_startPose.getTranslation()) > m_climbMaxDistance.getValue() ) {
       // if we have driven too far from where we began, lock in place
-      m_drive.setModuleStates(LOCK_STATES);
+      SmartDashboard.putNumber("Auto:condition", 2);
+      m_lockedCounter = 0;
+      lock();
+    } else if (m_lockedCounter< m_lockMin.getValue()) {
+      // if we recently locked, stay locked
+      m_lockedCounter++;
+      lock();
     } else {
       // drive up
-      m_drive.drive(m_climbSpeed.getValue() * Math.signum(-currentAngle), 0, 0);
+      if (!m_driving) {
+        m_driving = true;
+        m_driveCounter = 0;
+      }
+      m_drive.drive(m_climbSpeed.getValue() * Math.signum(currentAngle), 0, 0);
     }
+
   }
 
   // Called once the command ends or is interrupted.
@@ -82,6 +106,11 @@ public class AutoBalanceSimple extends CommandBase {
     // double roll = m_drive.getNavX().getRoll();
     // return (pitch*-Math.cos(Math.toRadians(yaw)))+(roll*Math.sin(Math.toRadians(yaw)));
     // trying something simple first:
-    return m_drive.getNavX().getRoll();
+    return m_drive.getNavX().getRoll() - m_rollOffset.getValue();
+  }
+
+  private void lock() {
+    m_driving =  false;
+    m_drive.setModuleStates(LOCK_STATES);
   }
 }
