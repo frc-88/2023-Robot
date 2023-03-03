@@ -24,6 +24,12 @@ import frc.robot.util.arm.ArmJoint;
 import frc.robot.util.arm.ArmState;
 import frc.robot.util.arm.ArmStates;
 
+/*
+ * a triple jointed
+ *               arm of amazing beuaty
+ *                                   what else can it do?
+ */
+
 public class Arm extends SubsystemBase {
     
     private final DigitalInput m_coastButton;

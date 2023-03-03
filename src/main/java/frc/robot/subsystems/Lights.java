@@ -20,6 +20,12 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
+/*
+ *     everyone's talkin'
+ * 'bout purple and yellow but
+ *   tie dye rocks the house
+ */
+
 public class Lights extends SubsystemBase {
     private IntPreferenceConstant numLEDs = new IntPreferenceConstant("Number of LEDs", 60);
     private int m_state = 0;
