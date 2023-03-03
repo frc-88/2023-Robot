@@ -22,6 +22,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
+/*
+ * don't tell anyone
+ * but my favorite game piece
+ * is the one you dropped
+ */
+
 public class Intake extends SubsystemBase {
   
   // Cube

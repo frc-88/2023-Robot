@@ -25,6 +25,12 @@ import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
+/*
+ * don't worry it's cool
+ * that cube is only mildy
+ * underinflated
+ */
+
 public class Grabber extends SubsystemBase {
 
   private final BooleanSupplier m_coastMode;
