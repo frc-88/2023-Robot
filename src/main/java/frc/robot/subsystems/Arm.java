@@ -190,7 +190,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 45);
+        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 30);
     }
 
     public boolean coastModeEnabled() {
@@ -228,7 +228,7 @@ public class Arm extends SubsystemBase {
                 from.getRetractIntermediaries(),
                 from.getRetractIntermediaryTolerance()
             )
-        );
+        ).andThen(new InstantCommand(this::resetStow));
     }
 
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {

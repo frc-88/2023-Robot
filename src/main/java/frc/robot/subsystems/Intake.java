@@ -134,7 +134,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void hold() {
-      if (hasGamePieceCentered()) {
+      if (hasGamePiece()) {
         if (!m_coneMode) {
           m_innerRoller.set(innerRollerHoldCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerHoldCubeIntakeSpeed.getValue());

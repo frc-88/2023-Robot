@@ -2,6 +2,7 @@ package frc.robot.util.arm;
 
 public class ArmStates {
     public static final ArmState stow = new ArmState("Stow", 80, -80, 70).makeStow();
+    public static final ArmState flat = new ArmState("Flat", 10, -170, 10);
     public static final ArmState getConeFromIntake2 = new ArmState("Get Cone From Intake 1", 40, -180.8, 0);
     public static final ArmState getConeFromIntake1 = new ArmState("Get Cone From Intake 2", 65.6, -125.5, 0);
     public static final ArmState getCubeFromIntake1 = new ArmState("Get Cube From Intake 1", 53.2, -120.3, 0);
