@@ -33,25 +33,25 @@ public class Autonomous {
 
     public static ConditionalCommand center2(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2("Red", drive, intake, arm, grabber, candle, source), 
-            center2("Red", drive, intake, arm, grabber, candle, source),
+            center2("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
     public static ConditionalCommand center2Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Balance("Red", drive, intake, arm, grabber, candle, source), 
-            center2Balance("Red", drive, intake, arm, grabber, candle, source),
+            center2Balance("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
     public static ConditionalCommand center3(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3("Red", drive, intake, arm, grabber, candle, source), 
-            center3("Red", drive, intake, arm, grabber, candle, source),
+            center3("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
     public static ConditionalCommand center3Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3Balance("Red", drive, intake, arm, grabber, candle, source), 
-            center3Balance("Red", drive, intake, arm, grabber, candle, source),
+            center3Balance("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
