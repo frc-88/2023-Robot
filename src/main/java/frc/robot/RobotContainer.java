@@ -181,9 +181,9 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
         m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch.negate())
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
@@ -209,9 +209,9 @@ public class RobotContainer {
     m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .whileTrue(m_grabber.centerConeFactory());
@@ -280,8 +280,8 @@ public class RobotContainer {
     SmartDashboard.putData("ROS Localize", new Localize(m_drive, m_coprocessor).ignoringDisable(true));
 
     // Combined
-    SmartDashboard.putData("Handoff Cone", new Handoff(m_intake, m_arm, m_grabber, true));
-    SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false));
+    SmartDashboard.putData("Handoff Cone", new Handoff(m_intake, m_arm, m_grabber, true, false));
+    SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     // Autonomous
     SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
