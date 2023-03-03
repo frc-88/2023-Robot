@@ -29,12 +29,12 @@ public class AutoBalanceSimple extends CommandBase {
     new SwerveModuleState(0, Rotation2d.fromDegrees(90))
   };
 
-  private final DoublePreferenceConstant m_rollOffset = new DoublePreferenceConstant("Auto/Balance/Roll Offset", 2.0);
+  private final DoublePreferenceConstant m_rollOffset = new DoublePreferenceConstant("Auto/Balance/Roll Offset", 0.0);
   private final DoublePreferenceConstant m_levelThreshold = new DoublePreferenceConstant("Auto/Balance/Level Theshold", 2.0);
-  private final DoublePreferenceConstant m_movingThreshold = new DoublePreferenceConstant("Auto/Balance/Moving Theshold", 0.5);
+  private final DoublePreferenceConstant m_movingThreshold = new DoublePreferenceConstant("Auto/Balance/Moving Theshold", 0.2);
   private final IntPreferenceConstant m_lockMin = new IntPreferenceConstant("Auto/Balance/Lock Min", 10);
-  private final DoublePreferenceConstant m_climbSpeed = new DoublePreferenceConstant("Auto/Balance/Climb Speed", 0.1);
-  private final DoublePreferenceConstant m_climbMaxDistance = new DoublePreferenceConstant("Auto/Balance/Climb Max", 1.0);
+  private final DoublePreferenceConstant m_climbSpeed = new DoublePreferenceConstant("Auto/Balance/Climb Speed", 0.08);
+  private final DoublePreferenceConstant m_climbMaxDistance = new DoublePreferenceConstant("Auto/Balance/Climb Max", 1.5);
 
   public AutoBalanceSimple(SwerveDrive drive) {
     m_drive = drive;
