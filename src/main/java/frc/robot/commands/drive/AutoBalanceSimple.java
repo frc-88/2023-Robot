@@ -65,7 +65,7 @@ public class AutoBalanceSimple extends CommandBase {
       SmartDashboard.putNumber("Auto:condition", 0);
       m_lockedCounter = 0;
       lock();
-    } else if (Math.abs(deltaAngle) > m_movingThreshold.getValue() && m_driving && m_driveCounter > 15) {
+    } else if (Math.abs(deltaAngle) > m_movingThreshold.getValue() && (m_driving && m_driveCounter > 15 || !m_driving)) {
       // if the angle is moving, lock in place
       SmartDashboard.putNumber("Auto:condition", 1);
       m_lockedCounter = 0;
