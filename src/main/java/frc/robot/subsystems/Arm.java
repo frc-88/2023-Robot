@@ -43,6 +43,8 @@ public class Arm extends SubsystemBase {
     private List<ArmJoint> m_allJoints;
     private CommandBase m_stowCommand;
 
+    private int loopCount = 0;
+
     private double m_aimX = 0;
 
     public Arm() {
@@ -275,6 +277,19 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         if (DriverStation.isDisabled()) {
             m_allJoints.forEach(ArmJoint::checkZero);
+            
+            switch (loopCount % 60) {
+                case 0:
+                    m_shoulder.configureMotor();
+                    break;
+                case 20:
+                    m_elbow.configureMotor();
+                    break;
+                case 40:
+                    m_wrist.configureMotor();
+                    break;
+            }
+            loopCount++;
         }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
