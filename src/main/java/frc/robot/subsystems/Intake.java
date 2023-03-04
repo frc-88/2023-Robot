@@ -42,13 +42,13 @@ public class Intake extends SubsystemBase {
       new DoublePreferenceConstant("Intake/Speeds/Intake/Outer Cone", 0.5);
   // Outgest
   private DoublePreferenceConstant innerRollerOutgestConeIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner", -1);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner Cone", -1);
   private DoublePreferenceConstant outerRollerOutgestConeIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer", -0.08);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer Cone", -0.1);
       private DoublePreferenceConstant innerRollerOutgestCubeIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner", -1);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner Cube", -1);
   private DoublePreferenceConstant outerRollerOutgestCubeIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer", -1);
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer Cube", -1);
   // Hold
   private DoublePreferenceConstant innerRollerHoldCubeIntakeSpeed =
     new DoublePreferenceConstant("Intake/Speeds/Hold/Inner Cube", 0.025);

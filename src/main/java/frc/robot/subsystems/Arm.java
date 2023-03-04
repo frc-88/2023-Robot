@@ -59,6 +59,8 @@ public class Arm extends SubsystemBase {
         m_targetArmState = ArmStates.stow;
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
 
+        SmartDashboard.putBoolean("Coast Arm", false);
+
         resetStow();
     }
 
@@ -277,19 +279,22 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         if (DriverStation.isDisabled()) {
             m_allJoints.forEach(ArmJoint::checkZero);
-            
-            switch (loopCount % 60) {
-                case 0:
-                    m_shoulder.configureMotor();
-                    break;
-                case 20:
-                    m_elbow.configureMotor();
-                    break;
-                case 40:
-                    m_wrist.configureMotor();
-                    break;
+
+            if (!coastModeEnabled() && loopCount < 2500) {
+                switch (loopCount % 60) {
+                    case 0:
+                        m_shoulder.configureMotor();
+                        break;
+                    case 20:
+                        m_elbow.configureMotor();
+                        break;
+                    case 40:
+                        m_wrist.configureMotor();
+                        break;
+                }
+                loopCount++;
             }
-            loopCount++;
+
         }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
@@ -303,5 +308,6 @@ public class Arm extends SubsystemBase {
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Angle", j.getAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
+        SmartDashboard.putBoolean("Coast Mode Enabled", coastModeEnabled());
     }
 }
