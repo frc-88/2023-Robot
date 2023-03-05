@@ -113,7 +113,7 @@ public class Autonomous {
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, false),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
@@ -158,7 +158,7 @@ public class Autonomous {
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, true),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
@@ -179,7 +179,7 @@ public class Autonomous {
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, true),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
@@ -202,9 +202,9 @@ public class Autonomous {
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, false),
-                    arm.holdTargetState().alongWith(intake.stowFactory(), grabber.holdConeFactory()).withTimeout(1),
+                    arm.holdTargetState().alongWith(intake.stowFactory(), grabber.grabConeFactory()).withTimeout(1),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
