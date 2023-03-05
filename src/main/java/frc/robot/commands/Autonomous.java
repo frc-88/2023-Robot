@@ -43,6 +43,13 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    // copied from center3
+    public static ConditionalCommand center2Link(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(center2Link("Red", drive, intake, arm, grabber, candle, source), 
+            center2Link("Blue", drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
     public static ConditionalCommand center3(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3("Red", drive, intake, arm, grabber, candle, source), 
             center3("Blue", drive, intake, arm, grabber, candle, source),
@@ -118,6 +125,25 @@ public class Autonomous {
                 )
             ),
             arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.75)
+        );
+    }
+
+    public static SequentialCommandGroup center2Link(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid1.wpilib.json"), false),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true, false),
+                    arm.holdTargetState()
+                        .alongWith(intake.stowFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()),
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                )
+            )
         );
     }
 
