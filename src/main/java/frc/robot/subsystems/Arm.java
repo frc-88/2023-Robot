@@ -24,6 +24,12 @@ import frc.robot.util.arm.ArmJoint;
 import frc.robot.util.arm.ArmState;
 import frc.robot.util.arm.ArmStates;
 
+/*
+ * a triple jointed
+ *               arm of amazing beuaty
+ *                                   what else can it do?
+ */
+
 public class Arm extends SubsystemBase {
     
     private final DigitalInput m_coastButton;
@@ -36,6 +42,8 @@ public class Arm extends SubsystemBase {
     private ArmState m_targetArmState = ArmStates.stow;
     private List<ArmJoint> m_allJoints;
     private CommandBase m_stowCommand;
+
+    private int loopCount = 0;
 
     private double m_aimX = 0;
 
@@ -50,6 +58,8 @@ public class Arm extends SubsystemBase {
 
         m_targetArmState = ArmStates.stow;
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
+
+        SmartDashboard.putBoolean("Coast Arm", false);
 
         resetStow();
     }
@@ -190,7 +200,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 45);
+        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 30);
     }
 
     public boolean coastModeEnabled() {
@@ -269,6 +279,22 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         if (DriverStation.isDisabled()) {
             m_allJoints.forEach(ArmJoint::checkZero);
+
+            if (!coastModeEnabled() && loopCount < 2500) {
+                switch (loopCount % 60) {
+                    case 0:
+                        m_shoulder.configureMotor();
+                        break;
+                    case 20:
+                        m_elbow.configureMotor();
+                        break;
+                    case 40:
+                        m_wrist.configureMotor();
+                        break;
+                }
+                loopCount++;
+            }
+
         }
         m_allJoints.forEach(ArmJoint::zeroRelative);
         
@@ -282,5 +308,6 @@ public class Arm extends SubsystemBase {
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Angle", j.getAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
+        SmartDashboard.putBoolean("Coast Mode Enabled", coastModeEnabled());
     }
 }

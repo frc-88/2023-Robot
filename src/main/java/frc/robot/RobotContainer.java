@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.Aiming;
@@ -108,9 +109,9 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2")) {
-      m_autoCommand = Autonomous.center2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center2";
+    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
+      m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2Link";
     }
 
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
@@ -191,15 +192,15 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
         .whileTrue(m_aiming.aimGrabberFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+    
+    m_buttonBox.setFlat
+        .whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
         m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch.negate())
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
@@ -225,9 +226,9 @@ public class RobotContainer {
     m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
-        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false));
+        .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
         .whileTrue(m_grabber.centerConeFactory());
@@ -296,8 +297,8 @@ public class RobotContainer {
     SmartDashboard.putData("ROS Localize", new Localize(m_drive, m_coprocessor).ignoringDisable(true));
 
     // Combined
-    SmartDashboard.putData("Handoff Cone", new Handoff(m_intake, m_arm, m_grabber, true));
-    SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false));
+    SmartDashboard.putData("Handoff Cone", new Handoff(m_intake, m_arm, m_grabber, true, false));
+    SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     // Autonomous
     SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
@@ -306,6 +307,7 @@ public class RobotContainer {
     SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_limelight_back));
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
+    SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));

@@ -43,6 +43,13 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    // copied from center3
+    public static ConditionalCommand center2Link(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(center2Link("Red", drive, intake, arm, grabber, candle, source), 
+            center2Link("Blue", drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
     public static ConditionalCommand center3(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3("Red", drive, intake, arm, grabber, candle, source), 
             center3("Blue", drive, intake, arm, grabber, candle, source),
@@ -67,7 +74,7 @@ public class Autonomous {
             new WaitCommand(0.5),
             new SequentialCommandGroup(
                 intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                new Handoff(intake, arm, grabber, true),
+                new Handoff(intake, arm, grabber, true, false),
                 new ConditionalCommand(
                             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageBack.wpilib.json"), false),
                             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageBack.wpilib.json"), false),
@@ -103,36 +110,68 @@ public class Autonomous {
 
     public static SequentialCommandGroup center3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            centerBase(alliance, drive, intake, arm, grabber, candle, source, "CenterPiece1ToGrid1.wpilib.json"),
+            centerBaseTo1Mid(alliance, drive, intake, arm, grabber, candle, source),
             new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), false)
                 .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
             new ParallelCommandGroup(
-                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid3"), false),
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid1.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                    new Handoff(intake, arm, grabber, true),
-                    arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                    new Handoff(intake, arm, grabber, true, false),
+                    arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
-            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.5)
+            arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.75)
+        );
+    }
+
+    public static SequentialCommandGroup center2Link(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid1.wpilib.json"), false),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true, false),
+                    arm.holdTargetState()
+                        .alongWith(intake.stowFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()),
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                )
+            )
         );
     }
 
     public static SequentialCommandGroup center2Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            centerBase(alliance, drive, intake, arm, grabber, candle, source, "CenterPiece1ToGrid3.wpilib.json"),
-            centerBalance(alliance, drive, intake, arm, grabber, candle, source)
+            centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToEngage.wpilib.json"), false),
+                    new AutoBalanceSimple(drive)
+                ),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    arm.sendArmToStateAndEnd(ArmStates.getConeFromIntake1).deadlineWith(grabber.grabConeFactory(), intake.stowFactory()),
+                    arm.sendArmToState(ArmStates.flat).alongWith(grabber.grabConeFactory(), intake.handoffFactory())
+                )
+            )
         );
     }
 
     public static SequentialCommandGroup center2(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
-        return centerBase(alliance, drive, intake, arm, grabber, candle, source, "CenterPiece1ToGrid1.wpilib.json");
+        return centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source);
     }
 
-    private static SequentialCommandGroup centerBase(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source, String returnPath) {
+    private static SequentialCommandGroup centerBaseTo1High(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialScoreCubeHigh(drive, arm, grabber, source)
                 .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
@@ -140,16 +179,62 @@ public class Autonomous {
                 .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
             new ParallelCommandGroup(
-                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + returnPath), false),
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid1.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                    new Handoff(intake, arm, grabber, true),
+                    new Handoff(intake, arm, grabber, true, true),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
-                        .deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), 
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
                             grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
-            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.5)
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.75)
+        );
+    }
+
+    private static SequentialCommandGroup centerBaseTo1Mid(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            initialScoreCubeMid(drive, arm, grabber, source)
+                .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid2ToPiece1.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid1.wpilib.json"), false),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true, true),
+                    arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                )
+            ),
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.75)
+        );
+    }
+
+    private static SequentialCommandGroup centerBaseTo3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            initialScoreCubeHigh(drive, arm, grabber, source)
+                .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid2ToPiece1.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid3-1.wpilib.json"), false),
+                    new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid3-2.wpilib.json"), false)
+                ),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true, false),
+                    arm.holdTargetState().alongWith(intake.stowFactory(), grabber.grabConeFactory()).withTimeout(1),
+                    arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                )
+            ),
+            arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.5)
         );
     }
 
@@ -163,8 +248,16 @@ public class Autonomous {
 
     private static SequentialCommandGroup initialScoreCubeHigh(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            new Localize(drive, source).alongWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
+            new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
             arm.sendArmToStateAndEnd(ArmStates.scoreCubeHigh).deadlineWith(grabber.holdCubeFactory()),
+            arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.4)
+        );
+    }
+
+    private static SequentialCommandGroup initialScoreCubeMid(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
+            arm.sendArmToStateAndEnd(ArmStates.scoreCubeMiddle).deadlineWith(grabber.holdCubeFactory()),
             arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.25)
         );
     }

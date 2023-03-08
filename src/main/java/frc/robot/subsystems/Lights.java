@@ -20,6 +20,12 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 
+/*
+ *     everyone's talkin'
+ * 'bout purple and yellow but
+ *   tie dye rocks the house
+ */
+
 public class Lights extends SubsystemBase {
     private IntPreferenceConstant numLEDs = new IntPreferenceConstant("Number of LEDs", 60);
     private int m_state = 0;
@@ -28,8 +34,7 @@ public class Lights extends SubsystemBase {
     private boolean m_animDirection = false;
     private boolean m_setAnim = false;
     private DoublePreferenceConstant dangerAngle = new DoublePreferenceConstant("Danger Angle", 5.0);
-    private double acceptableDifference = 0.15;
-    private double acceptableAngleDifference = 0.15;
+    private double m_acceptableDifference = 0.25;
 
     private Animation m_toAnimate = null;
     private Animation m_lastAnimation = null;
@@ -102,12 +107,7 @@ public class Lights extends SubsystemBase {
     }
 
     public boolean approximatelyEqual(Pose2d a, Pose2d b) {
-        if (a instanceof Pose2d && b instanceof Pose2d) {
-            return Math.abs(a.getX() - b.getX()) < acceptableDifference
-          && Math.abs(a.getY() - b.getY()) < acceptableDifference
-          && Math.abs(a.getRotation().getRadians()-b.getRotation().getRadians()) < acceptableAngleDifference;
-        }
-        return false;
+        return a.getTranslation().getDistance(b.getTranslation()) < m_acceptableDifference;
     }
 
     @Override
@@ -116,22 +116,25 @@ public class Lights extends SubsystemBase {
             switch (m_state) {
                 case 0:
                     larsonColor(255, 0, 0);
-                    if (m_coprocessor.getBotPose() != null) {
+                    if (m_coprocessor.getBotPose() != null && counter++ > 100) {
                         m_state++;
+                        counter = 0;
                     }
                     break;
+
                 case 1:
                     larsonColor(0, 255, 0);
-                    if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose())) {
+                    if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose()) && counter++ > 100) {
                         m_state++;
+                        counter = 0;
                     }
                     break;
                 case 2:
                     larsonColor(0, 0, 255);
                     m_swerve.resetPosition(m_coprocessor.getBotPose());
-                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_limelight.getBotPose()) 
-                        && approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose())) {
+                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose()) && counter++ > 100) {
                         m_state++;
+                        counter = 0;
                     }
                     break;
                 case 3:

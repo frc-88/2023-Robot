@@ -15,13 +15,12 @@ import frc.robot.util.arm.ArmStates;
 
 public class Handoff extends SequentialCommandGroup {
 
-  public Handoff(Intake intake, Arm arm, Grabber grabber, boolean coneMode) {
+  public Handoff(Intake intake, Arm arm, Grabber grabber, boolean coneMode, boolean runShort) {
     Supplier<CommandBase> grab = () -> coneMode ? grabber.grabConeFactory() :grabber.grabCubeFactory();
     addCommands(
       arm.sendArmToStateAndEnd(coneMode ? ArmStates.getConeFromIntake1 : ArmStates.getCubeFromIntake1).deadlineWith(grab.get(), intake.stowFactory()),
-      arm.sendArmToStateAndEnd(coneMode ? ArmStates.getConeFromIntake2 : ArmStates.getCubeFromIntake2).deadlineWith(grab.get(), intake.handoffFactory()),
-      arm.holdTargetState().alongWith(grab.get(), intake.handoffFactory()).withTimeout(0.25),
-      arm.sendArmToStateAndEnd(ArmStates.stow).deadlineWith(grab.get(), intake.handoffFactory())
+      arm.sendArmToStateAndEnd(coneMode ? ArmStates.getConeFromIntake2 : ArmStates.getCubeFromIntake2).deadlineWith(grab.get(), intake.handoffFactory()).withTimeout(coneMode ? 0.3 : 1),
+      arm.sendArmToState(ArmStates.stow).alongWith(grab.get(), intake.handoffFactory()).until(() -> arm.isAtTarget(ArmStates.stow, runShort ? 15 : 2))
     );
   }
 }
