@@ -121,7 +121,7 @@ public class Autonomous {
                     new Handoff(intake, arm, grabber, true, false),
                     arm.sendArmToState(ArmStates.scoreConeMiddle).until(() -> arm.isAtTarget(ArmStates.scoreConeMiddle, 10)))
                         .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : 0)))
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : 0))
                 )
             ),
             arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory(), new Localize(drive, source)).withTimeout(0.75).andThen(grabber.applyAim(0))
