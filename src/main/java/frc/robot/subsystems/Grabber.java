@@ -229,7 +229,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void aim(double angle) {
-    m_aimAngle = 0;
+    m_aimAngle = angle;
   }
 
   // COMMAND FACTORIES
