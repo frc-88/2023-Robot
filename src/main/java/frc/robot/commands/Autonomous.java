@@ -261,10 +261,10 @@ public class Autonomous {
                 new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "ChargePiece3ToBalance.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                    new Handoff(intake, arm, grabber, true, true),
+                    new Handoff(intake, arm, grabber, true, true)
                 )
             ),
-            new AutoBalanceSimple(m_drive);
+            new AutoBalanceSimple(drive)
         );
     }
 
