@@ -161,7 +161,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 90. + 360.*5.) % 360. - 90.;
+    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 270. + 360.*5.) % 360. - 270.;
   }
 
   public void zeroRelativePivot() {

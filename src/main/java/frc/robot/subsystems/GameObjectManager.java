@@ -58,8 +58,12 @@ public class GameObjectManager extends SubsystemBase {
 
         ArrayList<GridZone> redGridZones = new ArrayList<>();
 
-        redGridZones = redGridZones.stream().map((GridZone zone) -> new GridZone(zone.getType(), zone.getLevel(), zone.getX(), 
-            ScorpionTable.switchYAlliance(zone.getY()), zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
+        for(GridZone blueGridZone:blueGridZones) {
+            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), blueGridZone.getX(), ScorpionTable.switchYAlliance(blueGridZone.getY()), blueGridZone.getZ()));
+        }
+        
+        //redGridZones = redGridZones.stream().map((GridZone zone) -> new GridZone(zone.getType(), zone.getLevel(), zone.getX(), 
+        //    ScorpionTable.switchYAlliance(zone.getY()), zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
 
         if(DriverStation.getAlliance() == Alliance.Blue) {
             gridZones = blueGridZones;
@@ -67,6 +71,8 @@ public class GameObjectManager extends SubsystemBase {
         else if(DriverStation.getAlliance() == Alliance.Red) { 
             gridZones = redGridZones;
         }
+        System.out.println("redgridzone size: " +redGridZones.size());
+        System.out.println("bluegridzone size: " +blueGridZones.size());
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
