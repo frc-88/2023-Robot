@@ -182,6 +182,10 @@ public class Autonomous {
         return wallBaseTo9Mid(alliance, drive, intake, arm, grabber, candle, source);
     }
 
+        public static SequentialCommandGroup charge1balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return chargeBaseToPiece3(alliance, drive, intake, arm, grabber, candle, source);
+    } 
+
 
     private static SequentialCommandGroup centerBaseTo1High(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
@@ -243,6 +247,24 @@ public class Autonomous {
                 )
             ),
             arm.stowFrom(ArmStates.scoreConeHigh).alongWith(grabber.dropConeFactory()).withTimeout(0.75)
+        );
+    }
+
+    private static SequentialCommandGroup chargeBaseToPiece3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            initialScoreCubeMid(drive, arm, grabber, source)
+                .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
+            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "ChargeGrid5ToPiece3.wpilib.json"), false)
+                .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
+                    grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
+            new ParallelCommandGroup(
+                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "ChargePiece3ToBalance.wpilib.json"), false),
+                new SequentialCommandGroup(
+                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    new Handoff(intake, arm, grabber, true, true),
+                )
+            ),
+            new AutoBalanceSimple(m_drive);
         );
     }
 
