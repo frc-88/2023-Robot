@@ -7,6 +7,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -19,6 +20,7 @@ public class FollowTrajectory extends CommandBase {
   private RamseteController m_controller = new RamseteController();
   private Timer m_timer = new Timer();
   private double m_duration;
+  private Pose2d m_endPose;
   private int m_state;
 
   private static boolean forceResetOdometry = false;
@@ -29,6 +31,7 @@ public class FollowTrajectory extends CommandBase {
     m_resetOdometry = resetOdometry;
     m_trajectory = trajectory;
     m_duration = m_trajectory.getTotalTimeSeconds();
+    m_endPose = m_trajectory.sample(m_duration).poseMeters;
 
     addRequirements(m_drive);
   }
@@ -55,13 +58,13 @@ public class FollowTrajectory extends CommandBase {
           // m_drive.resetOdometry(m_trajectory.getInitialPose(), m_drive.getGyroscopeRotation());
         } else {
           if (!ignoreLocalizationErrors && Math.sqrt(Math.pow((m_drive.getOdometryPose().getX() - m_trajectory.getInitialPose().getX()), 2) +
-            Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > 3) {
-              System.out.println("Trajectory Error: Distance > 3.");
-              System.out.println("Trajectory Start X: " + m_trajectory.getInitialPose().getX());
-              System.out.println("Trajectory Start Y: " + m_trajectory.getInitialPose().getY());
-              m_state = 3;
-              break;
-            }
+                  Math.pow((m_drive.getOdometryPose().getY() - m_trajectory.getInitialPose().getY()), 2)) > 3) {
+            System.out.println("Trajectory Error: Distance > 3.");
+            System.out.println("Trajectory Start X: " + m_trajectory.getInitialPose().getX());
+            System.out.println("Trajectory Start Y: " + m_trajectory.getInitialPose().getY());
+            m_state = 3;
+            break;
+          }
         }
         m_state++;
         break;
@@ -70,11 +73,14 @@ public class FollowTrajectory extends CommandBase {
         m_state++;
         // fall through right away to case 2
       case 2: // follow the trajectory, our final state
-        if (m_timer.get() < m_duration) {
-          double now = m_timer.get();
-          Trajectory.State goal = m_trajectory.sample(now);
-          targetSpeeds = m_controller.calculate(m_drive.getTrajectoryOdometryPose(), goal);
-          // targetSpeeds = m_controller.calculate(m_drive.getOdometryPose(), goal);
+        double now = m_timer.get();
+        Pose2d currentPose = m_drive.getTrajectoryOdometryPose();
+        Trajectory.State goal = m_trajectory.sample(now);
+
+        // if ((m_timer.get() < m_duration) ||
+        //     (currentPose.getTranslation().getDistance(m_endPose.getTranslation()) > 0.25)) {
+        if ((m_timer.get() < m_duration)) {
+            targetSpeeds = m_controller.calculate(currentPose, goal);
         } else {
           m_state++;
         }

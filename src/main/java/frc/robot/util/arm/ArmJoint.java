@@ -23,6 +23,7 @@ public class ArmJoint {
     private final WPI_CANCoder m_cancoder;
 
     private final String m_name;
+    private final boolean m_motorInverted;
     private final double m_ratio;
     private final double m_length;
     private final boolean m_encoderInverted;
@@ -42,6 +43,7 @@ public class ArmJoint {
     
     public ArmJoint(String name, int motorID, int encoderID, boolean motorInverted, boolean encoderInverted, double ratio, double length, double wrapAngle) {
         m_name = name;
+        m_motorInverted = motorInverted;
         m_ratio = ratio;
         m_length = length;
         m_encoderInverted = encoderInverted;
@@ -53,12 +55,6 @@ public class ArmJoint {
         m_motor.configFactoryDefault();
         m_cancoder.configFactoryDefault();
 
-        m_motor.setInverted(motorInverted);
-        m_motor.setNeutralMode(NeutralMode.Brake);
-        m_motor.configNeutralDeadband(0);
-        m_motor.configClosedloopRamp(0.05);
-        m_motor.configMotionSCurveStrength(2);
-
         p_triggerCurrent = new DoublePreferenceConstant("Arm/" + name + "/Trigger Current", 120);
         p_triggerDuration = new DoublePreferenceConstant("Arm/" + name + "/Trigger Duration", 0.002);
         p_continuousCurrent = new DoublePreferenceConstant("Arm/" + name + "/Continuous Current", 80);
@@ -68,8 +64,28 @@ public class ArmJoint {
         p_encoderOffset = new DoublePreferenceConstant("Arm/" + name + "/Offset", 0);
         p_gravityCompensation = new DoublePreferenceConstant("Arm/" + name + "/Gravity Compensation", 0);
 
-        Consumer<Double> handler = (Double unused) -> {
-            StatorCurrentLimitConfiguration config = new StatorCurrentLimitConfiguration(
+        p_triggerCurrent.addChangeHandler(this::preferenceHandler);
+        p_triggerDuration.addChangeHandler(this::preferenceHandler);
+        p_continuousCurrent.addChangeHandler(this::preferenceHandler);
+        p_pid.addChangeHandler(this::preferenceHandler);
+        p_maxVelocity.addChangeHandler(this::preferenceHandler);
+        p_maxAcceleration.addChangeHandler(this::preferenceHandler);
+
+        configureMotor();
+    }
+
+    public void configureMotor() {
+        m_motor.setInverted(m_motorInverted);
+        m_motor.setNeutralMode(NeutralMode.Brake);
+        m_motor.configNeutralDeadband(0);
+        m_motor.configClosedloopRamp(0.05);
+        m_motor.configMotionSCurveStrength(2);
+
+        preferenceHandler(0.);
+    }
+
+    private void preferenceHandler(double unused) {
+        StatorCurrentLimitConfiguration config = new StatorCurrentLimitConfiguration(
                 true,
                 p_continuousCurrent.getValue(),
                 p_triggerCurrent.getValue(),
@@ -84,15 +100,6 @@ public class ArmJoint {
             m_motor.configMaxIntegralAccumulator(0, p_pid.getIMax().getValue());
             m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(p_maxVelocity.getValue()));
             m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue()));
-        };
-        p_triggerCurrent.addChangeHandler(handler);
-        p_triggerDuration.addChangeHandler(handler);
-        p_continuousCurrent.addChangeHandler(handler);
-        p_pid.addChangeHandler(handler);
-        p_maxVelocity.addChangeHandler(handler);
-        p_maxAcceleration.addChangeHandler(handler);
-
-        handler.accept(0.);
     }
 
     public String getName() {

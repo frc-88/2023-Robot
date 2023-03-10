@@ -229,7 +229,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void aim(double angle) {
-    m_aimAngle = 0;
+    m_aimAngle = angle;
   }
 
   // COMMAND FACTORIES
@@ -298,6 +298,10 @@ public class Grabber extends SubsystemBase {
 
   public CommandBase forcePivot() {
     return new InstantCommand(() -> m_lastPivotPosition = m_pivotForwards ? 0 : -180);
+  }
+
+  public CommandBase applyAim(double aim) {
+    return new InstantCommand(() -> aim(aim));
   }
 
   @Override
