@@ -22,6 +22,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
+/*
+ * don't tell anyone
+ * but my favorite game piece
+ * is the one you dropped
+ */
+
 public class Intake extends SubsystemBase {
   
   // Cube
@@ -35,10 +41,14 @@ public class Intake extends SubsystemBase {
   private DoublePreferenceConstant outerRollerConeIntakeSpeed =
       new DoublePreferenceConstant("Intake/Speeds/Intake/Outer Cone", 0.5);
   // Outgest
-  private DoublePreferenceConstant innerRollerOutgestIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner", -0.25);
-  private DoublePreferenceConstant outerRollerOutgestIntakeSpeed =
-      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer", 0.5);
+  private DoublePreferenceConstant innerRollerOutgestConeIntakeSpeed =
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner Cone", -1);
+  private DoublePreferenceConstant outerRollerOutgestConeIntakeSpeed =
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer Cone", -0.1);
+      private DoublePreferenceConstant innerRollerOutgestCubeIntakeSpeed =
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Inner Cube", -1);
+  private DoublePreferenceConstant outerRollerOutgestCubeIntakeSpeed =
+      new DoublePreferenceConstant("Intake/Speeds/Outgest/Outer Cube", -1);
   // Hold
   private DoublePreferenceConstant innerRollerHoldCubeIntakeSpeed =
     new DoublePreferenceConstant("Intake/Speeds/Hold/Inner Cube", 0.025);
@@ -124,8 +134,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void outgest() {
-      m_innerRoller.set(innerRollerOutgestIntakeSpeed.getValue());
-      m_outerRoller.set(outerRollerOutgestIntakeSpeed.getValue());
+      if (!m_coneMode) {
+        m_innerRoller.set(innerRollerOutgestCubeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerOutgestCubeIntakeSpeed.getValue());
+      } else {
+        m_innerRoller.set(innerRollerOutgestConeIntakeSpeed.getValue());
+        m_outerRoller.set(outerRollerOutgestConeIntakeSpeed.getValue());
+      }
     }
 
     public void stopRollers() {

@@ -25,6 +25,12 @@ import frc.robot.Constants;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
+/*
+ * don't worry it's cool
+ * that cube is only mildy
+ * underinflated
+ */
+
 public class Grabber extends SubsystemBase {
 
   private final BooleanSupplier m_coastMode;
@@ -223,7 +229,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void aim(double angle) {
-    m_aimAngle = 0;
+    m_aimAngle = angle;
   }
 
   // COMMAND FACTORIES
@@ -292,6 +298,10 @@ public class Grabber extends SubsystemBase {
 
   public CommandBase forcePivot() {
     return new InstantCommand(() -> m_lastPivotPosition = m_pivotForwards ? 0 : -180);
+  }
+
+  public CommandBase applyAim(double aim) {
+    return new InstantCommand(() -> aim(aim));
   }
 
   @Override
