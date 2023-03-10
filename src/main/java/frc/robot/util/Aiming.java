@@ -50,8 +50,8 @@ public class Aiming {
     }
     public void giveWristAim() {
         Pose2d botPose = m_ros.getBotPoseInches().plus(new Transform2d(new Translation2d(0., p_aimAdjustY.getValue()), new Rotation2d(0)));
-        double aimAngle = Math.toDegrees(Math.atan(p_aimHeight.getValue() / (getNearestScorePoint(botPose).getY()-botPose.getY())));
-        System.out.println("aiming final: " +aimAngle);
+        double aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
+        System.out.println("aiming final: " +aimAngle + "pole y" + getNearestScorePoint(botPose).getY() + "robo y" + botPose.getY() + "difference" + (getNearestScorePoint(botPose).getY()-botPose.getY()));
         m_grabber.aim(aimAngle); 
     }
     public CommandBase aimGrabberFactory() {
