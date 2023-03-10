@@ -89,6 +89,7 @@ public class RobotContainer {
       m_intake.setCube();
     }
     m_arm.resetStow();
+    m_grabber.aim(0);
   }
 
   public void disableInit() {
@@ -107,9 +108,9 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2")) {
-      m_autoCommand = Autonomous.center2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center2";
+    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
+      m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Center2Link";
     }
 
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
@@ -145,7 +146,8 @@ public class RobotContainer {
 
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
-    m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
+    m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory())
+        .and(m_buttonBox.gamepieceSwitch.negate()).onFalse(m_intake.downFactory().withTimeout(0.4));
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
