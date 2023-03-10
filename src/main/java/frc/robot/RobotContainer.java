@@ -91,6 +91,7 @@ public class RobotContainer {
       m_intake.setCube();
     }
     m_arm.resetStow();
+    m_grabber.aim(0);
   }
 
   public void disableInit() {
@@ -147,7 +148,8 @@ public class RobotContainer {
 
   private void configureControllers() {
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
-    m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory());
+    m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory())
+        .and(m_buttonBox.gamepieceSwitch.negate()).onFalse(m_intake.downFactory().withTimeout(0.4));
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
