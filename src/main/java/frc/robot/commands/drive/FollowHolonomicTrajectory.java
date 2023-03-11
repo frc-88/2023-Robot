@@ -9,9 +9,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
@@ -67,7 +69,23 @@ public class FollowHolonomicTrajectory extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.drive(m_controller.calculate(m_drive.getOdometryPose(), m_trajectory.sample(m_timer.get()), new Rotation2d()));
+    Pose2d currentPose = m_drive.getOdometryPose();
+    Trajectory.State desiredState = m_trajectory.sample(m_timer.get());
+    ChassisSpeeds targetSpeeds = m_controller.calculate(currentPose, desiredState, new Rotation2d());
+
+    SmartDashboard.putNumber("Auto:Measured vX", m_drive.getChassisSpeeds().vxMetersPerSecond);
+    SmartDashboard.putNumber("Auto:Measured vY", m_drive.getChassisSpeeds().vyMetersPerSecond);
+    SmartDashboard.putNumber("Auto:Measured omega", m_drive.getChassisSpeeds().omegaRadiansPerSecond);
+
+    SmartDashboard.putNumber("Auto:Desired vX", desiredState.velocityMetersPerSecond * Math.cos(desiredState.poseMeters.getRotation().getRadians()));
+    SmartDashboard.putNumber("Auto:Desired vY", desiredState.velocityMetersPerSecond * Math.sin(desiredState.poseMeters.getRotation().getRadians()));
+    SmartDashboard.putNumber("Auto:Desired omega", desiredState.curvatureRadPerMeter);
+
+    SmartDashboard.putNumber("Auto:Commanded vX", targetSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("Auto:Commanded vY", targetSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("Auto:Commanded omega", targetSpeeds.omegaRadiansPerSecond);
+
+    m_drive.drive(targetSpeeds);
   }
 
   // Called once the command ends or is interrupted.
