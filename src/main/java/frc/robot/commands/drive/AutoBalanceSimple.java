@@ -88,10 +88,10 @@ public class AutoBalanceSimple extends CommandBase {
       if (!m_driving) {
         m_driving = true;
         m_driveCounter = 0;
+        m_climbSpeed = m_climbSpeed / 2.00;
+
         if (m_climbSpeed <= 0.5) {
           m_climbSpeed = 0.5;
-        } else {
-          m_climbSpeed = m_climbSpeed / 2.00;
         }
       }
     }
