@@ -25,32 +25,25 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private final SwerveDrive m_drive;
   private final Trajectory m_trajectory;
   private final boolean m_resetOdometry;
-
-  private final HolonomicDriveController m_controller;
   private final Timer m_timer = new Timer();
-  private boolean m_cancel = false;
 
-  private final PIDPreferenceConstants p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
-  private final PIDPreferenceConstants p_vyPID = new PIDPreferenceConstants("Auto/vyPID/");
-  private final PIDPreferenceConstants p_thetaPID = new PIDPreferenceConstants("Auto/theta/PID/");
-  private final DoublePreferenceConstant p_thetaMaxVelocity = new DoublePreferenceConstant("Auto/theta/Max Velocity", Math.PI);;
-  private final DoublePreferenceConstant p_thetaMaxAcceleration = new DoublePreferenceConstant("Auto/theta/Max Acceleration", Math.PI);
-  private final DoublePreferenceConstant p_xTolerance = new DoublePreferenceConstant("Auto/Tolerance/x", 0.1);
-  private final DoublePreferenceConstant p_yTolerance = new DoublePreferenceConstant("Auto/Tolerance/y", 0.1);
-  private final DoublePreferenceConstant p_thetaTolerance = new DoublePreferenceConstant("Auto/Tolerance/theta", 0.05);
+  private final static PIDPreferenceConstants p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
+  private final static PIDPreferenceConstants p_vyPID = new PIDPreferenceConstants("Auto/vyPID/");
+  private final static PIDPreferenceConstants p_thetaPID = new PIDPreferenceConstants("Auto/theta/PID/");
+  private final static DoublePreferenceConstant p_thetaMaxVelocity = new DoublePreferenceConstant("Auto/theta/Max Velocity", Math.PI);;
+  private final static DoublePreferenceConstant p_thetaMaxAcceleration = new DoublePreferenceConstant("Auto/theta/Max Acceleration", Math.PI);
+  private final static DoublePreferenceConstant p_xTolerance = new DoublePreferenceConstant("Auto/Tolerance/x", 0.1);
+  private final static DoublePreferenceConstant p_yTolerance = new DoublePreferenceConstant("Auto/Tolerance/y", 0.1);
+  private final static DoublePreferenceConstant p_thetaTolerance = new DoublePreferenceConstant("Auto/Tolerance/theta", 0.05);
+
+  private HolonomicDriveController m_controller;
+  private boolean m_cancel = false;
 
   /** Creates a new FollowHolonomicTrajectory. */
   public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
     m_drive = drive;
     m_trajectory = trajectory;
     m_resetOdometry = resetOdometry;
-
-    m_controller = new HolonomicDriveController(new PIDController(p_vxPID.getKP().getValue(), p_vxPID.getKI().getValue(), p_vxPID.getKD().getValue()),
-      new PIDController(p_vyPID.getKP().getValue(), p_vyPID.getKI().getValue(), p_vyPID.getKD().getValue()),
-      new ProfiledPIDController(p_thetaPID.getKP().getValue(), p_thetaPID.getKI().getValue(), p_thetaPID.getKD().getValue(), 
-      new TrapezoidProfile.Constraints(p_thetaMaxVelocity.getValue(), p_thetaMaxAcceleration.getValue())));
-
-    m_controller.setTolerance(new Pose2d(p_xTolerance.getValue(), p_yTolerance.getValue(), Rotation2d.fromDegrees(p_thetaTolerance.getValue())));
 
     addRequirements(m_drive);
   }
@@ -59,6 +52,14 @@ public class FollowHolonomicTrajectory extends CommandBase {
   @Override
   public void initialize() {
     m_cancel = false;
+
+    m_controller = new HolonomicDriveController(new PIDController(p_vxPID.getKP().getValue(), p_vxPID.getKI().getValue(), p_vxPID.getKD().getValue()),
+    new PIDController(p_vyPID.getKP().getValue(), p_vyPID.getKI().getValue(), p_vyPID.getKD().getValue()),
+    new ProfiledPIDController(p_thetaPID.getKP().getValue(), p_thetaPID.getKI().getValue(), p_thetaPID.getKD().getValue(), 
+    new TrapezoidProfile.Constraints(p_thetaMaxVelocity.getValue(), p_thetaMaxAcceleration.getValue())));
+
+    m_controller.setTolerance(new Pose2d(p_xTolerance.getValue(), p_yTolerance.getValue(), Rotation2d.fromDegrees(p_thetaTolerance.getValue())));
+
     if (m_resetOdometry) {
       m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
     } else {
