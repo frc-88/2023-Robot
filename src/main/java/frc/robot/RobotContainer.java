@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.AutoBalance;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.FollowHolonomicTrajectory;
 import frc.robot.commands.drive.Localize;
@@ -255,6 +256,7 @@ public class RobotContainer {
     SmartDashboard.putData("Reset Yaw", m_drive.resetYawCommandFactory());
     SmartDashboard.putData("Field Drive", m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     SmartDashboard.putData("Grant Drive", m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    SmartDashboard.putData("Auto Balance", new AutoBalance(m_drive, true));
 
     // CANdle
     SmartDashboard.putData("Want Cone", m_candleSubsystem.wantConeFactory());
@@ -303,6 +305,8 @@ public class RobotContainer {
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
+    SmartDashboard.putData("Auto Wall 2", Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+
     SmartDashboard.putData("Auto Holonomic", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest.wpilib.json"), new Rotation2d(), new Rotation2d(), true));
     SmartDashboard.putData("Auto Holonomic2", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest2.wpilib.json"), new Rotation2d(), Rotation2d.fromDegrees(35), true));
 
