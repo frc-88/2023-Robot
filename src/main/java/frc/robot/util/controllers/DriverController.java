@@ -12,4 +12,5 @@ public interface DriverController {
 
     public Trigger getScoreButton();
 
+    public Trigger getPivotButton();
 }
