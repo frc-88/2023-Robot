@@ -84,11 +84,12 @@ public class AutoBalanceSimple extends CommandBase {
       lock();
     } else {
       // drive up
+      m_drive.drive(m_climbSpeed * Math.signum(currentAngle), 0, 0);
       if (!m_driving) {
         m_driving = true;
         m_driveCounter = 0;
+        m_climbSpeed = m_climbSpeed / 2.0;
       }
-      m_drive.drive(m_climbSpeed * Math.signum(currentAngle), 0, 0);
     }
 
   }
@@ -114,7 +115,6 @@ public class AutoBalanceSimple extends CommandBase {
 
   private void lock() {
     m_driving =  false;
-    m_climbSpeed = m_climbSpeed / 2.0;
     m_drive.setModuleStates(LOCK_STATES);
   }
 }

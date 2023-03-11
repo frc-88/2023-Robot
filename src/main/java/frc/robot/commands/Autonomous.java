@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.AutoBalanceSimple;
+import frc.robot.commands.drive.FollowHolonomicTrajectory;
 import frc.robot.commands.drive.FollowTrajectory;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.Lights;
@@ -96,9 +97,9 @@ public class Autonomous {
 
     public static SequentialCommandGroup redEngage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            initialScoreCubeHigh(drive, arm, grabber, source),
-            new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
-            drive.lockCommandFactory().alongWith(arm.holdTargetState(), grabber.holdCubeFactory())
+            initialShootCubeMid(drive, grabber, source),
+            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
+            new AutoBalanceSimple(drive)
         );
     }
 
@@ -178,7 +179,7 @@ public class Autonomous {
         return centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source);
     } 
 
-       public static SequentialCommandGroup wall2(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+    public static SequentialCommandGroup wall2(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return wallBaseTo9Mid(alliance, drive, intake, arm, grabber, candle, source);
     }
 
@@ -237,7 +238,7 @@ public class Autonomous {
                 .deadlineWith(intake.intakeFactory(), arm.holdTargetState(), grabber.holdConeFactory(), 
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
             new ParallelCommandGroup(
-                new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallPiece4ToGrid9.wpilib.json"), false),
+                // new FollowTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallPiece4ToGrid9.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, true),
@@ -314,6 +315,13 @@ public class Autonomous {
             new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
             arm.sendArmToStateAndEnd(ArmStates.scoreCubeMiddle).deadlineWith(grabber.holdCubeFactory()),
             arm.stowFrom(ArmStates.scoreCubeHigh).alongWith(grabber.dropCubeFactory()).withTimeout(0.25)
+        );
+    }
+
+    private static SequentialCommandGroup initialShootCubeMid(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+        return new SequentialCommandGroup(
+            new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
+            grabber.dropCubeFactory().withTimeout(0.25)
         );
     }
 }
