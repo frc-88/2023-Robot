@@ -30,29 +30,20 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private final Timer m_timer = new Timer();
   private boolean m_cancel = false;
 
-  private final PIDPreferenceConstants p_vxPID;
-  private final PIDPreferenceConstants p_vyPID;
-  private final PIDPreferenceConstants p_thetaPID;
-  private final DoublePreferenceConstant p_thetaMaxVelocity;
-  private final DoublePreferenceConstant p_thetaMaxAcceleration;
-  private final DoublePreferenceConstant p_xTolerance;
-  private final DoublePreferenceConstant p_yTolerance;
-  private final DoublePreferenceConstant p_thetaTolerance;
+  private final PIDPreferenceConstants p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
+  private final PIDPreferenceConstants p_vyPID = new PIDPreferenceConstants("Auto/vyPID/");
+  private final PIDPreferenceConstants p_thetaPID = new PIDPreferenceConstants("Auto/theta/PID/");
+  private final DoublePreferenceConstant p_thetaMaxVelocity = new DoublePreferenceConstant("Auto/theta/Max Velocity", Math.PI);;
+  private final DoublePreferenceConstant p_thetaMaxAcceleration = new DoublePreferenceConstant("Auto/theta/Max Acceleration", Math.PI);
+  private final DoublePreferenceConstant p_xTolerance = new DoublePreferenceConstant("Auto/Tolerance/x", 0.1);
+  private final DoublePreferenceConstant p_yTolerance = new DoublePreferenceConstant("Auto/Tolerance/y", 0.1);
+  private final DoublePreferenceConstant p_thetaTolerance = new DoublePreferenceConstant("Auto/Tolerance/theta", 0.05);
 
   /** Creates a new FollowHolonomicTrajectory. */
   public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
     m_drive = drive;
     m_trajectory = trajectory;
     m_resetOdometry = resetOdometry;
-
-    p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
-    p_vyPID = new PIDPreferenceConstants("Auto/vyPID/");
-    p_thetaPID = new PIDPreferenceConstants("Auto/theta/PID/");
-    p_thetaMaxVelocity = new DoublePreferenceConstant("Auto/theta/Max Velocity", 0);
-    p_thetaMaxAcceleration = new DoublePreferenceConstant("Auto/theta/Max Acceleration", 0);
-    p_xTolerance = new DoublePreferenceConstant("Auto/Tolerance/x", 0);
-    p_yTolerance = new DoublePreferenceConstant("Auto/Tolerance/y", 0);
-    p_thetaTolerance = new DoublePreferenceConstant("Auto/Tolerance/theta", 0);
 
     m_controller = new HolonomicDriveController(new PIDController(p_vxPID.getKP().getValue(), p_vxPID.getKI().getValue(), p_vxPID.getKD().getValue()),
       new PIDController(p_vyPID.getKP().getValue(), p_vyPID.getKI().getValue(), p_vyPID.getKD().getValue()),
