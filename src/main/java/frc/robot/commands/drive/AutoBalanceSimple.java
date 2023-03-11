@@ -59,6 +59,7 @@ public class AutoBalanceSimple extends CommandBase {
     
     SmartDashboard.putNumber("Auto:currentAngle", currentAngle);
     SmartDashboard.putNumber("Auto:deltaAngle", deltaAngle);
+    SmartDashboard.putNumber("Auto:climbSpeed", m_climbSpeed);
 
     if (m_driving) m_driveCounter++;
 
