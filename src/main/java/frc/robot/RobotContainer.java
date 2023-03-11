@@ -149,6 +149,8 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private void configureControllers() {
+    m_driverController.getPivotButton().whileTrue(m_drive.pivotOnCommandFactory()).whileFalse(m_drive.pivotOffCommandFactory());
+
     m_buttonBox.outgestButton.whileTrue(m_intake.outgestFactory());
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory())
         .and(m_buttonBox.gamepieceSwitch.negate()).onFalse(m_intake.downFactory().withTimeout(0.4));
