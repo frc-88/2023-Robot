@@ -298,8 +298,8 @@ public class RobotContainer {
     // Autonomous
     SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
-    SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_limelight_back));
+    SmartDashboard.putData("AutoROS Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor));
+    SmartDashboard.putData("AutoLL Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_limelight_back));
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));

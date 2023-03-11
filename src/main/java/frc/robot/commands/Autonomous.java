@@ -28,8 +28,8 @@ import frc.robot.util.arm.ArmStates;
 public class Autonomous {
 
     public static ConditionalCommand engage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
-        return new ConditionalCommand(redEngage(drive,arm,grabber,source), 
-            blueEngage(drive,grabber,source),
+        return new ConditionalCommand(engage("Red",drive,arm,grabber,source), 
+            engage("Blue",drive,arm, grabber,source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
@@ -96,10 +96,10 @@ public class Autonomous {
         );
     }
 
-    public static SequentialCommandGroup redEngage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
+    public static SequentialCommandGroup engage(String alliance, SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialShootCubeMid(drive, grabber, source),
-            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
+            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "Engage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
             new AutoBalanceSimple(drive)
         );
     }
