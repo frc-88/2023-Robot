@@ -69,7 +69,7 @@ public class RobotContainer {
 
   public RobotContainer(Robot robot) {
     m_arm.setStowSuppliers(
-      () -> m_intake.getCurrentCommand().getName().equals("intake") || m_intake.hasGamePiece(), 
+      () -> m_intake.isIntaking() || m_intake.hasGamePiece(), 
       () -> m_grabber.hasGamePiece() || !m_grabber.isAtZero(),
       m_buttonBox.hpModeSwitch
       );
@@ -93,6 +93,7 @@ public class RobotContainer {
       m_candleSubsystem.wantCubeFactory().schedule();
       m_intake.setCube();
     }
+    m_arm.resetMotionMagic();
     m_arm.resetStow();
     m_grabber.aim(0);
   }
@@ -187,6 +188,8 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+
+    m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));

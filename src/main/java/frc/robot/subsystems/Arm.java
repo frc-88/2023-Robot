@@ -221,6 +221,10 @@ public class Arm extends SubsystemBase {
         return DriverStation.isDisabled() && (!m_coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
     }
 
+    public void resetMotionMagic() {
+        m_allJoints.forEach((ArmJoint::stop));
+    }
+
     // COMMAND FACTORIES
 
     public CommandBase calibrateShoulderFactory() {
@@ -340,5 +344,7 @@ public class Arm extends SubsystemBase {
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
         SmartDashboard.putBoolean("Coast Mode Enabled", coastModeEnabled());
+        SmartDashboard.putString("Arm Target State", m_targetArmState.toString());
+        SmartDashboard.putString("Arm Stow", getCurrentStow().toString());
     }
 }

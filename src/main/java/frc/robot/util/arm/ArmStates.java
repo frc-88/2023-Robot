@@ -5,6 +5,7 @@ public class ArmStates {
     public static final ArmState stowForHP = new ArmState("Stow For HP", 80, -80, 70).makeStow();
     public static final ArmState stowFlat = new ArmState("Stow Flat", 10, -170, 10).makeStow();
     public static final ArmState stowForHandoff = new ArmState("Stow For Handoff", 10, -170, 10).makeStow();
+    public static final ArmState flat = new ArmState("Flat", 10, -170, 10).makeStow();
     public static final ArmState stowWithPiece = new ArmState("Stow With Piece", 10, -170, 10).makeStow();
     public static final ArmState getConeFromIntake1 = new ArmState("Get Cone From Intake 1", 40, -180.8, 0);
     public static final ArmState getConeFromIntake2 = new ArmState("Get Cone From Intake 2", 65.6, -125.5, 0);

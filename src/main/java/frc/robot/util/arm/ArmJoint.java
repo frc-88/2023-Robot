@@ -110,6 +110,10 @@ public class ArmJoint {
         m_motor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
+    public void stop() {
+        setPercentOutput(0);
+    }
+
     public WPI_TalonFX getMotor() {
         return m_motor;
     }
@@ -184,12 +188,15 @@ public class ArmJoint {
 
     public void zeroRelative() {
         if (m_motor.hasResetOccurred()) {
+            System.err.println(m_name + " has reset!");
             m_zeroed = false;
         }
         if (!m_zeroed && isCancoderPresent()) {
-            SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
+            System.out.println("Zeroing " + m_name);
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;
+        } else if (!m_zeroed) {
+            SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
         }
     }
 
