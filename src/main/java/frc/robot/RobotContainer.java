@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.AutoBalanceSimple;
+import frc.robot.commands.drive.FollowHolonomicTrajectory;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.Aiming;
+import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
@@ -297,6 +299,7 @@ public class RobotContainer {
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
+    SmartDashboard.putData("Auto Holonomic", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest.wpilib.json"), true));
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
