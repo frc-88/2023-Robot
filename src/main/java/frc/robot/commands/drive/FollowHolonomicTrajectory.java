@@ -53,10 +53,11 @@ public class FollowHolonomicTrajectory extends CommandBase {
   public void initialize() {
     m_cancel = false;
 
-    m_controller = new HolonomicDriveController(new PIDController(p_vxPID.getKP().getValue(), p_vxPID.getKI().getValue(), p_vxPID.getKD().getValue()),
-    new PIDController(p_vyPID.getKP().getValue(), p_vyPID.getKI().getValue(), p_vyPID.getKD().getValue()),
-    new ProfiledPIDController(p_thetaPID.getKP().getValue(), p_thetaPID.getKI().getValue(), p_thetaPID.getKD().getValue(), 
-    new TrapezoidProfile.Constraints(p_thetaMaxVelocity.getValue(), p_thetaMaxAcceleration.getValue())));
+    m_controller = new HolonomicDriveController(
+      new PIDController(p_vxPID.getKP().getValue(), p_vxPID.getKI().getValue(), p_vxPID.getKD().getValue()),
+      new PIDController(p_vyPID.getKP().getValue(), p_vyPID.getKI().getValue(), p_vyPID.getKD().getValue()),
+      new ProfiledPIDController(p_thetaPID.getKP().getValue(), p_thetaPID.getKI().getValue(), p_thetaPID.getKD().getValue(), 
+        new TrapezoidProfile.Constraints(p_thetaMaxVelocity.getValue(), p_thetaMaxAcceleration.getValue())));
 
     m_controller.setTolerance(new Pose2d(p_xTolerance.getValue(), p_yTolerance.getValue(), Rotation2d.fromDegrees(p_thetaTolerance.getValue())));
 
