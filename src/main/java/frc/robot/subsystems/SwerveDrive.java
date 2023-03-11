@@ -115,6 +115,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
         private Pose2d m_pose;
+        private boolean m_pivot = false;
         private boolean m_odometryReset = false;
 
         private Pose2d m_traj_pose;
@@ -311,7 +312,12 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
 
         public void drive(ChassisSpeeds chassisSpeeds) {
                 m_chassisSpeeds = chassisSpeeds;
-                SwerveModuleState[] states = kinematics.toSwerveModuleStates(m_chassisSpeeds);
+                SwerveModuleState[] states;
+                if (m_pivot) {
+                        states = kinematics.toSwerveModuleStates(m_chassisSpeeds, new Translation2d(-Constants.DRIVETRAIN_WHEELBASE_METERS/2, Constants.DRIVETRAIN_WHEELBASE_METERS/2));
+                } else {
+                        states = kinematics.toSwerveModuleStates(m_chassisSpeeds);
+                }
                 setModuleStates(states);
         }
 
@@ -378,6 +384,14 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         }
         public InstantCommand resetYawCommandFactory() {
                 return new InstantCommand(() -> {zeroGyroscope();});
+        }
+
+        public InstantCommand pivotOnCommandFactory() {
+                return new InstantCommand(() -> {m_pivot = true;});
+        }
+
+        public InstantCommand pivotOffCommandFactory() {
+                return new InstantCommand(() -> {m_pivot = false;});
         }
 
         private double deadband(double value, double deadband) {

@@ -21,6 +21,7 @@ public class AutoBalanceSimple extends CommandBase {
   private int m_lockedCounter;
   private int m_driveCounter;
   private boolean m_driving= false;
+  private double m_climbSpeed;
 
   private final SwerveModuleState [] LOCK_STATES = { 
     new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
@@ -29,12 +30,12 @@ public class AutoBalanceSimple extends CommandBase {
     new SwerveModuleState(0, Rotation2d.fromDegrees(90))
   };
 
-  private final DoublePreferenceConstant m_rollOffset = new DoublePreferenceConstant("Auto/Balance/Roll Offset", 0.0);
-  private final DoublePreferenceConstant m_levelThreshold = new DoublePreferenceConstant("Auto/Balance/Level Theshold", 4.0);
-  private final DoublePreferenceConstant m_movingThreshold = new DoublePreferenceConstant("Auto/Balance/Moving Theshold", 0.2);
-  private final IntPreferenceConstant m_lockMin = new IntPreferenceConstant("Auto/Balance/Lock Min", 10);
-  private final DoublePreferenceConstant m_climbSpeed = new DoublePreferenceConstant("Auto/Balance/Climb Speed", 0.5);
-  private final DoublePreferenceConstant m_climbMaxDistance = new DoublePreferenceConstant("Auto/Balance/Climb Max", 1.5);
+  private final DoublePreferenceConstant p_rollOffset = new DoublePreferenceConstant("Auto/Balance/Roll Offset", 0.0);
+  private final DoublePreferenceConstant p_levelThreshold = new DoublePreferenceConstant("Auto/Balance/Level Theshold", 4.0);
+  private final DoublePreferenceConstant p_movingThreshold = new DoublePreferenceConstant("Auto/Balance/Moving Theshold", 0.2);
+  private final IntPreferenceConstant p_lockMin = new IntPreferenceConstant("Auto/Balance/Lock Min", 10);
+  private final DoublePreferenceConstant p_initialClimbSpeed = new DoublePreferenceConstant("Auto/Balance/Climb Speed", 0.5);
+  private final DoublePreferenceConstant p_climbMaxDistance = new DoublePreferenceConstant("Auto/Balance/Climb Max", 1.5);
 
   public AutoBalanceSimple(SwerveDrive drive) {
     m_drive = drive;
@@ -46,6 +47,7 @@ public class AutoBalanceSimple extends CommandBase {
   public void initialize() {
     m_startPose = m_drive.getOdometryPose();
     m_lastAngle = getChargeStationAngle();
+    m_climbSpeed = p_initialClimbSpeed.getValue();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -57,25 +59,26 @@ public class AutoBalanceSimple extends CommandBase {
     
     SmartDashboard.putNumber("Auto:currentAngle", currentAngle);
     SmartDashboard.putNumber("Auto:deltaAngle", deltaAngle);
+    SmartDashboard.putNumber("Auto:climbSpeed", m_climbSpeed);
 
     if (m_driving) m_driveCounter++;
 
-    if (Math.abs(currentAngle) < m_levelThreshold.getValue()) {
+    if (Math.abs(currentAngle) < p_levelThreshold.getValue()) {
       // if the angle is level, lock in place
       SmartDashboard.putNumber("Auto:condition", 0);
       m_lockedCounter = 0;
       lock();
-    } else if (Math.abs(deltaAngle) > m_movingThreshold.getValue() && (m_driving && m_driveCounter > 15 || !m_driving)) {
+    } else if (Math.abs(deltaAngle) > p_movingThreshold.getValue() && (m_driving && m_driveCounter > 15 || !m_driving)) {
       // if the angle is moving, lock in place
       SmartDashboard.putNumber("Auto:condition", 1);
       m_lockedCounter = 0;
       lock();
-    } else if (m_drive.getOdometryPose().getTranslation().getDistance(m_startPose.getTranslation()) > m_climbMaxDistance.getValue() ) {
+    } else if (m_drive.getOdometryPose().getTranslation().getDistance(m_startPose.getTranslation()) > p_climbMaxDistance.getValue() ) {
       // if we have driven too far from where we began, lock in place
       SmartDashboard.putNumber("Auto:condition", 2);
       m_lockedCounter = 0;
       lock();
-    } else if (m_lockedCounter< m_lockMin.getValue()) {
+    } else if (m_lockedCounter< p_lockMin.getValue()) {
       // if we recently locked, stay locked
       m_lockedCounter++;
       lock();
@@ -85,7 +88,7 @@ public class AutoBalanceSimple extends CommandBase {
         m_driving = true;
         m_driveCounter = 0;
       }
-      m_drive.drive(m_climbSpeed.getValue() * Math.signum(currentAngle), 0, 0);
+      m_drive.drive(m_climbSpeed * Math.signum(currentAngle), 0, 0);
     }
 
   }
@@ -106,11 +109,12 @@ public class AutoBalanceSimple extends CommandBase {
     // double roll = m_drive.getNavX().getRoll();
     // return (pitch*-Math.cos(Math.toRadians(yaw)))+(roll*Math.sin(Math.toRadians(yaw)));
     // trying something simple first:
-    return m_drive.getNavX().getRoll() - m_rollOffset.getValue();
+    return m_drive.getNavX().getRoll() - p_rollOffset.getValue();
   }
 
   private void lock() {
     m_driving =  false;
+    m_climbSpeed = m_climbSpeed / 2.0;
     m_drive.setModuleStates(LOCK_STATES);
   }
 }
