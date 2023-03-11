@@ -118,20 +118,20 @@ public class ArmJoint {
         return m_motor;
     }
 
-    public void setMotionMagic(double angle, double speed) {
+    public void setMotionMagic(double angle, double speed, double acceleration) {
         if (!m_zeroed) {
             setPercentOutput(0);
             return;
         }
         
         m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(speed));
-        m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue() * speed / p_maxVelocity.getValue()));
+        m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(acceleration));
         
         m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle), DemandType.ArbitraryFeedForward, p_gravityCompensation.getValue() * Math.cos(Math.toRadians(getAngle())));
     }
 
     public void setMotionMagic(double angle) {
-        setMotionMagic(angle, p_maxVelocity.getValue());
+        setMotionMagic(angle, p_maxVelocity.getValue(), p_maxAcceleration.getValue());
     }
 
     public void coast() {

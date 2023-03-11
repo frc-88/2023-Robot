@@ -163,7 +163,7 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
-    public void goToArmState(ArmState armState) {
+    public void goToArmState(ArmState armState, double acceleration) {
         if (!isValidState(armState)) return;
 
         double shoulderAngle = armState.getShoulderAngle();
@@ -178,12 +178,16 @@ public class Arm extends SubsystemBase {
             Math.abs(shoulderAngle-m_shoulder.getAngle()), 
             Math.abs(elbowAngle-m_elbow.getAngle()), 
             Math.abs(wristAngle-m_wrist.getAngle())}));
+        double shoulderFactor = Math.abs(m_shoulder.getAngle() - shoulderAngle) / greatestAngle;
+        double elbowFactor = Math.abs(m_elbow.getAngle() - elbowAngle) / greatestAngle;
+        double wristFactor = Math.abs(m_wrist.getAngle() - wristAngle) / greatestAngle;
+
 
         if (greatestAngle > 2) {
             // Keep max velocities the same or change this
-            m_shoulder.setMotionMagic(shoulderAngle, m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - shoulderAngle) / greatestAngle);
-            m_elbow.setMotionMagic(elbowAngle, m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - elbowAngle) / greatestAngle);
-            m_wrist.setMotionMagic(wristAngle, m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - wristAngle) / greatestAngle);
+            m_shoulder.setMotionMagic(shoulderAngle, m_shoulder.getMaxVelocity() * shoulderFactor, acceleration * shoulderFactor);
+            m_elbow.setMotionMagic(elbowAngle, m_elbow.getMaxVelocity() * elbowFactor, acceleration * elbowFactor);
+            m_wrist.setMotionMagic(wristAngle, m_wrist.getMaxVelocity() * wristFactor, acceleration * wristFactor);
         } else {
             m_shoulder.setMotionMagic(shoulderAngle);
             m_elbow.setMotionMagic(elbowAngle);
@@ -252,17 +256,26 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase stowSimple() {
-        return new RunCommand(() -> {
-            goToArmState(getCurrentStow());
-            m_targetArmState = getCurrentStow();
-        });
+        return new CommandBase() {
+            double m_acceleration;
+            @Override
+            public void initialize() {
+                m_acceleration = m_targetArmState.getAcceleration();
+                m_targetArmState = getCurrentStow();
+            }
+
+            public void execute() {
+                goToArmState(getCurrentStow(), m_acceleration);
+            }
+        };
     }
 
-    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance) {
+    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance, double acceleration, BooleanSupplier unless) {
         CommandBase command = initialCommand;
         for (ArmState intermediary : intermediaries) {
-            command = new RunCommand(() -> goToArmState(intermediary), this)
+            command = new RunCommand(() -> goToArmState(intermediary, acceleration), this)
                 .until(() -> isAtTarget(intermediary, tolerance))
+                .unless(unless)
                 .andThen(command);
         }
         return command;
@@ -272,20 +285,24 @@ public class Arm extends SubsystemBase {
         return chainIntermediaries(
             stowSimple(),
             from.getRetractIntermediaries(),
-            from.getRetractIntermediaryTolerance()
+            from.getRetractIntermediaryTolerance(),
+            from.getAcceleration(),
+            () -> false
         ).andThen(new InstantCommand(this::resetStow));
     }
 
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
         if (armState.isStow()) {
-            CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
+            CommandBase command = new ProxyCommand(() -> isAtTarget(m_targetArmState, 15) ? m_stowCommand : stowSimple()).until(until);
             command.addRequirements(this);
             return command;
         } else {
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, armState.getAcceleration()), this).until(until)),
                 armState.getDeployIntermediaries(),
-                armState.getDeployIntermediaryTolerance()
+                armState.getDeployIntermediaryTolerance(),
+                armState.getAcceleration(),
+                () -> !isAtTarget(ArmStates.stowFlat, 15) && !isAtTarget(ArmStates.stowForHP, 15) && !isAtTarget(ArmStates.stowWithPiece, 15) && !isAtTarget(ArmStates.stowForHandoff, 15)
             );
             command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
             return command;
@@ -293,7 +310,7 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase holdTargetState() {
-        return new RunCommand(() -> goToArmState(m_targetArmState), this);
+        return new RunCommand(() -> goToArmState(m_targetArmState, m_targetArmState.getAcceleration()), this);
     }
 
     public CommandBase sendArmToState(ArmState armState) {
