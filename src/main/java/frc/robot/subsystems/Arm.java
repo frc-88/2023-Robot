@@ -32,6 +32,10 @@ import frc.robot.util.arm.ArmStates;
 
 public class Arm extends SubsystemBase {
     
+    private BooleanSupplier m_isIntaking = () -> false;
+    private BooleanSupplier m_hasGamePiece = () -> false;
+    private BooleanSupplier m_hpMode = () -> false;
+
     private final DigitalInput m_coastButton;
 
     public final ArmJoint m_shoulder;
@@ -39,7 +43,7 @@ public class Arm extends SubsystemBase {
     public final ArmJoint m_wrist;
     public final Translation2d m_shoulderPosition;
 
-    private ArmState m_targetArmState = ArmStates.stow;
+    private ArmState m_targetArmState;
     private List<ArmJoint> m_allJoints;
     private CommandBase m_stowCommand;
 
@@ -56,7 +60,7 @@ public class Arm extends SubsystemBase {
         m_wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, true, (16./42.) * (1./49.), 25.5, 270);
         m_shoulderPosition = new Translation2d(3, 18.5);
 
-        m_targetArmState = ArmStates.stow;
+        m_targetArmState = getCurrentStow();
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
 
         SmartDashboard.putBoolean("Coast Arm", false);
@@ -64,8 +68,14 @@ public class Arm extends SubsystemBase {
         resetStow();
     }
 
+    public void setStowSuppliers(BooleanSupplier isIntaking, BooleanSupplier hasGamePiece, BooleanSupplier hpMode) {
+        m_isIntaking = isIntaking;
+        m_hasGamePiece = hasGamePiece;
+        m_hpMode = hpMode;
+    }
+
     public void resetStow() {
-        m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow)).alongWith(new InstantCommand(() -> m_targetArmState = ArmStates.stow));
+        m_stowCommand = stowSimple();
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
@@ -199,6 +209,10 @@ public class Arm extends SubsystemBase {
         return isAtTarget(state, () -> tolerance);
     }
 
+    public boolean isAtTarget(double tolerance) {
+        return isAtTarget(m_targetArmState, tolerance);
+    }
+
     public boolean isStowed() {
         return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 30);
     }
@@ -221,6 +235,25 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
+    public ArmState getCurrentStow() {
+        if (m_hasGamePiece.getAsBoolean()) {
+            return ArmStates.stowWithPiece;
+        } else if (m_isIntaking.getAsBoolean()) {
+            return ArmStates.stowForHandoff;
+        } else if (m_hpMode.getAsBoolean()) {
+            return ArmStates.stowForHP;
+        } else {
+            return ArmStates.stowFlat;
+        }
+    }
+
+    public CommandBase stowSimple() {
+        return new RunCommand(() -> {
+            goToArmState(getCurrentStow());
+            m_targetArmState = getCurrentStow();
+        });
+    }
+
     private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance) {
         CommandBase command = initialCommand;
         for (ArmState intermediary : intermediaries) {
@@ -232,12 +265,10 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase stowFrom(ArmState from) {
-        return new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
-            chainIntermediaries(
-                new RunCommand(() -> goToArmState(ArmStates.stow)),
-                from.getRetractIntermediaries(),
-                from.getRetractIntermediaryTolerance()
-            )
+        return chainIntermediaries(
+            stowSimple(),
+            from.getRetractIntermediaries(),
+            from.getRetractIntermediaryTolerance()
         ).andThen(new InstantCommand(this::resetStow));
     }
 

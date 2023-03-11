@@ -193,7 +193,7 @@ public class Intake extends SubsystemBase {
         && m_irValue < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue()));
     }
 
-    private boolean hasGamePiece() {
+    public boolean hasGamePiece() {
       return m_hasGamePieceDebounce.calculate(m_irValue > irSensorHasPiece.getValue());
     }
     

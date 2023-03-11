@@ -137,6 +137,10 @@ public class Grabber extends SubsystemBase {
     m_pivotForwards = false;
   }
 
+  public boolean isAtZero() {
+    return Math.abs(getPivotAngle()) < 5;
+  }
+
   private void movePivot() {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
