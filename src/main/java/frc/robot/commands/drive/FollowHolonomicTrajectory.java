@@ -9,6 +9,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -21,9 +23,12 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
 public class FollowHolonomicTrajectory extends CommandBase {
   private final SwerveDrive m_drive;
-  private final HolonomicDriveController m_controller;
   private final Trajectory m_trajectory;
+  private final boolean m_resetOdometry;
+
+  private final HolonomicDriveController m_controller;
   private final Timer m_timer = new Timer();
+  private boolean m_cancel = false;
 
   private final PIDPreferenceConstants p_vxPID;
   private final PIDPreferenceConstants p_vyPID;
@@ -35,9 +40,10 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private final DoublePreferenceConstant p_thetaTolerance;
 
   /** Creates a new FollowHolonomicTrajectory. */
-  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory) {
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
     m_drive = drive;
     m_trajectory = trajectory;
+    m_resetOdometry = resetOdometry;
 
     p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
     p_vyPID = new PIDPreferenceConstants("Auto/vyPID/");
@@ -61,6 +67,16 @@ public class FollowHolonomicTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_cancel = false;
+    if (m_resetOdometry) {
+      m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
+    } else {
+      Transform2d offset = m_drive.getOdometryPose().minus(m_trajectory.getInitialPose());
+      if (offset.getTranslation().getDistance(new Translation2d()) > 1.0 || offset.getRotation().getDegrees() > 45.0 ) {
+        m_cancel = true;
+      }
+    }
+
     m_controller.setEnabled(true);
     m_timer.reset();
     m_timer.start();
@@ -85,7 +101,7 @@ public class FollowHolonomicTrajectory extends CommandBase {
     SmartDashboard.putNumber("Auto:Commanded vY", targetSpeeds.vyMetersPerSecond);
     SmartDashboard.putNumber("Auto:Commanded omega", targetSpeeds.omegaRadiansPerSecond);
 
-    m_drive.drive(targetSpeeds);
+    if (!m_cancel) m_drive.drive(targetSpeeds);
   }
 
   // Called once the command ends or is interrupted.
@@ -96,6 +112,6 @@ public class FollowHolonomicTrajectory extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_controller.atReference();
+    return m_controller.atReference() || m_cancel;
   }
 }
