@@ -50,6 +50,10 @@ public class FollowHolonomicTrajectory extends CommandBase {
     addRequirements(m_drive);
   }
 
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
+    this(drive, trajectory, new Rotation2d(), new Rotation2d(), resetOdometry);
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
