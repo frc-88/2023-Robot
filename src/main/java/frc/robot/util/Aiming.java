@@ -1,16 +1,16 @@
 package frc.robot.util;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.GameObjectManager;
 import frc.robot.subsystems.Grabber;
-import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
@@ -21,17 +21,19 @@ public class Aiming {
     public Grabber m_grabber;
     public ScorpionTable m_ros;
     public GameObjectManager m_objects;
+    public BooleanSupplier m_enabled;
 
     private final DoublePreferenceConstant p_aimHeight
         = new DoublePreferenceConstant("Aiming/Height", 8.);
     private final DoublePreferenceConstant p_aimAdjustY
         = new DoublePreferenceConstant("Aiming/AdjustY", 0);
     
-    public Aiming(Arm arm, Grabber grabber, ScorpionTable ros, GameObjectManager objectManager) {
+    public Aiming(Arm arm, Grabber grabber, ScorpionTable ros, GameObjectManager objectManager, BooleanSupplier enabled) {
         m_arm = arm;
         m_grabber = grabber;
         m_ros = ros;
         m_objects = objectManager;
+        m_enabled = enabled;
     }
 
     public Pose2d getNearestScorePoint(Pose2d botPose) {

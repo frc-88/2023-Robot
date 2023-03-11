@@ -40,6 +40,13 @@ import frc.robot.util.controllers.ButtonBox;
 public class RobotContainer {
 
   /////////////////////////////////////////////////////////////////////////////
+  //                              CONTROLLERS                                //
+  /////////////////////////////////////////////////////////////////////////////
+
+  private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
+  private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
+
+  /////////////////////////////////////////////////////////////////////////////
   //                              SUBSYSTEMS                                 //
   /////////////////////////////////////////////////////////////////////////////
 
@@ -52,14 +59,7 @@ public class RobotContainer {
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
   private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight_back);
-  private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor, m_manager);
-
-  /////////////////////////////////////////////////////////////////////////////
-  //                              CONTROLLERS                                //
-  /////////////////////////////////////////////////////////////////////////////
-
-  private final DriverController m_driverController = new FrskyDriverController(Constants.DRIVER_CONTROLLER_ID);
-  private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
+  private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              AUTONOMOUS                                 //

@@ -146,7 +146,7 @@ public class Grabber extends SubsystemBase {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition  + m_aimAngle));
+    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition  - m_aimAngle));
   }
 
   private void lockPivot() {
@@ -311,7 +311,7 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_pivot.hasResetOccurred()) {
+    if (m_pivot.hasResetOccurred() || getPivotSpeed() < 5 && Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) > 15) {
       zeroRelativePivot();
     }
 
