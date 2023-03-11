@@ -104,12 +104,6 @@ public class Autonomous {
         );
     }
 
-    public static SequentialCommandGroup blueEngage(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
-        return new SequentialCommandGroup(
-            new WaitCommand(1)
-        );
-    }
-
     public static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             center3(alliance, drive, intake, arm, grabber, candle, source),
