@@ -138,6 +138,10 @@ public class Grabber extends SubsystemBase {
     m_pivotForwards = false;
   }
 
+  public boolean isAtZero() {
+    return Math.abs(getPivotAngle()) < 5;
+  }
+
   private void movePivot() {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
@@ -240,19 +244,19 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase grabConeFactory() {
-    return new RunCommand(() -> {grabCone(); movePivot(); lockPivot();}, this).withName("Grab Cone");
+    return new RunCommand(() -> {grabCone(); movePivot(); unlockPivot();}, this).withName("Grab Cone");
   }
 
   public CommandBase grabCubeFactory() {
-    return new RunCommand(() -> {grabCube(); movePivot(); lockPivot();}, this).withName("Grab Cube");
+    return new RunCommand(() -> {grabCube(); movePivot(); unlockPivot();}, this).withName("Grab Cube");
   }
 
   public CommandBase dropConeFactory() {
-    return new RunCommand(() -> {dropCone(); movePivot(); lockPivot();}, this).withName("Drop Cone");
+    return new RunCommand(() -> {dropCone(); movePivot(); unlockPivot();}, this).withName("Drop Cone");
   }
 
   public CommandBase dropCubeFactory() {
-    return new RunCommand(() -> {dropCube(); movePivot(); lockPivot();}, this).withName("Drop Cube");
+    return new RunCommand(() -> {dropCube(); movePivot(); unlockPivot();}, this).withName("Drop Cube");
   }
 
   public CommandBase holdConeFactory() {

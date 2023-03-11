@@ -19,6 +19,7 @@ public class ButtonBox extends Joystick {
     private static int FORCE_PIVOT_FORWARDS = 25;
     private static int FORCE_PIVOT_BACKWARDS = 24;
     private static int DISABLE_AIMING = 23;
+    private static int HP_MODE = 22;
 
 
 	public ButtonBox(int port) {
@@ -38,6 +39,7 @@ public class ButtonBox extends Joystick {
     public Trigger forcePivotForwardsSwitch = new JoystickButton(this, FORCE_PIVOT_FORWARDS);
     public Trigger forcePivotBackwardsSwitch = new JoystickButton(this, FORCE_PIVOT_BACKWARDS);
     public Trigger disableAimingSwitch = new JoystickButton(this, DISABLE_AIMING);
+    public Trigger hpModeSwitch = new JoystickButton(this, HP_MODE);
 
 	public boolean isIntakeButtonPressed() {
 		return intakeButton.getAsBoolean();

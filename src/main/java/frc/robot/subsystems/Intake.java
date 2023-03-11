@@ -92,6 +92,7 @@ public class Intake extends SubsystemBase {
   private double m_irValue = 0;
 
   private boolean m_coneMode = false;
+  private boolean m_isIntaking = false;
 
   /** Creates a new Intake. */
   public Intake() {
@@ -193,12 +194,16 @@ public class Intake extends SubsystemBase {
         && m_irValue < (m_coneMode ? irSensorConeMax.getValue() : irSensorCubeMax.getValue()));
     }
 
-    private boolean hasGamePiece() {
+    public boolean hasGamePiece() {
       return m_hasGamePieceDebounce.calculate(m_irValue > irSensorHasPiece.getValue());
     }
     
     public Trigger holdAndHasPiece() {
       return new Trigger(() -> isArmUp() && hasGamePieceCentered());
+    }
+
+    public boolean isIntaking() {
+      return m_isIntaking;
     }
 
     ////////// Commands :) /////////
@@ -222,24 +227,24 @@ public class Intake extends SubsystemBase {
         .until(this::hasGamePieceCentered)
         .andThen(new RunCommand(() -> {hold(); armDown();}, this)
           .withTimeout(0.4));
-      return new ConditionalCommand(coneCommand, cubeCommand, () -> m_coneMode)
+      return new ConditionalCommand(coneCommand, cubeCommand, () -> m_coneMode).alongWith(new InstantCommand(() -> m_isIntaking = true)).andThen(new InstantCommand(() -> m_isIntaking = false))
           .withName("intake");
     }
 
     public CommandBase outgestFactory() {
-      return new RunCommand(() -> {outgest(); armDown();}, this).withName("outgest"); 
+      return new RunCommand(() -> {outgest(); armDown();}, this).withName("outgest").alongWith(new InstantCommand(() -> m_isIntaking = false)); 
     }
 
     public CommandBase stowFactory() {
-      return new RunCommand(() -> {hold(); armUp();}, this).withName("stow");
+      return new RunCommand(() -> {hold(); armUp();}, this).withName("stow").alongWith(new InstantCommand(() -> m_isIntaking = false));
     }
 
     public CommandBase handoffFactory() {
-      return new RunCommand (() -> {outgest(); armUp();}, this).withName("handoff");
+      return new RunCommand (() -> {outgest(); armUp();}, this).withName("handoff").alongWith(new InstantCommand(() -> m_isIntaking = false));
     }
 
     public CommandBase downFactory() {
-      return new RunCommand(() -> {hold(); armDown();}, this).withName("down");
+      return new RunCommand(() -> {hold(); armDown();}, this).withName("down").alongWith(new InstantCommand(() -> m_isIntaking = false));
     }
 
   @Override

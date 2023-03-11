@@ -32,6 +32,10 @@ import frc.robot.util.arm.ArmStates;
 
 public class Arm extends SubsystemBase {
     
+    private BooleanSupplier m_isIntaking = () -> false;
+    private BooleanSupplier m_hasGamePiece = () -> false;
+    private BooleanSupplier m_hpMode = () -> false;
+
     private final DigitalInput m_coastButton;
 
     public final ArmJoint m_shoulder;
@@ -39,7 +43,7 @@ public class Arm extends SubsystemBase {
     public final ArmJoint m_wrist;
     public final Translation2d m_shoulderPosition;
 
-    private ArmState m_targetArmState = ArmStates.stow;
+    private ArmState m_targetArmState;
     private List<ArmJoint> m_allJoints;
     private CommandBase m_stowCommand;
 
@@ -56,7 +60,7 @@ public class Arm extends SubsystemBase {
         m_wrist = new ArmJoint("Wrist", Constants.WRIST_ID, Constants.WRIST_ENCODER_ID, true, true, (16./42.) * (1./49.), 25.5, 270);
         m_shoulderPosition = new Translation2d(3, 18.5);
 
-        m_targetArmState = ArmStates.stow;
+        m_targetArmState = getCurrentStow();
         m_allJoints = Arrays.asList(new ArmJoint[]{m_shoulder, m_elbow, m_wrist});
 
         SmartDashboard.putBoolean("Coast Arm", false);
@@ -64,8 +68,14 @@ public class Arm extends SubsystemBase {
         resetStow();
     }
 
+    public void setStowSuppliers(BooleanSupplier isIntaking, BooleanSupplier hasGamePiece, BooleanSupplier hpMode) {
+        m_isIntaking = isIntaking;
+        m_hasGamePiece = hasGamePiece;
+        m_hpMode = hpMode;
+    }
+
     public void resetStow() {
-        m_stowCommand = new RunCommand(() -> goToArmState(ArmStates.stow)).alongWith(new InstantCommand(() -> m_targetArmState = ArmStates.stow));
+        m_stowCommand = stowSimple();
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
@@ -153,7 +163,7 @@ public class Arm extends SubsystemBase {
         return true;
     }
 
-    public void goToArmState(ArmState armState) {
+    public void goToArmState(ArmState armState, double acceleration) {
         if (!isValidState(armState)) return;
 
         double shoulderAngle = armState.getShoulderAngle();
@@ -168,12 +178,16 @@ public class Arm extends SubsystemBase {
             Math.abs(shoulderAngle-m_shoulder.getAngle()), 
             Math.abs(elbowAngle-m_elbow.getAngle()), 
             Math.abs(wristAngle-m_wrist.getAngle())}));
+        double shoulderFactor = Math.abs(m_shoulder.getAngle() - shoulderAngle) / greatestAngle;
+        double elbowFactor = Math.abs(m_elbow.getAngle() - elbowAngle) / greatestAngle;
+        double wristFactor = Math.abs(m_wrist.getAngle() - wristAngle) / greatestAngle;
+
 
         if (greatestAngle > 2) {
             // Keep max velocities the same or change this
-            m_shoulder.setMotionMagic(shoulderAngle, m_shoulder.getMaxVelocity() * Math.abs(m_shoulder.getAngle() - shoulderAngle) / greatestAngle);
-            m_elbow.setMotionMagic(elbowAngle, m_elbow.getMaxVelocity() * Math.abs(m_elbow.getAngle() - elbowAngle) / greatestAngle);
-            m_wrist.setMotionMagic(wristAngle, m_wrist.getMaxVelocity() * Math.abs(m_wrist.getAngle() - wristAngle) / greatestAngle);
+            m_shoulder.setMotionMagic(shoulderAngle, m_shoulder.getMaxVelocity() * shoulderFactor, acceleration * shoulderFactor);
+            m_elbow.setMotionMagic(elbowAngle, m_elbow.getMaxVelocity() * elbowFactor, acceleration * elbowFactor);
+            m_wrist.setMotionMagic(wristAngle, m_wrist.getMaxVelocity() * wristFactor, acceleration * wristFactor);
         } else {
             m_shoulder.setMotionMagic(shoulderAngle);
             m_elbow.setMotionMagic(elbowAngle);
@@ -199,12 +213,20 @@ public class Arm extends SubsystemBase {
         return isAtTarget(state, () -> tolerance);
     }
 
+    public boolean isAtTarget(double tolerance) {
+        return isAtTarget(m_targetArmState, tolerance);
+    }
+
     public boolean isStowed() {
         return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 30);
     }
 
     public boolean coastModeEnabled() {
         return DriverStation.isDisabled() && (!m_coastButton.get() || SmartDashboard.getBoolean("Coast Arm", false));
+    }
+
+    public void resetMotionMagic() {
+        m_allJoints.forEach((ArmJoint::stop));
     }
 
     // COMMAND FACTORIES
@@ -221,36 +243,66 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
     }
 
-    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance) {
+    public ArmState getCurrentStow() {
+        if (m_hasGamePiece.getAsBoolean()) {
+            return ArmStates.stowWithPiece;
+        } else if (m_isIntaking.getAsBoolean()) {
+            return ArmStates.stowForHandoff;
+        } else if (m_hpMode.getAsBoolean()) {
+            return ArmStates.stowForHP;
+        } else {
+            return ArmStates.stowFlat;
+        }
+    }
+
+    public CommandBase stowSimple() {
+        return new CommandBase() {
+            double m_acceleration;
+            @Override
+            public void initialize() {
+                m_acceleration = m_targetArmState.getAcceleration();
+                m_targetArmState = getCurrentStow();
+            }
+
+            public void execute() {
+                goToArmState(getCurrentStow(), m_acceleration);
+            }
+        };
+    }
+
+    private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance, double acceleration, BooleanSupplier unless) {
         CommandBase command = initialCommand;
         for (ArmState intermediary : intermediaries) {
-            command = new RunCommand(() -> goToArmState(intermediary), this)
+            command = new RunCommand(() -> goToArmState(intermediary, acceleration), this)
                 .until(() -> isAtTarget(intermediary, tolerance))
+                .unless(unless)
                 .andThen(command);
         }
         return command;
     }
 
     public CommandBase stowFrom(ArmState from) {
-        return new InstantCommand(() -> {m_targetArmState = ArmStates.stow;}).alongWith(
-            chainIntermediaries(
-                new RunCommand(() -> goToArmState(ArmStates.stow)),
-                from.getRetractIntermediaries(),
-                from.getRetractIntermediaryTolerance()
-            )
+        return chainIntermediaries(
+            stowSimple(),
+            from.getRetractIntermediaries(),
+            from.getRetractIntermediaryTolerance(),
+            from.getAcceleration(),
+            () -> false
         ).andThen(new InstantCommand(this::resetStow));
     }
 
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
         if (armState.isStow()) {
-            CommandBase command = new ProxyCommand(() -> m_stowCommand).until(until);
+            CommandBase command = new ProxyCommand(() -> isAtTarget(m_targetArmState, 15) ? m_stowCommand : stowSimple()).until(until);
             command.addRequirements(this);
             return command;
         } else {
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, armState.getAcceleration()), this).until(until)),
                 armState.getDeployIntermediaries(),
-                armState.getDeployIntermediaryTolerance()
+                armState.getDeployIntermediaryTolerance(),
+                armState.getAcceleration(),
+                () -> !isAtTarget(ArmStates.stowFlat, 15) && !isAtTarget(ArmStates.stowForHP, 15) && !isAtTarget(ArmStates.stowWithPiece, 15) && !isAtTarget(ArmStates.stowForHandoff, 15)
             );
             command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
             return command;
@@ -258,7 +310,7 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase holdTargetState() {
-        return new RunCommand(() -> goToArmState(m_targetArmState), this);
+        return new RunCommand(() -> goToArmState(m_targetArmState, m_targetArmState.getAcceleration()), this);
     }
 
     public CommandBase sendArmToState(ArmState armState) {
@@ -309,5 +361,7 @@ public class Arm extends SubsystemBase {
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putNumber(j.getName() + " Absolute Angle", j.getAbsoluteAngle()));
         m_allJoints.forEach((ArmJoint j) -> SmartDashboard.putBoolean(j.getName() + " Is Zeroed", j.isZeroed()));
         SmartDashboard.putBoolean("Coast Mode Enabled", coastModeEnabled());
+        SmartDashboard.putString("Arm Target State", m_targetArmState.toString());
+        SmartDashboard.putString("Arm Stow", getCurrentStow().toString());
     }
 }
