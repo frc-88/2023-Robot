@@ -24,6 +24,7 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 public class FollowHolonomicTrajectory extends CommandBase {
   private final SwerveDrive m_drive;
   private final Trajectory m_trajectory;
+  private final Rotation2d m_rotation;
   private final boolean m_resetOdometry;
   private final Timer m_timer = new Timer();
 
@@ -40,9 +41,10 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private boolean m_cancel = false;
 
   /** Creates a new FollowHolonomicTrajectory. */
-  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, Rotation2d startRotation,  Rotation2d endRotation, boolean resetOdometry) {
     m_drive = drive;
     m_trajectory = trajectory;
+    m_rotation = endRotation.minus(startRotation);
     m_resetOdometry = resetOdometry;
 
     addRequirements(m_drive);
@@ -80,7 +82,9 @@ public class FollowHolonomicTrajectory extends CommandBase {
   public void execute() {
     Pose2d currentPose = m_drive.getOdometryPose();
     Trajectory.State desiredState = m_trajectory.sample(m_timer.get());
-    ChassisSpeeds targetSpeeds = m_controller.calculate(currentPose, desiredState, new Rotation2d());
+    Rotation2d targetRotation = new Rotation2d(m_timer.get() * m_rotation.getRadians() / m_trajectory.getTotalTimeSeconds());
+
+    ChassisSpeeds targetSpeeds = m_controller.calculate(currentPose, desiredState, targetRotation);
 
     SmartDashboard.putNumber("Auto:Measured vX", m_drive.getChassisSpeeds().vxMetersPerSecond);
     SmartDashboard.putNumber("Auto:Measured vY", m_drive.getChassisSpeeds().vyMetersPerSecond);
@@ -105,6 +109,6 @@ public class FollowHolonomicTrajectory extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_controller.atReference() || m_cancel;
+    return  m_timer.get() > m_trajectory.getTotalTimeSeconds() || m_cancel;
   }
 }
