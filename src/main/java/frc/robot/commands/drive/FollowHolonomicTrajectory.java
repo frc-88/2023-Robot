@@ -71,7 +71,8 @@ public class FollowHolonomicTrajectory extends CommandBase {
       m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
     } else {
       Transform2d offset = m_drive.getOdometryPose().minus(m_trajectory.getInitialPose());
-      if (offset.getTranslation().getDistance(new Translation2d()) > 1.0 || offset.getRotation().getDegrees() > 45.0 ) {
+      if (offset.getTranslation().getDistance(new Translation2d()) > 3.0 || offset.getRotation().getDegrees() > 45.0 ) {
+        System.out.println("!!!canceling holomic trajectory!!!");
         m_cancel = true;
       }
     }
