@@ -17,7 +17,6 @@ public class ButtonBox extends Joystick {
     private static int SET_FLAT = 19;
     private static int GAMEPIECE_SWITCH = 17;
     private static int FORCE_PIVOT_FORWARDS = 25;
-    private static int FORCE_PIVOT_BACKWARDS = 24;
     private static int ENABLE_AIMING = 23;
     private static int HP_MODE = 22;
 

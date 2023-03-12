@@ -140,9 +140,14 @@ public class RobotContainer {
       m_autoCommandName = "Center3Balance";
     }
 
-    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Over")) {
-      m_autoCommand = Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Over";
+    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Charge1.5")) {
+      m_autoCommand = Autonomous.charge1balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Charge1.5";
+    }
+
+    if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("WallSide")) {
+      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "WallSide";
     }
 
     SmartDashboard.putString("Auto", m_autoCommandName);
@@ -214,7 +219,7 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
         .whileTrue(m_aiming.aimGrabberFactory(0));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
         .whileTrue(m_aiming.aimGrabberFactory(0));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
@@ -324,11 +329,13 @@ public class RobotContainer {
     // Autonomous
     SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
-    SmartDashboard.putData("AutoROS Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Engage", Autonomous.redEngage(m_drive, m_arm, m_grabber, m_limelight_back));
+    SmartDashboard.putData("AutoROS Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor));
+    SmartDashboard.putData("AutoLL Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_limelight_back));
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
+    SmartDashboard.putData("Auto Wall 2", Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
+
     SmartDashboard.putData("Auto Holonomic", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest.wpilib.json"), new Rotation2d(), new Rotation2d(), true));
     SmartDashboard.putData("Auto Holonomic2", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest2.wpilib.json"), new Rotation2d(), Rotation2d.fromDegrees(35), true));
 
