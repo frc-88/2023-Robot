@@ -219,7 +219,7 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
         .whileTrue(m_aiming.aimGrabberFactory(0));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
         .whileTrue(m_aiming.aimGrabberFactory(0));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
