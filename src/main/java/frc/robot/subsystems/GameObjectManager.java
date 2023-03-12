@@ -71,8 +71,6 @@ public class GameObjectManager extends SubsystemBase {
         else if(DriverStation.getAlliance() == Alliance.Red) { 
             gridZones = redGridZones;
         }
-        System.out.println("redgridzone size: " +redGridZones.size());
-        System.out.println("bluegridzone size: " +blueGridZones.size());
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {

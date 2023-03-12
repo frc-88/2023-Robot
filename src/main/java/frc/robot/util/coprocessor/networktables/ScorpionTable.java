@@ -124,8 +124,8 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         // double z = pose.value[3];
         double theta = pose.value[4];
         tagGlobalPose = new Pose2d(x, y, new Rotation2d(theta));
-        swerve.addVisionPoseUpdate(tagGlobalPose);
         tagGlobalPoseTimer.reset();
+        swerve.addVisionPoseUpdate(getBotPose());
     }
 
     private boolean isBlue() {

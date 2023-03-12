@@ -50,13 +50,15 @@ public class Aiming {
                 closestZoneDistance = distance;
             }
         }
-        System.out.println("Closest Distance: " +closestZoneDistance);
         return closestZone;
     }
     public void giveWristAim(double outreach) {
+        if (!m_enabled.getAsBoolean()) {
+            noWristAim();
+            return;
+        }
         Pose2d botPose = m_drive.getPoseEstimate().times(39.3701).plus(new Transform2d(new Translation2d(outreach, p_aimAdjustY.getValue()), new Rotation2d(0)));
         double aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
-        System.out.println("aiming final: " +aimAngle + "pole y" + getNearestScorePoint(botPose).getY() + "robo y" + botPose.getY() + "difference" + (getNearestScorePoint(botPose).getY()-botPose.getY()));
         m_grabber.aim(aimAngle); 
     }
     public CommandBase aimGrabberFactory(double outreach) {
@@ -65,7 +67,6 @@ public class Aiming {
     public void noWristAim() {
         double aimAngle = 0.;
         m_grabber.aim(aimAngle);
-        System.out.println("not aiming!");
     }
     public CommandBase noGrabberAimFactory() {
         return new RunCommand(this::noWristAim);

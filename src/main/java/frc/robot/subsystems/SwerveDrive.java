@@ -31,6 +31,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -75,7 +76,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
          * Ideally, we'd record the capture timestamp in ROS, but we 
          * don't have that feature currently
          */
-        public static final Matrix<N3, N1> HIGH_CONFIDENCE_STD = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9);
+        public static final Matrix<N3, N1> HIGH_CONFIDENCE_STD = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 2);
         public static final Matrix<N3, N1> LOW_CONFIDENCE_STD = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(10, 10, 10);
         public static final double TAG_LATENCY = 0.2;
 
@@ -301,12 +302,18 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         }
 
         public Pose2d getPoseEstimate() {
-                return m_poseEstimator.getEstimatedPosition();
+                return new Pose2d(m_poseEstimator.getEstimatedPosition().getTranslation(), getGyroscopeRotation());
         }
 
         public void addVisionPoseUpdate(Pose2d visionPose) {
-                m_poseEstimator.addVisionMeasurement(visionPose, RobotController.getFPGATime() - TAG_LATENCY, 
-                                getPoseEstimate().getX() < 3. ? HIGH_CONFIDENCE_STD : LOW_CONFIDENCE_STD);
+                m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp() - TAG_LATENCY, 
+                                getPoseEstimate().getX() < 3. 
+                                        && getChassisSpeeds().vxMetersPerSecond < 0.25 
+                                        && getChassisSpeeds().vyMetersPerSecond < 0.25
+                                        && getChassisSpeeds().omegaRadiansPerSecond < 0.05
+                                        && getPoseEstimate().minus(visionPose).getX() < 1
+                                        && getPoseEstimate().minus(visionPose).getY() < 1
+                                         ? HIGH_CONFIDENCE_STD : LOW_CONFIDENCE_STD);
         }
 
         public ChassisSpeeds getChassisSpeeds() {
@@ -472,6 +479,9 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 SmartDashboard.putNumber("odomX", m_pose.getX());
                 SmartDashboard.putNumber("odomY", m_pose.getY());
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
+                SmartDashboard.putNumber("poseX", getPoseEstimate().getX());
+                SmartDashboard.putNumber("poseY", getPoseEstimate().getY());
+                SmartDashboard.putNumber("poseTheta", getPoseEstimate().getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
         }
 

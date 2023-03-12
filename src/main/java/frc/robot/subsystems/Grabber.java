@@ -93,6 +93,7 @@ public class Grabber extends SubsystemBase {
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
     m_pivot.configMotionSCurveStrength(2);
+    m_pivot.configClosedloopRamp(0.1);
 
     Consumer<Double> pivotHandler = (Double unused) -> {
       m_pivot.config_kP(0, p_pivotPID.getKP().getValue());
@@ -311,7 +312,7 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_pivot.hasResetOccurred() || getPivotSpeed() < 5 && Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) > 15) {
+    if (m_pivot.hasResetOccurred() || getPivotSpeed() < 5 && Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) > 3) {
       zeroRelativePivot();
     }
 
@@ -324,5 +325,6 @@ public class Grabber extends SubsystemBase {
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
+    SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
   }
 }
