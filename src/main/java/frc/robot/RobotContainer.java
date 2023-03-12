@@ -137,6 +137,11 @@ public class RobotContainer {
       m_autoCommandName = "Over";
     }
 
+    if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("WallSide")) {
+      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back);
+      m_autoCommandName = "WallSide";
+    }
+
     SmartDashboard.putString("Auto", m_autoCommandName);
   }
 
