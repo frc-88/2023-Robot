@@ -72,6 +72,11 @@ public class RobotContainer {
 
 
   public RobotContainer(Robot robot) {
+    m_arm.setStowSuppliers(
+      () -> m_intake.isIntaking() || m_intake.hasGamePiece(), 
+      () -> m_grabber.hasGamePiece() || !m_grabber.isAtZero(),
+      m_buttonBox.hpModeSwitch
+      );
     configureControllers();
     configureDefaultCommands();
     configureTriggers();
@@ -92,6 +97,7 @@ public class RobotContainer {
       m_candleSubsystem.wantCubeFactory().schedule();
       m_intake.setCube();
     }
+    m_arm.resetMotionMagic();
     m_arm.resetStow();
     m_grabber.aim(0);
   }
@@ -188,9 +194,8 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
-    
-    m_buttonBox.setFlat
-        .whileTrue(m_arm.sendArmToState(ArmStates.flat));
+
+    m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
@@ -236,7 +241,7 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
     m_intake.setDefaultCommand(m_intake.stowFactory());
-    m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stow));
+    m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stowGeneric));
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
 
@@ -274,7 +279,6 @@ public class RobotContainer {
     SmartDashboard.putData("!!Calibrate Shoulder Absolute!!", m_arm.calibrateShoulderFactory());
     SmartDashboard.putData("!!Calibrate Elbow Absolute!!", m_arm.calibrateElbowFactory());
     SmartDashboard.putData("!!Calibrate Wrist Absolute!!", m_arm.calibrateWristFactory());
-    SmartDashboard.putData("Arm Stow", m_arm.sendArmToState(ArmStates.stow));
 
     // Grabber
     SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
