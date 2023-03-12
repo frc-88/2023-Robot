@@ -110,24 +110,28 @@ public class ArmJoint {
         m_motor.set(TalonFXControlMode.PercentOutput, percent);
     }
 
+    public void stop() {
+        setPercentOutput(0);
+    }
+
     public WPI_TalonFX getMotor() {
         return m_motor;
     }
 
-    public void setMotionMagic(double angle, double speed) {
+    public void setMotionMagic(double angle, double speed, double acceleration) {
         if (!m_zeroed) {
             setPercentOutput(0);
             return;
         }
         
         m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(speed));
-        m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(p_maxAcceleration.getValue() * speed / p_maxVelocity.getValue()));
+        m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(acceleration));
         
         m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle), DemandType.ArbitraryFeedForward, p_gravityCompensation.getValue() * Math.cos(Math.toRadians(getAngle())));
     }
 
     public void setMotionMagic(double angle) {
-        setMotionMagic(angle, p_maxVelocity.getValue());
+        setMotionMagic(angle, p_maxVelocity.getValue(), p_maxAcceleration.getValue());
     }
 
     public void coast() {
@@ -184,12 +188,15 @@ public class ArmJoint {
 
     public void zeroRelative() {
         if (m_motor.hasResetOccurred()) {
+            System.err.println(m_name + " has reset!");
             m_zeroed = false;
         }
         if (!m_zeroed && isCancoderPresent()) {
-            SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
+            System.out.println("Zeroing " + m_name);
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;
+        } else if (!m_zeroed) {
+            SmartDashboard.putString(getName() + " Last Error", m_cancoder.getLastError().toString());
         }
     }
 
