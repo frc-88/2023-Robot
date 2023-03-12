@@ -12,6 +12,10 @@ import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,9 +25,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -59,6 +67,18 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         public static final double MAX_VOLTAGE = 12.0;
 
         public static final int NUM_MODULES = 4;
+
+        /**
+         * Standard Deviations for vision updates on the pose estimator, 
+         * depending on our current pose.
+         * 
+         * Also, a latency estimate for our tag estimates in seconds. 
+         * Ideally, we'd record the capture timestamp in ROS, but we 
+         * don't have that feature currently
+         */
+        public static final Matrix<N3, N1> HIGH_CONFIDENCE_STD = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 2);
+        public static final Matrix<N3, N1> LOW_CONFIDENCE_STD = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(10, 10, 10);
+        public static final double TAG_LATENCY = 0.2;
 
         /**
          * The maximum velocity of the robot in meters per second.
@@ -114,6 +134,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
         private double m_fieldOffset = 0.0;
         private SwerveDriveOdometry m_odometry;
+        private SwerveDrivePoseEstimator m_poseEstimator;
         private Pose2d m_pose;
         private boolean m_pivot = false;
         private boolean m_odometryReset = false;
@@ -133,6 +154,12 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 m_odometry = new SwerveDriveOdometry(kinematics, getGyroscopeRotation(),
                                 getSwerveModulePositions(),
                                 m_pose);
+                m_poseEstimator = new SwerveDrivePoseEstimator(kinematics, 
+                                getGyroscopeRotation(), 
+                                getSwerveModulePositions(), 
+                                m_pose, 
+                                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.05, 0.05, 0.05), 
+                                LOW_CONFIDENCE_STD);
        }
 
         public SwerveModulePosition[] getSwerveModulePositions() {
@@ -242,6 +269,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 m_odometry.resetPosition(startGyro,
                                 getSwerveModulePositions(),
                                 startPose);
+                m_poseEstimator.resetPosition(startGyro, getSwerveModulePositions(), startPose);
                 m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
                 m_odometryReset = true;
         }
@@ -255,6 +283,9 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         public void updateOdometry() {
                 m_pose = m_odometry.update(getGyroscopeRotation(),
                                 getSwerveModulePositions());
+
+                m_poseEstimator.update(getGyroscopeRotation(), getSwerveModulePositions());
+
                 if (m_traj_reset_pose == null || m_traj_offset == null) {
                         m_traj_pose = m_pose;
                 } else {
@@ -269,6 +300,21 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
 
         public Pose2d getOdometryPose() {
                 return m_pose;
+        }
+
+        public Pose2d getPoseEstimate() {
+                return new Pose2d(m_poseEstimator.getEstimatedPosition().getTranslation(), getGyroscopeRotation());
+        }
+
+        public void addVisionPoseUpdate(Pose2d visionPose) {
+                m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp() - TAG_LATENCY, 
+                                getPoseEstimate().getX() < 3. 
+                                        && getChassisSpeeds().vxMetersPerSecond < 0.25 
+                                        && getChassisSpeeds().vyMetersPerSecond < 0.25
+                                        && getChassisSpeeds().omegaRadiansPerSecond < 0.05
+                                        && getPoseEstimate().minus(visionPose).getX() < 1
+                                        && getPoseEstimate().minus(visionPose).getY() < 1
+                                         ? HIGH_CONFIDENCE_STD : LOW_CONFIDENCE_STD);
         }
 
         public ChassisSpeeds getChassisSpeeds() {
@@ -447,6 +493,9 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 SmartDashboard.putNumber("odomX", m_pose.getX());
                 SmartDashboard.putNumber("odomY", m_pose.getY());
                 SmartDashboard.putNumber("odomTheta", m_pose.getRotation().getDegrees());
+                SmartDashboard.putNumber("poseX", getPoseEstimate().getX());
+                SmartDashboard.putNumber("poseY", getPoseEstimate().getY());
+                SmartDashboard.putNumber("poseTheta", getPoseEstimate().getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
         }
 

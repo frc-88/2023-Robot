@@ -114,4 +114,9 @@ public final class Constants {
     public static final double COPROCESSOR_UPDATE_DELAY_OFFSET = 0.01;
     public static final double COPROCESSOR_SLOW_UPDATE_DELAY = 1.0/5;
     public static final double COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET = 0.02;
+
+    // Aiming
+    public static final double AIM_HIGH_OUTREACH = -30;
+    public static final double AIM_MIDDLE_OUTREACH = -20;
+    public static final double AIM_LOW_OUTREACH = -10;
 }

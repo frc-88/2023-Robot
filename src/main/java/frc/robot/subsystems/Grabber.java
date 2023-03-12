@@ -87,13 +87,13 @@ public class Grabber extends SubsystemBase {
     m_roller.configFactoryDefault();
 
     m_pivot.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    zeroRelativePivot();
 
     m_pivot.setInverted(true);
     m_pivot.setSensorPhase(true);
     m_pivot.configNeutralDeadband(0);
     m_pivot.setNeutralMode(NeutralMode.Brake);
-    m_pivot.configMotionSCurveStrength(4);
+    m_pivot.configMotionSCurveStrength(2);
+    m_pivot.configClosedloopRamp(0.1);
 
     Consumer<Double> pivotHandler = (Double unused) -> {
       m_pivot.config_kP(0, p_pivotPID.getKP().getValue());
@@ -108,6 +108,8 @@ public class Grabber extends SubsystemBase {
     p_pivotPID.addChangeHandler(pivotHandler);
     p_pivotMaxVelocity.addChangeHandler(pivotHandler);
     p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
+
+    zeroRelativePivot();
 
     m_roller.configNeutralDeadband(0);
     m_roller.overrideLimitSwitchesEnable(false);
@@ -145,7 +147,7 @@ public class Grabber extends SubsystemBase {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(ControlMode.MotionMagic, convertActualPositionToSensorPosition(m_lastPivotPosition  + m_aimAngle));
+    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition  - m_aimAngle));
   }
 
   private void lockPivot() {
@@ -165,7 +167,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 90. + 360.*5.) % 360. - 90.;
+    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 270. + 360.*5.) % 360. - 270.;
   }
 
   public void zeroRelativePivot() {
@@ -310,7 +312,7 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_pivot.hasResetOccurred()) {
+    if (m_pivot.hasResetOccurred() || getPivotSpeed() < 5 && Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) > 3) {
       zeroRelativePivot();
     }
 
@@ -323,5 +325,6 @@ public class Grabber extends SubsystemBase {
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
+    SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
   }
 }
