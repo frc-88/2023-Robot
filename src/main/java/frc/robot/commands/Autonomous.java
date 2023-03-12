@@ -45,6 +45,12 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    public static ConditionalCommand charge1balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+        return new ConditionalCommand(charge1balance("Red", drive, intake, arm, grabber, candle, source), 
+            charge1balance("Blue", drive, intake, arm, grabber, candle, source),
+            () -> {return DriverStation.getAlliance() == Alliance.Red;});
+    }
+
 
     public static ConditionalCommand center2Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Balance("Red", drive, intake, arm, grabber, candle, source), 
@@ -184,11 +190,6 @@ public class Autonomous {
         return wallBaseTo9Mid(alliance, drive, intake, arm, grabber, candle, source);
     }
 
-        public static SequentialCommandGroup charge1balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
-        return chargeBaseToPiece3(alliance, drive, intake, arm, grabber, candle, source);
-    } 
-
-
     private static SequentialCommandGroup centerBaseTo1High(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialScoreCubeHigh(drive, arm, grabber, source)
@@ -252,7 +253,7 @@ public class Autonomous {
         );
     }
 
-    private static SequentialCommandGroup chargeBaseToPiece3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
+    private static SequentialCommandGroup charge1balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialScoreCubeMid(drive, arm, grabber, source)
                 .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
