@@ -242,7 +242,7 @@ public class Autonomous {
             new ParallelCommandGroup(
                 new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallPiece4ToGrid9.wpilib.json"), false),
                 new SequentialCommandGroup(
-                    intake.stowFactory().alongWith(arm.holdTargetState(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, true),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
                         .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
