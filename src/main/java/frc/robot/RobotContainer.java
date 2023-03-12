@@ -138,7 +138,7 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("WallSide")) {
-      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back);
+      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "WallSide";
     }
 
