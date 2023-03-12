@@ -59,7 +59,7 @@ public class RobotContainer {
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
   private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight_back);
-  private final Aiming m_aiming = new Aiming(m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
+  private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
 
   /////////////////////////////////////////////////////////////////////////////
   //                              AUTONOMOUS                                 //
@@ -169,38 +169,47 @@ public class RobotContainer {
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_LOW_OUTREACH));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh))
-        .whileTrue(m_aiming.aimGrabberFactory())
-        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH))
+        .and(() -> m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
+        .onTrue(m_intake.downFactory())
+        .onFalse(m_intake.downFactory()
+          .until(() -> !m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
+          .withTimeout(0.5));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(0));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(0));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_LOW_OUTREACH));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh))
-        .whileTrue(m_aiming.aimGrabberFactory())
-        .and(m_coprocessor::isInCommunity).whileTrue(m_intake.downFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH))
+        .and(() -> m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
+        .onTrue(m_intake.downFactory())
+        .onFalse(m_intake.downFactory()
+          .until(() -> !m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
+          .withTimeout(0.5));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
-        .whileTrue(m_aiming.aimGrabberFactory());
+        .whileTrue(m_aiming.aimGrabberFactory(0));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
+        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
+        .whileTrue(m_aiming.aimGrabberFactory(0));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 

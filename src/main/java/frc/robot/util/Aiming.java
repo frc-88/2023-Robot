@@ -11,24 +11,27 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.GameObjectManager;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class Aiming {
 
-    public Arm m_arm;
-    public Grabber m_grabber;
-    public ScorpionTable m_ros;
-    public GameObjectManager m_objects;
-    public BooleanSupplier m_enabled;
+    private final SwerveDrive m_drive;
+    private final Arm m_arm;
+    private final Grabber m_grabber;
+    private final ScorpionTable m_ros;
+    private final GameObjectManager m_objects;
+    private final BooleanSupplier m_enabled;
 
     private final DoublePreferenceConstant p_aimHeight
         = new DoublePreferenceConstant("Aiming/Height", 8.);
     private final DoublePreferenceConstant p_aimAdjustY
         = new DoublePreferenceConstant("Aiming/AdjustY", 0);
     
-    public Aiming(Arm arm, Grabber grabber, ScorpionTable ros, GameObjectManager objectManager, BooleanSupplier enabled) {
+    public Aiming(SwerveDrive drive, Arm arm, Grabber grabber, ScorpionTable ros, GameObjectManager objectManager, BooleanSupplier enabled) {
+        m_drive = drive;
         m_arm = arm;
         m_grabber = grabber;
         m_ros = ros;
@@ -50,14 +53,14 @@ public class Aiming {
         System.out.println("Closest Distance: " +closestZoneDistance);
         return closestZone;
     }
-    public void giveWristAim() {
-        Pose2d botPose = m_ros.getBotPoseInches().plus(new Transform2d(new Translation2d(0., p_aimAdjustY.getValue()), new Rotation2d(0)));
+    public void giveWristAim(double outreach) {
+        Pose2d botPose = m_drive.getPoseEstimate().times(39.3701).plus(new Transform2d(new Translation2d(outreach, p_aimAdjustY.getValue()), new Rotation2d(0)));
         double aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
         System.out.println("aiming final: " +aimAngle + "pole y" + getNearestScorePoint(botPose).getY() + "robo y" + botPose.getY() + "difference" + (getNearestScorePoint(botPose).getY()-botPose.getY()));
         m_grabber.aim(aimAngle); 
     }
-    public CommandBase aimGrabberFactory() {
-        return new RunCommand(this::giveWristAim);
+    public CommandBase aimGrabberFactory(double outreach) {
+        return new RunCommand(() -> giveWristAim(outreach));
     }
     public void noWristAim() {
         double aimAngle = 0.;

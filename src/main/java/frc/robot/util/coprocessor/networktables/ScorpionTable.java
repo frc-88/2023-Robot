@@ -82,8 +82,8 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         return tagGlobalPoseTimer.isActive();
     }
 
-    public boolean isInCommunity() {
-        Pose2d pos = getBotPoseInches();
+    public boolean isInCommunity(Pose2d pos) {
+        pos = pos.times(39.3701);
         double shortXLimit = 106;
         double longXLimit = 164;
         double communityYStartRed = 100;
@@ -124,6 +124,7 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         // double z = pose.value[3];
         double theta = pose.value[4];
         tagGlobalPose = new Pose2d(x, y, new Rotation2d(theta));
+        swerve.addVisionPoseUpdate(tagGlobalPose);
         tagGlobalPoseTimer.reset();
     }
 
