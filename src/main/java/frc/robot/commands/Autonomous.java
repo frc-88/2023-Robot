@@ -31,6 +31,7 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    // TODO Remove center2?
     public static ConditionalCommand center2(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2("Red", drive, intake, arm, grabber, candle, source), 
             center2("Blue", drive, intake, arm, grabber, candle, source),
@@ -55,6 +56,7 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    // TODO Remove center2Link?
     public static ConditionalCommand center2Link(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Link("Red", drive, intake, arm, grabber, candle, source), 
             center2Link("Blue", drive, intake, arm, grabber, candle, source),
@@ -67,11 +69,14 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
+    // TODO Remove center3Balance?
     public static ConditionalCommand center3Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3Balance("Red", drive, intake, arm, grabber, candle, source), 
             center3Balance("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
+
+    // TODO everything below should be private
 
     public static SequentialCommandGroup engage(String alliance, SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
@@ -81,6 +86,7 @@ public class Autonomous {
         );
     }
 
+    // TODO Remove center3Balance?
     public static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             center3(alliance, drive, intake, arm, grabber, candle, source),
@@ -108,6 +114,7 @@ public class Autonomous {
         );
     }
 
+    // TODO remove center2Link?
     public static SequentialCommandGroup center2Link(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source),
@@ -147,6 +154,7 @@ public class Autonomous {
         );
     }
 
+    // TODO remove center2?
     public static SequentialCommandGroup center2(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return centerBaseTo1High(alliance, drive, intake, arm, grabber, candle, source);
     } 
@@ -155,6 +163,7 @@ public class Autonomous {
         return wallBaseTo9Mid(alliance, drive, intake, arm, grabber, candle, source);
     }
 
+    // TODO remove centerBaseTo1High? Only used in other items considered for removal and we probably don't need to score high in auto
     private static SequentialCommandGroup centerBaseTo1High(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialScoreCubeHigh(drive, arm, grabber, source)
@@ -236,6 +245,7 @@ public class Autonomous {
         );
     }
 
+    // TODO remove centerBaseTo3 - not used anywhere
     private static SequentialCommandGroup centerBaseTo3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialScoreCubeHigh(drive, arm, grabber, source)
@@ -261,6 +271,7 @@ public class Autonomous {
         );
     }
 
+    // TODO - remove centerBalance? only used in center3Balance
     private static SequentialCommandGroup centerBalance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterEngage.wpilib.json"), false)
                 .deadlineWith(arm.stowSimple(), 
@@ -269,6 +280,7 @@ public class Autonomous {
         );
     }
 
+    // TODO remove centerBaseTo1High? Only used in other items considered for removal and we probably don't need to score high in auto
     private static SequentialCommandGroup initialScoreCubeHigh(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
@@ -277,6 +289,7 @@ public class Autonomous {
         );
     }
 
+    // TODO - should we score...
     private static SequentialCommandGroup initialScoreCubeMid(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
@@ -285,6 +298,8 @@ public class Autonomous {
         );
     }
 
+    // TODO - or should we shoot?
+    // either way, all references to these commands should consolidate on a single method, probably score.
     private static SequentialCommandGroup initialShootCubeMid(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
