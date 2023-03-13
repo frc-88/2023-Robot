@@ -69,7 +69,7 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-    // TODO Remove center3Balance?
+    // TODO Remove center3Balance? Maybe keep for now...
     public static ConditionalCommand center3Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center3Balance("Red", drive, intake, arm, grabber, candle, source), 
             center3Balance("Blue", drive, intake, arm, grabber, candle, source),
@@ -86,7 +86,7 @@ public class Autonomous {
         );
     }
 
-    // TODO Remove center3Balance?
+    // TODO Remove center3Balance? Maybe keep for now...how fast can we get?
     public static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
             center3(alliance, drive, intake, arm, grabber, candle, source),
