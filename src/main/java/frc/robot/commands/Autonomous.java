@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.FollowHolonomicTrajectory;
-import frc.robot.commands.drive.FollowHolonomicTrajectory;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Arm;
@@ -51,14 +50,12 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-
     public static ConditionalCommand center2Balance(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Balance("Red", drive, intake, arm, grabber, candle, source), 
             center2Balance("Blue", drive, intake, arm, grabber, candle, source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-    // copied from center3
     public static ConditionalCommand center2Link(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new ConditionalCommand(center2Link("Red", drive, intake, arm, grabber, candle, source), 
             center2Link("Blue", drive, intake, arm, grabber, candle, source),
