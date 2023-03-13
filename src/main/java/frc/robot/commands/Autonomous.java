@@ -74,31 +74,6 @@ public class Autonomous {
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
-    public static SequentialCommandGroup upAndOver(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
-        return new SequentialCommandGroup(
-            initialScoreCubeHigh(drive, arm, grabber, source)
-                .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
-            new ConditionalCommand(
-                new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageOver.wpilib.json"), false),
-                new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageOver.wpilib.json"), false),
-                () -> {return DriverStation.getAlliance() == Alliance.Red;})
-               .deadlineWith(new WaitCommand(3.5).andThen(intake.intakeFactory()), arm.stowSimple(), grabber.holdConeFactory(), grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
-            new WaitCommand(0.5),
-            new SequentialCommandGroup(
-                intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                new Handoff(intake, arm, grabber, true, false),
-                new ConditionalCommand(
-                            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("RedEngageBack.wpilib.json"), false),
-                            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory("BlueEngageBack.wpilib.json"), false),
-                            () -> {return DriverStation.getAlliance() == Alliance.Red;})
-                // arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle).deadlineWith(intake.downFactory(), grabber.centerConeFactory().andThen(grabber.holdConeFactory()), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
-            ),
-            new AutoBalanceSimple(drive)
-            //drive.lockCommandFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory())
-            // arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory()).withTimeout(0.25)
-        );
-    }
-
     public static SequentialCommandGroup engage(String alliance, SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
             initialShootCubeMid(drive, grabber, source),
