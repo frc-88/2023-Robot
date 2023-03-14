@@ -165,6 +165,7 @@ public class Arm extends SubsystemBase {
 
     public void goToArmState(ArmState armState, double acceleration) {
         if (!isValidState(armState)) return;
+        if (!m_shoulder.isZeroed() || !m_elbow.isZeroed() || !m_wrist.isZeroed()) return;
 
         double shoulderAngle = armState.getShoulderAngle();
         double elbowAngle = armState.getElbowAngle();

@@ -27,9 +27,9 @@ import frc.robot.util.arm.ArmStates;
 /** Add your docs here. */
 public class Autonomous {
 
-    public static ConditionalCommand engage(SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
-        return new ConditionalCommand(engage("Red",drive,arm,grabber,source), 
-            engage("Blue",drive,arm, grabber,source),
+    public static ConditionalCommand engage(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, BotPoseProvider source) {
+        return new ConditionalCommand(engage("Red",drive,intake,arm,grabber,source), 
+            engage("Blue",drive,intake,arm, grabber,source),
             () -> {return DriverStation.getAlliance() == Alliance.Red;});
     }
 
@@ -102,10 +102,10 @@ public class Autonomous {
         );
     }
 
-    public static SequentialCommandGroup engage(String alliance, SwerveDrive drive, Arm arm, Grabber grabber, BotPoseProvider source) {
+    public static SequentialCommandGroup engage(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            initialShootCubeMid(drive, grabber, source),
-            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "Engage.wpilib.json"), false).deadlineWith(arm.holdTargetState(), grabber.holdCubeFactory()),
+            initialShootCubeMid(drive, intake, arm, grabber, source),
+            new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "Engage.wpilib.json"), false).deadlineWith(intake.stowFactory(), arm.holdTargetState(), grabber.holdCubeFactory()),
             new AutoBalanceSimple(drive).alongWith(arm.stowSimple(), grabber.holdCubeFactory())
         );
     }
@@ -213,7 +213,7 @@ public class Autonomous {
 
     private static SequentialCommandGroup centerBaseTo1Mid(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            initialShootCubeMid(drive, grabber, source)
+            initialShootCubeMid(drive, intake, arm, grabber, source)
                 .deadlineWith(intake.setConeFactory(), candle.wantConeFactory()),
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid2ToPiece1.wpilib.json"), false)
                 .deadlineWith(intake.intakeFactory(), arm.stowSimple(), grabber.holdConeFactory(), 
@@ -222,12 +222,12 @@ public class Autonomous {
                 new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid1.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                    new Handoff(intake, arm, grabber, true, true),
-                    arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
-                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : 0)))
+                    new Handoff(intake, arm, grabber, true, true)
                 )
             ),
+            arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
+                        .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : -10))),
             arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory()).withTimeout(0.75).andThen(grabber.applyAim(0))
         );
     }
@@ -284,7 +284,7 @@ public class Autonomous {
                     new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid3-2.wpilib.json"), false)
                 ),
                 new SequentialCommandGroup(
-                    intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
+                    intake.stowFactory().alongWith(arm.stowSimple(), grabber.dropConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                     new Handoff(intake, arm, grabber, true, false),
                     arm.stowSimple().alongWith(intake.stowFactory(), grabber.grabConeFactory()).withTimeout(1),
                     arm.sendArmToStateAndEnd(ArmStates.scoreConeHigh)
@@ -320,10 +320,13 @@ public class Autonomous {
         );
     }
 
-    private static SequentialCommandGroup initialShootCubeMid(SwerveDrive drive, Grabber grabber, BotPoseProvider source) {
+    private static SequentialCommandGroup initialShootCubeMid(SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, BotPoseProvider source) {
         return new SequentialCommandGroup(
-            new Localize(drive, source).deadlineWith(grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).withTimeout(0.25),
-            grabber.dropCubeFactory().withTimeout(0.25)
+            new Localize(drive, source).withTimeout(0.25).alongWith(
+                arm.sendArmToState(ArmStates.scoreCubeMiddle).withTimeout(0.3),
+                grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).deadlineWith(
+                intake.downFactory()),
+            arm.holdTargetState().alongWith(grabber.dropCubeFactory(), intake.downFactory()).withTimeout(0.15)
         );
     }
 }

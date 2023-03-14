@@ -116,7 +116,7 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setHigh.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
-      m_autoCommand = Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor);
+      m_autoCommand = Autonomous.engage(m_drive, m_intake, m_arm, m_grabber, m_coprocessor);
       m_autoCommandName = "Engage";
     }
 
@@ -329,8 +329,8 @@ public class RobotContainer {
     // Autonomous
     SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
-    SmartDashboard.putData("AutoROS Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor));
-    SmartDashboard.putData("AutoLL Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_limelight_back));
+    SmartDashboard.putData("AutoROS Engage", Autonomous.engage(m_drive, m_intake, m_arm, m_grabber, m_coprocessor));
+    SmartDashboard.putData("AutoLL Engage", Autonomous.engage(m_drive, m_intake, m_arm, m_grabber, m_limelight_back));
     SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
     SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
