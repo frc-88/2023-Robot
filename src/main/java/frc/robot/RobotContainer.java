@@ -114,10 +114,10 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
-      m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center2Link";
-    }
+    // if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
+    //   m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+    //   m_autoCommandName = "Center2Link";
+    // }
 
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
       m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
