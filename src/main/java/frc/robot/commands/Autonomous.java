@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.AutoBalanceSimple;
@@ -21,6 +22,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.TrajectoryHelper;
+import frc.robot.util.arm.ArmState;
 import frc.robot.util.arm.ArmStates;
 
 /** Add your docs here. */
@@ -217,16 +219,17 @@ public class Autonomous {
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid2ToPiece1.wpilib.json"), false)
                 .deadlineWith(intake.intakeFactory(), arm.stowSimple(), grabber.holdConeFactory(), 
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
-            new ParallelCommandGroup(
+            new ParallelDeadlineGroup(
                 new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece1ToGrid1.wpilib.json"), false),
                 new SequentialCommandGroup(
                     intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
-                    new Handoff(intake, arm, grabber, true, true)
+                    new Handoff(intake, arm, grabber, true, true),
+                    arm.sendArmToState(ArmStates.autoPrepScoreCone).alongWith(intake.downFactory(), grabber.grabConeFactory(), grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
             arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
                         .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : -10))),
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? -60 : 36))),
             arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory()).withTimeout(0.75).andThen(grabber.applyAim(0))
         );
     }
