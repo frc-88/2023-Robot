@@ -79,6 +79,7 @@ public class RobotContainer {
       () -> m_grabber.hasGamePiece() || !m_grabber.isAtZero(),
       m_buttonBox.hpModeSwitch
       );
+  
     configureControllers();
     configureDefaultCommands();
     configureTriggers();
@@ -168,6 +169,24 @@ public class RobotContainer {
     m_buttonBox.intakeButton.whileTrue(m_intake.intakeFactory())
         .and(m_buttonBox.gamepieceSwitch.negate()).onFalse(m_intake.downFactory().withTimeout(0.4));
     m_buttonBox.gamepieceSwitch.onTrue(m_intake.setConeFactory()).onFalse(m_intake.setCubeFactory());
+
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory())
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1))
+        .whileTrue(m_aiming.noGrabberAimFactory());
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory())
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
+        .whileTrue(m_aiming.noGrabberAimFactory());
+
+    m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch)
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromChute)).whileTrue(m_grabber.grabConeFactory())
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1))
+        .whileTrue(m_aiming.noGrabberAimFactory());
+    m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch.negate())
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromChute)).whileTrue(m_grabber.grabCubeFactory())
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
+        .whileTrue(m_aiming.noGrabberAimFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory())
