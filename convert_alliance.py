@@ -2,7 +2,7 @@ import json
 import glob
 
 
-JSON_PATH = "src/main/deploy/pathplanner/"
+JSON_PATH = "src\\main\\deploy\\pathplanner\\"
 CONVERT_FROM_RED = True
 FIELD_WIDTH = 16.54
 
@@ -22,7 +22,7 @@ for file_to_convert in files_to_convert:
         if waypoint["prevControl"] is not None:
             waypoint["prevControl"]["x"] = FIELD_WIDTH - waypoint["prevControl"]["x"]
             
-    with open(JSON_PATH + ("Blue" if CONVERT_FROM_RED else "Red") + file_to_convert, 'w') as f:
+    with open(file_to_convert.replace("Red" if CONVERT_FROM_RED else "Blue", "Blue" if CONVERT_FROM_RED else "Red"), 'w') as f:
         json.dump(data, f, indent=4)
         
     
