@@ -6,9 +6,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.BotPoseProvider;
@@ -19,12 +23,29 @@ import frc.robot.util.LimelightHelpers;
  * bright green glowing eyes to see
  *      but April guides me
  */
+
 public class Limelight extends SubsystemBase implements BotPoseProvider {
 
   private String m_name;
+  private double m_distance; 
+  private double m_length; 
+  private double tx;
+  private double ty;
+  private double pipeHeight = .6223;
+  public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 
   public Limelight(String name) {
     m_name = name;
+  }
+
+  public double limelightOffset() { 
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    limeLightPipe.setNumber(1);
+    tx = Math.toRadians(LimelightHelpers.getTX("limelight"));
+    ty = Math.toRadians(LimelightHelpers.getTY("limelight"));
+    m_length = (pipeHeight/(Math.tan(ty)));
+    m_distance = m_length*Math.tan(tx);
+    return m_distance = Math.tan(tx);
   }
 
   public Pose2d getBotPose() {
