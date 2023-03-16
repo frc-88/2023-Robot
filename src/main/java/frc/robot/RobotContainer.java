@@ -82,9 +82,9 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingBackwards().getAsBoolean()) {
+    if (m_drive.isFacingBackwards().getAsBoolean() && DriverStation.isTeleop()) {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
-    } else {
+    } else if (DriverStation.isTeleop()) {
       new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
@@ -126,12 +126,12 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setLow.getAsBoolean() && !m_autoCommandName.equals("Center3")) {
-      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center3";
     }
 
     if (m_buttonBox.scoreButton.getAsBoolean() && !m_autoCommandName.equals("Center3Balance")) {
-      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center3Balance";
     }
 
