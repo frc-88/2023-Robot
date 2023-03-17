@@ -112,6 +112,10 @@ public class Intake extends SubsystemBase {
       m_orchestra.addInstrument(m_outerRoller);
     }
 
+    public boolean isReady() {
+      return m_arm.isAlive() && m_outerRoller.isAlive() && m_innerRoller.isAlive() && isArmUp();
+    }
+
     public void setCube() {
       m_coneMode = false;
     }

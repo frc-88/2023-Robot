@@ -212,6 +212,15 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                                 m_pose);
         }
 
+        public boolean areAllCANDevicesPresent() {
+                for (SwerveModule module : m_modules) {
+                        if (!module.areAllCANDevicesPresent()) {
+                                return false;
+                        }
+                }
+                return true;
+        }
+
         public SwerveModule[] getModules() {
                 return m_modules;
         }

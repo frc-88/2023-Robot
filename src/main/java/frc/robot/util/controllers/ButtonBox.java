@@ -10,6 +10,7 @@ public class ButtonBox extends Joystick {
     private static int OUTGEST = 18;
     private static int HANDOFF = 8;
     private static int GRAB_FROM_SHELF = 6;
+    private static int GRAB_FROM_CHUTE = 12;
     private static int SET_LOW = 11;
     private static int SET_MIDDLE = 2;
     private static int SET_HIGH = 15;
@@ -30,6 +31,7 @@ public class ButtonBox extends Joystick {
     public Trigger outgestButton = new JoystickButton(this, OUTGEST);
     public Trigger handoffButton = new JoystickButton(this, HANDOFF);
     public Trigger getFromShelfButton = new JoystickButton(this, GRAB_FROM_SHELF);
+    public Trigger getFromChuteButton = new JoystickButton(this, GRAB_FROM_CHUTE);
     public Trigger setLow = new JoystickButton(this, SET_LOW);
     public Trigger setMiddle = new JoystickButton(this, SET_MIDDLE);
     public Trigger setHigh = new JoystickButton(this, SET_HIGH);    

@@ -111,5 +111,10 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
         public void zeroModule() {
             steerController.checkAngleReset();
         }
+
+        @Override
+        public boolean areAllCANDevicesPresent() {
+            return driveController.getMotor().isAlive() && steerController.getMotor().isAlive() && steerController.getEncoder().isPresent();
+        }
     }
 }

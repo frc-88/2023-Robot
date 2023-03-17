@@ -41,6 +41,9 @@ public class Lights extends SubsystemBase {
     private Animation m_strobe = null;
 
     private SwerveDrive m_swerve;
+    private Intake m_intake;
+    private Arm m_arm;
+    private Grabber m_grabber;
     private ScorpionTable m_coprocessor;
     private Limelight m_limelight;
 
@@ -58,8 +61,11 @@ public class Lights extends SubsystemBase {
         Empty
     }
 
-    public Lights(SwerveDrive swerve, ScorpionTable coprocessor, Limelight limelight) {
+    public Lights(SwerveDrive swerve, Intake intake, Arm arm, Grabber grabber, ScorpionTable coprocessor, Limelight limelight) {
         m_swerve = swerve;
+        m_intake = intake;
+        m_arm = arm;
+        m_grabber = grabber;
         m_coprocessor = coprocessor;
         m_limelight = limelight;
         CANdleConfiguration configAll = new CANdleConfiguration();
@@ -116,28 +122,52 @@ public class Lights extends SubsystemBase {
             switch (m_state) {
                 case 0:
                     larsonColor(255, 0, 0);
-                    if (m_coprocessor.getBotPose() != null && counter++ > 100) {
+                    if (m_swerve.areAllCANDevicesPresent() && counter++ > 75) {
+                        m_state++;
+                        counter = 0;
+                    }
+                case 1:
+                    larsonColor(255, 255, 0);
+                    if (m_arm.isReady() && counter++ > 75) {
+                        m_state++;
+                        counter = 0;
+                    }
+                case 2:
+                    larsonColor(0, 255, 0);
+                    if (m_grabber.isReady() && counter++ > 75) {
+                        m_state++;
+                        counter = 0;
+                    }
+                case 3:
+                    larsonColor(0, 255, 255);
+                    if (m_intake.isReady() && counter++ > 75) {
+                        m_state++;
+                        counter = 0;
+                    }
+                case 4:
+                    larsonColor(0, 0, 255);
+                    if (m_coprocessor.getBotPose() != null && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
 
-                case 1:
-                    larsonColor(0, 255, 0);
-                    if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose()) && counter++ > 100) {
+                case 5:
+                    larsonColor(255, 0, 255);
+                    if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose()) && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
-                case 2:
-                    larsonColor(0, 0, 255);
+                case 6:
+                    larsonColor(255, 255, 255);
                     m_swerve.resetPosition(m_coprocessor.getBotPose());
-                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose()) && counter++ > 100) {
+                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose()) && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
-                case 3:
+                case 7:
                     rainbow();
                     if (counter++ > 100) {
                         m_state++;

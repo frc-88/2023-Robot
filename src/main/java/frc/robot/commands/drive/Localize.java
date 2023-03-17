@@ -5,6 +5,7 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
@@ -33,8 +34,9 @@ public class Localize extends CommandBase {
     Pose2d sourcePose = m_source.getBotPose();
 
     if (m_source.isConnected() && sourcePose.getX()!=0 && sourcePose.getY() !=0) {
-      m_drive.resetPosition(m_source.getBotPose());
+      m_drive.resetPosition(new Pose2d(m_source.getBotPose().getTranslation(), new Rotation2d(0)));
     } else {
+      System.err.println("Did not localize");
       FollowTrajectory.forceResetOdometry();
     }
 

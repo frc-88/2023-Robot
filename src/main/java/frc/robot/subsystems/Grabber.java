@@ -131,6 +131,10 @@ public class Grabber extends SubsystemBase {
     rollerHandler.accept(0.);
   }
 
+  public boolean isReady() {
+    return m_pivot.isAlive() && m_roller.isAlive();
+  }
+
   public void setPivotForwards() {
     m_pivotForwards = true;
   }

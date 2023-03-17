@@ -1,6 +1,6 @@
 package com.swervedrivespecialties.swervelib;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public interface DriveController {
     void setReferenceVoltage(double voltage);
@@ -9,5 +9,5 @@ public interface DriveController {
 
     double getDistance();
 
-    TalonFX getMotor();
+    WPI_TalonFX getMotor();
 }

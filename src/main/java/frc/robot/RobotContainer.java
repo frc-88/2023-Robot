@@ -4,24 +4,20 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.AutoBalanceSimple;
-import frc.robot.commands.drive.FollowHolonomicTrajectory;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.Aiming;
-import frc.robot.util.TrajectoryHelper;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
@@ -62,7 +58,7 @@ public class RobotContainer {
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
-  private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight_back);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back);
   private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -79,6 +75,7 @@ public class RobotContainer {
       () -> m_grabber.hasGamePiece() || !m_grabber.isAtZero(),
       m_buttonBox.hpModeSwitch
       );
+  
     configureControllers();
     configureDefaultCommands();
     configureTriggers();
@@ -87,9 +84,9 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingBackwards().getAsBoolean()) {
+    if (m_drive.isFacingBackwards().getAsBoolean() && DriverStation.isTeleop()) {
       new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
-    } else {
+    } else if (DriverStation.isTeleop()) {
       new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
     }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
@@ -116,14 +113,14 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setHigh.getAsBoolean() && !m_autoCommandName.equals("Engage")) {
-      m_autoCommand = Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor);
+      m_autoCommand = Autonomous.engage(m_drive, m_intake, m_arm, m_grabber, m_coprocessor);
       m_autoCommandName = "Engage";
     }
 
-    if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
-      m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Center2Link";
-    }
+    // if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
+    //   m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+    //   m_autoCommandName = "Center2Link";
+    // }
 
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
       m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
@@ -131,12 +128,12 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setLow.getAsBoolean() && !m_autoCommandName.equals("Center3")) {
-      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center3";
     }
 
     if (m_buttonBox.scoreButton.getAsBoolean() && !m_autoCommandName.equals("Center3Balance")) {
-      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center3Balance";
     }
 
@@ -177,6 +174,28 @@ public class RobotContainer {
         .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
         .whileTrue(m_aiming.noGrabberAimFactory());
+
+    m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch)
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromChute).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabConeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
+    m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch.negate())
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromChute).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabCubeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
+
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabConeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
+    m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabCubeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))
@@ -327,17 +346,7 @@ public class RobotContainer {
     SmartDashboard.putData("Handoff Cube", new Handoff(m_intake, m_arm, m_grabber, false, false));
 
     // Autonomous
-    SmartDashboard.putData("AutoROS Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-    SmartDashboard.putData("AutoLL Red Center", Autonomous.center2("Red", m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
-    SmartDashboard.putData("AutoROS Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_coprocessor));
-    SmartDashboard.putData("AutoLL Engage", Autonomous.engage(m_drive, m_arm, m_grabber, m_limelight_back));
-    SmartDashboard.putData("AutoROS Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-    SmartDashboard.putData("AutoLL Over", Autonomous.upAndOver(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_limelight_back));
     SmartDashboard.putData("Auto Balance Simple", new AutoBalanceSimple(m_drive));
-    SmartDashboard.putData("Auto Wall 2", Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor));
-
-    SmartDashboard.putData("Auto Holonomic", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest.wpilib.json"), new Rotation2d(), new Rotation2d(), true));
-    SmartDashboard.putData("Auto Holonomic2", new FollowHolonomicTrajectory(m_drive, TrajectoryHelper.loadJSONTrajectory("HolonomicTest2.wpilib.json"), new Rotation2d(), Rotation2d.fromDegrees(35), true));
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
