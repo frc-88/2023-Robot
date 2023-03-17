@@ -32,7 +32,7 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   private double tx;
   private double ty;
   private double pipeHeight = .6223;
-  public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+  public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
 
   public Limelight(String name) {
     m_name = name;
