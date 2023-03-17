@@ -39,13 +39,17 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   }
 
   public double limelightOffset() { 
-    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
-    limeLightPipe.setNumber(1);
-    tx = Math.toRadians(LimelightHelpers.getTX(m_name));
-    ty = Math.toRadians(LimelightHelpers.getTY(m_name));
-    m_length = (pipeHeight/(Math.tan(ty)));
-    m_distance = m_length*Math.tan(tx);
-    return m_distance = Math.tan(tx);
+    // NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    // limeLightPipe.setNumber(1);
+    if (LimelightHelpers.getTV(m_name)) {
+      tx = Math.toRadians(LimelightHelpers.getTX(m_name));
+      ty = Math.toRadians(LimelightHelpers.getTY(m_name));
+      m_length = (pipeHeight/(Math.tan(ty)));
+      m_distance = m_length*Math.tan(tx);
+      return m_distance = Math.tan(tx);
+    } else {
+      return 0;
+    }
   }
 
   public Pose2d getBotPose() {
@@ -72,7 +76,7 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   public void periodic() {
     Pose2d botPose = getBotPose();
 
-    SmartDashboard.putNumber("LL:" + m_name + "Wrist Aiming", limelightOffset());
+    // SmartDashboard.putNumber("LL:" + m_name + "Wrist Aiming", limelightOffset());
 
     SmartDashboard.putNumber("LL:" + m_name + ":BotX", botPose.getX());
     SmartDashboard.putNumber("LL:" + m_name + ":BotY", botPose.getY());
