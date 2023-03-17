@@ -329,7 +329,6 @@ public class RobotContainer {
     SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
-    SmartDashboard.putNumber("Wrist Aiming", m_limelight_front.limelightOffset());
 
     // Localization
     SmartDashboard.putData("LL Front Localize", new Localize(m_drive, m_limelight_front).ignoringDisable(true));
