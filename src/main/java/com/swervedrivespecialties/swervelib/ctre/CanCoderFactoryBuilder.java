@@ -1,9 +1,11 @@
 package com.swervedrivespecialties.swervelib.ctre;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix.sensors.MagnetFieldStrength;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoderFactory;
 
@@ -53,6 +55,13 @@ public class CanCoderFactoryBuilder {
             }
 
             return angle;
+        }
+
+        @Override
+        public boolean isPresent() {
+            return !(encoder.getMagnetFieldStrength() == MagnetFieldStrength.BadRange_RedLED
+                || encoder.getMagnetFieldStrength() == MagnetFieldStrength.Invalid_Unknown
+                || encoder.getLastError() == ErrorCode.SensorNotPresent);
         }
     }
 

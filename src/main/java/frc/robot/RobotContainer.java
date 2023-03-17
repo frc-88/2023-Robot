@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.AutoBalanceSimple;
@@ -56,7 +58,7 @@ public class RobotContainer {
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
-  private final Lights m_candleSubsystem = new Lights(m_drive, m_coprocessor, m_limelight_back);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back);
   private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
 
   /////////////////////////////////////////////////////////////////////////////
@@ -174,22 +176,26 @@ public class RobotContainer {
         .whileTrue(m_aiming.noGrabberAimFactory());
 
     m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch)
-        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromChute)).whileTrue(m_grabber.grabConeFactory())
-        .onFalse(m_grabber.grabConeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromChute).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabConeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
     m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch.negate())
-        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromChute)).whileTrue(m_grabber.grabCubeFactory())
-        .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromChute).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabCubeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
-        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory())
-        .onFalse(m_grabber.grabConeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabConeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabConeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
-        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory())
-        .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_grabber.grabCubeFactory().unless(new Trigger(m_arm::isStowed).negate()))
+        .onFalse(m_grabber.grabCubeFactory().withTimeout(1).unless(new Trigger(m_arm::isStowed).negate()))
+        .whileTrue(m_aiming.noGrabberAimFactory().unless(new Trigger(m_arm::isStowed).negate()));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))

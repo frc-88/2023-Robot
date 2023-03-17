@@ -32,7 +32,7 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   private double tx;
   private double ty;
   private double pipeHeight = .6223;
-  public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
+  // public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
 
   public Limelight(String name) {
     m_name = name;
@@ -41,15 +41,15 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   public double limelightOffset() { 
     // NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
     // limeLightPipe.setNumber(1);
-    if (LimelightHelpers.getTV(m_name)) {
-      tx = Math.toRadians(LimelightHelpers.getTX(m_name));
-      ty = Math.toRadians(LimelightHelpers.getTY(m_name));
-      m_length = (pipeHeight/(Math.tan(ty)));
-      m_distance = m_length*Math.tan(tx);
-      return m_distance = Math.tan(tx);
-    } else {
+    // if (LimelightHelpers.getTV(m_name)) {
+    //   tx = Math.toRadians(LimelightHelpers.getTX(m_name));
+    //   ty = Math.toRadians(LimelightHelpers.getTY(m_name));
+    //   m_length = (pipeHeight/(Math.tan(ty)));
+    //   m_distance = m_length*Math.tan(tx);
+    //   return m_distance = Math.tan(tx);
+    // } else {
       return 0;
-    }
+    // }
   }
 
   public Pose2d getBotPose() {

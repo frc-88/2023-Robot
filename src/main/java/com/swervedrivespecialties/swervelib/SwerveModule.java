@@ -16,4 +16,6 @@ public interface SwerveModule {
     void zeroModule();
 
     void set(double driveVoltage, double steerAngle);
+
+    boolean areAllCANDevicesPresent();
 }

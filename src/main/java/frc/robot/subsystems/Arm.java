@@ -78,6 +78,10 @@ public class Arm extends SubsystemBase {
         m_stowCommand = stowSimple();
     }
 
+    public boolean isReady() {
+        return m_shoulder.isZeroed() && m_elbow.isZeroed() && m_wrist.isZeroed() && isAtTarget(ArmStates.stowForHP, 30);
+    }
+
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
         return m_shoulderPosition.plus(shoulder).plus(elbow).plus(wrist);
     }
