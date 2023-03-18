@@ -150,7 +150,7 @@ public class Lights extends SubsystemBase {
                     break;
                 case 4:
                     larsonColor(0, 0, 255);
-                    if (m_coprocessor.getBotPose() != null && counter++ > 75) {
+                    if ( m_coprocessor.isConnected() && m_coprocessor.getBotPose() != null && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }

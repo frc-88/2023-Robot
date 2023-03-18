@@ -132,7 +132,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean isReady() {
-    return m_pivot.isAlive() && m_roller.isAlive();
+    return m_pivot.getBusVoltage() > 6 && m_roller.getBusVoltage() > 6;
   }
 
   public void setPivotForwards() {

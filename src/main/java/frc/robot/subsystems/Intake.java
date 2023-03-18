@@ -113,7 +113,7 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean isReady() {
-      return m_arm.isAlive() && m_outerRoller.isAlive() && m_innerRoller.isAlive() && isArmUp();
+      return m_arm.getBusVoltage() > 6 && m_outerRoller.getBusVoltage() > 6 && m_innerRoller.getBusVoltage() > 6 && isArmUp();
     }
 
     public void setCube() {
