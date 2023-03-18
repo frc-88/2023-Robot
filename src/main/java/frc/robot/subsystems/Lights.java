@@ -126,27 +126,31 @@ public class Lights extends SubsystemBase {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 1:
                     larsonColor(255, 255, 0);
                     if (m_arm.isReady() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 2:
                     larsonColor(0, 255, 0);
                     if (m_grabber.isReady() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 3:
                     larsonColor(0, 255, 255);
                     if (m_intake.isReady() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 4:
                     larsonColor(0, 0, 255);
-                    if (m_coprocessor.getBotPose() != null && counter++ > 75) {
+                    if ( m_coprocessor.isConnected() && m_coprocessor.getBotPose() != null && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
