@@ -47,6 +47,13 @@ public class RobotContainer {
   private final ButtonBox m_buttonBox = new ButtonBox(Constants.BUTTON_BOX_ID);
 
   /////////////////////////////////////////////////////////////////////////////
+  //                              AUTONOMOUS                                 //
+  /////////////////////////////////////////////////////////////////////////////
+
+  private CommandBase m_autoCommand = new WaitCommand(15);
+  private String m_autoCommandName = "Wait";
+
+  /////////////////////////////////////////////////////////////////////////////
   //                              SUBSYSTEMS                                 //
   /////////////////////////////////////////////////////////////////////////////
 
@@ -58,15 +65,8 @@ public class RobotContainer {
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
-  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back, () -> m_autoCommandName);
   private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
-
-  /////////////////////////////////////////////////////////////////////////////
-  //                              AUTONOMOUS                                 //
-  /////////////////////////////////////////////////////////////////////////////
-
-  private CommandBase m_autoCommand = new WaitCommand(15);
-  private String m_autoCommandName = "Wait";
 
 
   public RobotContainer(Robot robot) {

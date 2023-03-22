@@ -146,7 +146,7 @@ public class Autonomous {
             ),
             arm.sendArmToStateAndEnd(ArmStates.scoreConeMiddle)
                         .deadlineWith(intake.downFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? 40 : 10))),
+                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(), grabber.applyAim(alliance.equals("Blue") ? 30 : 0))),
             arm.stowFrom(ArmStates.scoreConeMiddle).alongWith(grabber.dropConeFactory()).withTimeout(0.5).andThen(grabber.applyAim(0))
         );
     }
