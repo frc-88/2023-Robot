@@ -191,7 +191,7 @@ public class ArmJoint {
             System.err.println(m_name + " has reset!");
             m_zeroed = false;
         }
-        if (!m_zeroed && isCancoderPresent() && m_motor.isAlive()) {
+        if (!m_zeroed && isCancoderPresent() && m_motor.getBusVoltage() > 6) {
             System.out.println("Zeroing " + m_name);
             m_motor.setSelectedSensorPosition(convertActualPositionToMotorPosition(getAbsoluteAngle()));
             m_zeroed = true;

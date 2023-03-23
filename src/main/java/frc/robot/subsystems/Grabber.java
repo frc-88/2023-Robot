@@ -132,7 +132,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean isReady() {
-    return m_pivot.isAlive() && m_roller.isAlive();
+    return m_pivot.getBusVoltage() > 6 && m_roller.getBusVoltage() > 6;
   }
 
   public void setPivotForwards() {
@@ -151,7 +151,7 @@ public class Grabber extends SubsystemBase {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition  - m_aimAngle));
+    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition - m_aimAngle));
   }
 
   private void lockPivot() {

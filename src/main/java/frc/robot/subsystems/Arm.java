@@ -79,7 +79,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isReady() {
-        return m_shoulder.isZeroed() && m_elbow.isZeroed() && m_wrist.isZeroed() && isAtTarget(ArmStates.stowForHP, 30);
+        return m_shoulder.isZeroed() && m_elbow.isZeroed() && m_wrist.isZeroed() && isAtTarget(ArmStates.stowForHP, 40);
     }
 
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {

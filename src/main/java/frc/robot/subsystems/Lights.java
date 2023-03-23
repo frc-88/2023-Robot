@@ -14,6 +14,8 @@ import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.IntPreferenceConstant;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
@@ -46,6 +48,7 @@ public class Lights extends SubsystemBase {
     private Grabber m_grabber;
     private ScorpionTable m_coprocessor;
     private Limelight m_limelight;
+    private Supplier<String> m_autoName;
 
     public enum AnimationTypes {
         ColorFlow,
@@ -61,13 +64,14 @@ public class Lights extends SubsystemBase {
         Empty
     }
 
-    public Lights(SwerveDrive swerve, Intake intake, Arm arm, Grabber grabber, ScorpionTable coprocessor, Limelight limelight) {
+    public Lights(SwerveDrive swerve, Intake intake, Arm arm, Grabber grabber, ScorpionTable coprocessor, Limelight limelight, Supplier<String> autoName) {
         m_swerve = swerve;
         m_intake = intake;
         m_arm = arm;
         m_grabber = grabber;
         m_coprocessor = coprocessor;
         m_limelight = limelight;
+        m_autoName = autoName;
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
@@ -126,48 +130,66 @@ public class Lights extends SubsystemBase {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 1:
                     larsonColor(255, 255, 0);
                     if (m_arm.isReady() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 2:
                     larsonColor(0, 255, 0);
-                    if (m_grabber.isReady() && counter++ > 75) {
+                    if (m_grabber.isReady() && m_grabber.hasGamePiece() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
+                    break;
                 case 3:
+                    larsonColor(0, 255, 255);
+                    if ((m_intake.isArmDown() || DriverStation.isFMSAttached() || !m_autoName.get().equals("Wait")) && counter++ > 25) {
+                        m_state++;
+                        counter = 0;
+                    }
+                    break;
+                case 4:
+                    larsonColor(0, 255, 255);
+                    if ((m_intake.hasGamePiece() || DriverStation.isFMSAttached() || !m_autoName.get().equals("Wait")) && counter++ > 25) {
+                        m_state++;
+                        counter = 0;
+                    }
+                    break;
+                case 5:
                     larsonColor(0, 255, 255);
                     if (m_intake.isReady() && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
-                case 4:
+                    break;
+                case 6:
                     larsonColor(0, 0, 255);
-                    if (m_coprocessor.getBotPose() != null && counter++ > 75) {
+                    if ( m_coprocessor.isConnected() && m_coprocessor.getBotPose() != null && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
 
-                case 5:
+                case 7:
                     larsonColor(255, 0, 255);
                     if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose()) && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
-                case 6:
+                case 8:
                     larsonColor(255, 255, 255);
                     m_swerve.resetPosition(m_coprocessor.getBotPose());
-                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose()) && counter++ > 75) {
+                    if (approximatelyEqual(m_swerve.getOdometryPose(), m_coprocessor.getBotPose()) && !m_autoName.get().equals("Wait") && counter++ > 75) {
                         m_state++;
                         counter = 0;
                     }
                     break;
-                case 7:
+                case 9:
                     rainbow();
                     if (counter++ > 100) {
                         m_state++;
