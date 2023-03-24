@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -335,6 +337,7 @@ public class RobotContainer {
     SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
+    SmartDashboard.putData("Wrist Aiming", m_grabber.applyWristAim(() -> m_limelight_back.limelightAngleCalculator()));
 
     // Localization
     SmartDashboard.putData("LL Front Localize", new Localize(m_drive, m_limelight_front).ignoringDisable(true));
@@ -359,4 +362,4 @@ public class RobotContainer {
     robot.addPeriodic(m_coprocessor::updateSlow, Constants.COPROCESSOR_SLOW_UPDATE_DELAY, Constants.COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET);
   }
 
-}
+} 

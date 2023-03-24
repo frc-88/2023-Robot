@@ -316,7 +316,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase applyWristAim(DoubleSupplier aim) {
-    return new InstantCommand(() -> aim(aim.getAsDouble()));
+    return new RunCommand(() -> aim(aim.getAsDouble()));
   }
 
   @Override
