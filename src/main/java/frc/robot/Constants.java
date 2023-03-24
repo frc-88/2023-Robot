@@ -119,4 +119,5 @@ public final class Constants {
     public static final double AIM_HIGH_OUTREACH = -30;
     public static final double AIM_MIDDLE_OUTREACH = -20;
     public static final double AIM_LOW_OUTREACH = -10;
+    public static final double ANGLE_CONSTANT = 90;
 }
