@@ -350,6 +350,8 @@ public class RobotContainer {
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
+    SmartDashboard.putData("Retro Pipeline", m_limelight_back.SetRetroPipelineFactory());
+    SmartDashboard.putData("April Tag Pipeline", m_limelight_back.SetAprilTagPipelineFactory());
   }
   
   private void configurePeriodics(Robot robot) {

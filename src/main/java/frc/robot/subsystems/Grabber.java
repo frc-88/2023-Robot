@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -312,6 +313,10 @@ public class Grabber extends SubsystemBase {
 
   public CommandBase applyAim(double aim) {
     return new InstantCommand(() -> aim(aim));
+  }
+
+  public CommandBase applyWristAim(DoubleSupplier aim) {
+    return new InstantCommand(() -> aim(aim.getAsDouble()));
   }
 
   @Override

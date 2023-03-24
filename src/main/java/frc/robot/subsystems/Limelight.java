@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.LimelightHelpers;
 
@@ -27,29 +29,49 @@ import frc.robot.util.LimelightHelpers;
 public class Limelight extends SubsystemBase implements BotPoseProvider {
 
   private String m_name;
-  private double m_distance; 
+  public double m_distance; 
   private double m_length; 
   private double tx;
   private double ty;
   private double pipeHeight = .6223;
-  // public NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
+  private double m_angle;
+  private double heightOverPipe = .3;
+  private NetworkTable limelightTable;
 
   public Limelight(String name) {
     m_name = name;
+    limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
   }
 
-  public double limelightOffset() { 
-    // NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
-    // limeLightPipe.setNumber(1);
-    // if (LimelightHelpers.getTV(m_name)) {
-    //   tx = Math.toRadians(LimelightHelpers.getTX(m_name));
-    //   ty = Math.toRadians(LimelightHelpers.getTY(m_name));
-    //   m_length = (pipeHeight/(Math.tan(ty)));
-    //   m_distance = m_length*Math.tan(tx);
-    //   return m_distance = Math.tan(tx);
-    // } else {
-      return 0;
-    // }
+  public double limelightAngleCalculator() { 
+    
+    //Calculates distance from limelight horizontally
+    tx = Math.toRadians(LimelightHelpers.getTX(m_name));
+    ty = Math.toRadians(LimelightHelpers.getTY(m_name));
+    m_length = (pipeHeight/(Math.tan(ty)));
+    m_distance = m_length*Math.tan(tx);
+    return Math.toDegrees(Math.atan2(heightOverPipe, m_distance))-Constants.ANGLE_CONSTANT;
+  }
+
+  public void limelightSwitch(int pipe) {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    limeLightPipe.setNumber(pipe);
+  }
+
+  public void SetRetroPipeline() {
+    limelightSwitch(1);
+  }
+
+  public void SetAprilTagPipeline() {
+    limelightSwitch(0);
+  }
+
+  public CommandBase SetRetroPipelineFactory() {
+    return new InstantCommand(this::SetRetroPipeline);
+  }
+
+  public CommandBase SetAprilTagPipelineFactory() {
+    return new InstantCommand(this::SetAprilTagPipeline);
   }
 
   public Pose2d getBotPose() {
@@ -76,10 +98,10 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   public void periodic() {
     Pose2d botPose = getBotPose();
 
-    // SmartDashboard.putNumber("LL:" + m_name + "Wrist Aiming", limelightOffset());
-
+    SmartDashboard.putNumber("LL:" + m_name + "Wrist Aiming", limelightAngleCalculator());
     SmartDashboard.putNumber("LL:" + m_name + ":BotX", botPose.getX());
     SmartDashboard.putNumber("LL:" + m_name + ":BotY", botPose.getY());
     SmartDashboard.putNumber("LL:" + m_name + ":BotYaw", botPose.getRotation().getDegrees());
+    SmartDashboard.putNumber("LL:" + m_name + ":M_Distance", m_distance);
   }
 }
