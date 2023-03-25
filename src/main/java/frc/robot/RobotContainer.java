@@ -68,7 +68,7 @@ public class RobotContainer {
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
   private final GameObjectManager m_manager = new GameObjectManager(m_coprocessor);
   private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back, () -> m_autoCommandName);
-  private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_manager, m_buttonBox.enableAimingSwitch);
+  private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_limelight_back, m_manager, m_buttonBox.gamepieceSwitch, m_buttonBox.enableAimingSwitch);
 
 
   public RobotContainer(Robot robot) {
@@ -106,6 +106,7 @@ public class RobotContainer {
   public void disableInit() {
     m_candleSubsystem.rainbow();
     m_arm.resetStow();
+    m_limelight_back.setAprilTagPipeline();
   }
 
   public void disabledPeriodic() {
@@ -201,35 +202,55 @@ public class RobotContainer {
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_LOW_OUTREACH));
+        .whileTrue(m_aiming.noGrabberAimFactory())
+        .whileTrue(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddle))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH));
+        .whileTrue(
+          m_arm.sendArmToState(ArmStates.scoreConeMiddle)
+            .alongWith(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()))
+            .until(() -> m_aiming.readyToScore(true) && m_drive.notMoving())
+            .andThen(
+              m_arm.holdTargetState()
+                .alongWith(m_grabber.dropConeFactory())
+                .withTimeout(0.1),
+              m_arm.stowFrom(ArmStates.scoreConeMiddle)
+                .deadlineWith(m_grabber.dropConeFactory())
+            )
+        )
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH, true));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeHigh))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH))
-        .and(() -> m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
+        .whileTrue(
+          m_arm.sendArmToState(ArmStates.scoreConeHigh)
+            .alongWith(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()))
+            .until(() -> m_aiming.readyToScore(false) && m_drive.notMoving())
+            .andThen(
+              m_arm.holdTargetState()
+                .alongWith(m_grabber.dropConeFactory())
+                .withTimeout(0.1),
+              m_arm.stowFrom(ArmStates.scoreConeHigh)
+                .deadlineWith(m_grabber.dropConeFactory())
+            )
+        )
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH, false))
         .onTrue(m_intake.downFactory())
-        .onFalse(m_intake.downFactory()
-          .until(() -> !m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
-          .withTimeout(0.5));
+        .onFalse(m_intake.downFactory().withTimeout(0.25));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0));
+        .whileTrue(m_aiming.noGrabberAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0));
+        .whileTrue(m_aiming.aimGrabberFactory(0, true));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_LOW_OUTREACH));
+        .whileTrue(m_aiming.noGrabberAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH));
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH, true));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH))
+        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH, false))
         .and(() -> m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory()
@@ -238,10 +259,10 @@ public class RobotContainer {
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0));
+        .whileTrue(m_aiming.noGrabberAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0));
+        .whileTrue(m_aiming.aimGrabberFactory(0, true));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
@@ -337,7 +358,6 @@ public class RobotContainer {
     SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
     SmartDashboard.putData("Drop Cube", m_grabber.dropCubeFactory());
-    SmartDashboard.putData("Wrist Aiming", m_grabber.applyWristAim(() -> m_limelight_back.limelightAngleCalculator()));
 
     // Localization
     SmartDashboard.putData("LL Front Localize", new Localize(m_drive, m_limelight_front).ignoringDisable(true));
@@ -353,8 +373,9 @@ public class RobotContainer {
 
     // Misc
     SmartDashboard.putData("Play Song", new PlaySong("somethingcomfortingrobot.chrp", m_intake, m_drive, m_arm));
-    SmartDashboard.putData("Retro Pipeline", m_limelight_back.SetRetroPipelineFactory());
-    SmartDashboard.putData("April Tag Pipeline", m_limelight_back.SetAprilTagPipelineFactory());
+    SmartDashboard.putData("Retro Mid Pipeline", m_limelight_back.setRetroMidPipelineFactory());
+    SmartDashboard.putData("Retro High Pipeline", m_limelight_back.setRetroHighPipelineFactory());
+    SmartDashboard.putData("April Tag Pipeline", m_limelight_back.setAprilTagPipelineFactory());
   }
   
   private void configurePeriodics(Robot robot) {

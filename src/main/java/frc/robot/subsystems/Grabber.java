@@ -240,6 +240,9 @@ public class Grabber extends SubsystemBase {
   }
 
   public void aim(double angle) {
+    if (angle > 90 || angle < -90) {
+      angle = 0;
+    }
     m_aimAngle = angle;
   }
 
@@ -274,7 +277,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase centerConeFactory() {
-    return new RunCommand(() -> {centerCone(); movePivot(); unlockPivot();}, this).withTimeout(2);
+    return new RunCommand(() -> {centerCone(); movePivot(); unlockPivot();}, this).withTimeout(3);
   }
 
   public CommandBase holdFactory(BooleanSupplier coneMode) {
@@ -315,13 +318,9 @@ public class Grabber extends SubsystemBase {
     return new InstantCommand(() -> aim(aim));
   }
 
-  public CommandBase applyWristAim(DoubleSupplier aim) {
-    return new RunCommand(() -> aim(aim.getAsDouble()));
-  }
-
   @Override
   public void periodic() {
-    if (m_pivot.hasResetOccurred() || getPivotSpeed() < 5 && Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) > 3) {
+    if (m_pivot.hasResetOccurred() || (getPivotSpeed() < 5 && (Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) % 360) > 3)) {
       zeroRelativePivot();
     }
 
@@ -335,5 +334,9 @@ public class Grabber extends SubsystemBase {
     SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
     SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
+  }
+
+  public boolean isAtTarget() {
+    return Math.abs(convertSensorPositionToActualPosition(m_pivot.getClosedLoopError())) < 5;
   }
 }

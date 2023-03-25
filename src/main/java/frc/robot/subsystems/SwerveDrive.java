@@ -514,4 +514,8 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 
         }
 
+        public boolean notMoving() {
+            return getChassisSpeeds().vxMetersPerSecond < 0.1 && getChassisSpeeds().vyMetersPerSecond < 0.1 && getChassisSpeeds().omegaRadiansPerSecond < 0.05;
+        }
+
 }

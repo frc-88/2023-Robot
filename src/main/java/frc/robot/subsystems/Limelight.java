@@ -29,13 +29,7 @@ import frc.robot.util.LimelightHelpers;
 public class Limelight extends SubsystemBase implements BotPoseProvider {
 
   private String m_name;
-  public double m_distance; 
-  private double m_length; 
-  private double tx;
-  private double ty;
-  private double pipeHeight = .6223;
-  private double m_angle;
-  private double heightOverPipe = .3;
+  public double m_distance;
   private NetworkTable limelightTable;
 
   public Limelight(String name) {
@@ -43,35 +37,42 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
     limelightTable = NetworkTableInstance.getDefault().getTable(m_name);
   }
 
-  public double limelightAngleCalculator() { 
-    
-    //Calculates distance from limelight horizontally
-    tx = Math.toRadians(LimelightHelpers.getTX(m_name));
-    ty = Math.toRadians(LimelightHelpers.getTY(m_name));
-    m_length = (pipeHeight/(Math.tan(ty)));
-    m_distance = m_length*Math.tan(tx);
-    return Math.toDegrees(Math.atan2(heightOverPipe, m_distance))-Constants.ANGLE_CONSTANT;
+  public double getTX() {
+    return Math.toRadians(LimelightHelpers.getTX(m_name));
   }
+
+  public double getTY() {
+    return Math.toRadians(LimelightHelpers.getTY(m_name) + 24);
+  }
+
 
   public void limelightSwitch(int pipe) {
     NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
     limeLightPipe.setNumber(pipe);
   }
 
-  public void SetRetroPipeline() {
+  public void setRetroMidPipeline() {
     limelightSwitch(1);
   }
 
-  public void SetAprilTagPipeline() {
+  public void setRetroHighPipeline() {
+    limelightSwitch(2);
+  }
+
+  public void setAprilTagPipeline() {
     limelightSwitch(0);
   }
 
-  public CommandBase SetRetroPipelineFactory() {
-    return new InstantCommand(this::SetRetroPipeline);
+  public CommandBase setRetroMidPipelineFactory() {
+    return new InstantCommand(this::setRetroMidPipeline).ignoringDisable(true);
   }
 
-  public CommandBase SetAprilTagPipelineFactory() {
-    return new InstantCommand(this::SetAprilTagPipeline);
+  public CommandBase setRetroHighPipelineFactory() {
+    return new InstantCommand(this::setRetroHighPipeline).ignoringDisable(true);
+  }
+
+  public CommandBase setAprilTagPipelineFactory() {
+    return new InstantCommand(this::setAprilTagPipeline).ignoringDisable(true);
   }
 
   public Pose2d getBotPose() {
@@ -98,7 +99,6 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   public void periodic() {
     Pose2d botPose = getBotPose();
 
-    SmartDashboard.putNumber("LL:" + m_name + "Wrist Aiming", limelightAngleCalculator());
     SmartDashboard.putNumber("LL:" + m_name + ":BotX", botPose.getX());
     SmartDashboard.putNumber("LL:" + m_name + ":BotY", botPose.getY());
     SmartDashboard.putNumber("LL:" + m_name + ":BotYaw", botPose.getRotation().getDegrees());
