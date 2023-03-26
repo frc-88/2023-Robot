@@ -13,9 +13,16 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -37,8 +44,16 @@ public class Grabber extends SubsystemBase {
   private final BooleanSupplier m_coastMode;
   private final BooleanSupplier m_armStowed;
 
-  private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
-  private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
+  private final DigitalInput m_gamePieceSense;
+
+  //private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
+  //private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
+
+  private final CANSparkMax m_pivot = new CANSparkMax(Constants.GRABBER_PIVOT_ID, MotorType.kBrushless);
+  private final CANSparkMax m_roller = new CANSparkMax(Constants.GRABBER_ROLLER_ID, MotorType.kBrushless);
+  private final CANCoder m_pivotCoder = new CANCoder(Constants.PIVOT_CANCODER_ID, "1");
+
+ private final PIDController m_pivotPID;
 
   private boolean m_pivotForwards = true;
   private boolean m_pivotLocked = false;
@@ -48,19 +63,8 @@ public class Grabber extends SubsystemBase {
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
 
-  private final DoublePreferenceConstant p_pivotMaxVelocity = 
-    new DoublePreferenceConstant("Grabber/Pivot/Max Velocity", 0);
-  private final DoublePreferenceConstant p_pivotMaxAcceleration = 
-    new DoublePreferenceConstant("Grabber/Pivot/Max Acceleration", 0);
   private final PIDPreferenceConstants p_pivotPID = 
     new PIDPreferenceConstants("Grabber/Pivot/");
-
-  private final DoublePreferenceConstant p_rollerTriggerCurrent =
-    new DoublePreferenceConstant("Grabber/Roller/Trigger Current", 60);
-  private final DoublePreferenceConstant p_rollerTriggerDuration =
-    new DoublePreferenceConstant("Grabber/Roller/Trigger Duration", 0.002);
-  private final DoublePreferenceConstant p_rollerContinuousCurrent =
-    new DoublePreferenceConstant("Grabber/Roller/Continuous Current", 10);
 
   private DoublePreferenceConstant p_grabCubeSpeed =
     new DoublePreferenceConstant("Grabber/Roller/Grab Cube Speed", 0.5);
@@ -81,55 +85,24 @@ public class Grabber extends SubsystemBase {
   private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
   public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
+    this.m_gamePieceSense = new DigitalInput(4);
+    
     m_coastMode = coastMode;
     m_armStowed = armStowed;
 
-    m_pivot.configFactoryDefault();
-    m_roller.configFactoryDefault();
-
-    m_pivot.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    m_pivot.restoreFactoryDefaults();
+    m_roller.restoreFactoryDefaults();
 
     m_pivot.setInverted(true);
-    m_pivot.setSensorPhase(true);
-    m_pivot.configNeutralDeadband(0);
-    m_pivot.setNeutralMode(NeutralMode.Brake);
-    m_pivot.configMotionSCurveStrength(2);
-    m_pivot.configClosedloopRamp(0.1);
+    m_pivot.setIdleMode(IdleMode.kBrake);
+    m_pivot.setClosedLoopRampRate(0.1);
 
-    Consumer<Double> pivotHandler = (Double unused) -> {
-      m_pivot.config_kP(0, p_pivotPID.getKP().getValue());
-      m_pivot.config_kI(0, p_pivotPID.getKI().getValue());
-      m_pivot.config_kD(0, p_pivotPID.getKD().getValue());
-      m_pivot.config_kF(0, p_pivotPID.getKF().getValue());
-      m_pivot.config_IntegralZone(0, p_pivotPID.getIZone().getValue());
-      m_pivot.configMaxIntegralAccumulator(0, p_pivotPID.getIMax().getValue());
-      m_pivot.configMotionCruiseVelocity(convertActualVelocityToSensorVelocity(p_pivotMaxVelocity.getValue()));
-      m_pivot.configMotionAcceleration(convertActualVelocityToSensorVelocity(p_pivotMaxAcceleration.getValue()));
-    };
-    p_pivotPID.addChangeHandler(pivotHandler);
-    p_pivotMaxVelocity.addChangeHandler(pivotHandler);
-    p_pivotMaxAcceleration.addChangeHandler(pivotHandler);
+    m_pivotPID = new PIDController(p_pivotPID.getKP().getValue(), p_pivotPID.getKI().getValue(), p_pivotPID.getKD().getValue());
+    p_pivotPID.getKP().addChangeHandler(m_pivotPID::setP);
+    p_pivotPID.getKI().addChangeHandler(m_pivotPID::setI);
+    p_pivotPID.getKD().addChangeHandler(m_pivotPID::setD);
 
-    zeroRelativePivot();
-
-    m_roller.configNeutralDeadband(0);
-    m_roller.overrideLimitSwitchesEnable(false);
-
-    Consumer<Double> rollerHandler = (Double unused) -> {
-      SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration(
-                true,
-                p_rollerContinuousCurrent.getValue(),
-                p_rollerTriggerCurrent.getValue(),
-                p_rollerTriggerDuration.getValue()
-            );
-      m_roller.configSupplyCurrentLimit(config);
-    };
-    p_rollerContinuousCurrent.addChangeHandler(rollerHandler);
-    p_rollerTriggerCurrent.addChangeHandler(rollerHandler);
-    p_rollerTriggerDuration.addChangeHandler(rollerHandler);
-    
-    pivotHandler.accept(0.);
-    rollerHandler.accept(0.);
+    m_roller.setSmartCurrentLimit(50);
   }
 
   public boolean isReady() {
@@ -152,7 +125,7 @@ public class Grabber extends SubsystemBase {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(ControlMode.Position, convertActualPositionToSensorPosition(m_lastPivotPosition - m_aimAngle));
+    m_pivot.set(m_pivotPID.calculate(getPivotAngle(), m_lastPivotPosition - m_aimAngle));
   }
 
   private void lockPivot() {
@@ -164,25 +137,16 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAngle() {
-    return convertSensorPositionToActualPosition(m_pivot.getSelectedSensorPosition());
+    return(m_pivotCoder.getAbsolutePosition() - p_pivotOffset.getValue());
   }
 
   public double getPivotSpeed() {
-    return convertSensorVelocityToActualVelocity(m_pivot.getSelectedSensorVelocity());
-  }
-
-  public double getPivotAbsoluteAngle() {
-    return (m_pivot.getSensorCollection().getPulseWidthPosition() * 360. / 4096. - p_pivotOffset.getValue() + 270. + 360.*5.) % 360. - 270.;
-  }
-
-  public void zeroRelativePivot() {
-    m_pivot.setSelectedSensorPosition(convertActualPositionToSensorPosition(getPivotAbsoluteAngle()));
+    return convertSensorVelocityToActualVelocity(m_pivotCoder.getVelocity());
   }
 
   public void calibrateAbsolutePivot() {
     p_pivotOffset.setValue(0.);
-    p_pivotOffset.setValue(getPivotAbsoluteAngle());
-    zeroRelativePivot();
+    p_pivotOffset.setValue(getPivotAngle());
   }
 
   public void grabCube() {
@@ -216,7 +180,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public boolean hasGamePiece() {
-    return m_roller.isFwdLimitSwitchClosed() > 0;
+    return !m_gamePieceSense.get();
   }
 
   public Trigger hasGamePieceTrigger() {
@@ -320,23 +284,18 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_pivot.hasResetOccurred() || (getPivotSpeed() < 5 && (Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) % 360) > 3)) {
-      zeroRelativePivot();
-    }
-
     if (m_coastMode.getAsBoolean()) {
-      m_pivot.setNeutralMode(NeutralMode.Coast);
+      m_pivot.setIdleMode(IdleMode.kCoast);
     } else {
-      m_pivot.setNeutralMode(NeutralMode.Brake);
+      m_pivot.setIdleMode(IdleMode.kBrake);
     }
 
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
-    SmartDashboard.putNumber("Grabber Pivot Absolute Angle", getPivotAbsoluteAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
     SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
   }
 
   public boolean isAtTarget() {
-    return Math.abs(convertSensorPositionToActualPosition(m_pivot.getClosedLoopError())) < 5;
+    return Math.abs(m_pivotPID.getPositionError()) < 5;
   }
 }

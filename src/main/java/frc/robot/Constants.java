@@ -83,6 +83,7 @@ public final class Constants {
     public static final int SHOULDER_ENCODER_ID = 4;
     public static final int ELBOW_ENCODER_ID = 3;
     public static final int WRIST_ENCODER_ID = 5;
+    public static final int PIVOT_CANCODER_ID = 13;
 
     public static final int COAST_BUTTON_ID = 0;
 
