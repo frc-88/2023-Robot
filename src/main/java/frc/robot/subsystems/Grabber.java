@@ -22,6 +22,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,6 +62,8 @@ public class Grabber extends SubsystemBase {
   private double m_aimAngle = 0;
   private double m_lastPivotPosition = 0;
 
+  private int loopCount = 0;
+
   private DoublePreferenceConstant p_pivotOffset = 
     new DoublePreferenceConstant("Grabber/Pivot/Offset", 0);
 
@@ -95,6 +98,8 @@ public class Grabber extends SubsystemBase {
     p_pivotPID.getKP().addChangeHandler(m_pivotPID::setP);
     p_pivotPID.getKI().addChangeHandler(m_pivotPID::setI);
     p_pivotPID.getKD().addChangeHandler(m_pivotPID::setD);
+
+    zeroPivotAngle();
   }
 
   public boolean isReady() {
@@ -129,16 +134,25 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAngle() {
-    return(m_pivotCoder.getAbsolutePosition() - p_pivotOffset.getValue());
+    return m_pivotCoder.getPosition() - p_pivotOffset.getValue();
   }
 
   public double getPivotSpeed() {
-    return convertSensorVelocityToActualVelocity(m_pivotCoder.getVelocity());
+    return m_pivotCoder.getVelocity();
+  }
+
+  public double getPivotAbsoluteAngle() {
+    return m_pivotCoder.getAbsolutePosition();
+  }
+
+  public void zeroPivotAngle() {
+    m_pivotCoder.setPosition(((getPivotAbsoluteAngle() - p_pivotOffset.getValue() + 630) % 360) - 270);
   }
 
   public void calibrateAbsolutePivot() {
     p_pivotOffset.setValue(0.);
-    p_pivotOffset.setValue(getPivotAngle());
+    p_pivotOffset.setValue(getPivotAbsoluteAngle());
+    zeroPivotAngle();
   }
 
   public void grabCube() {
@@ -177,22 +191,6 @@ public class Grabber extends SubsystemBase {
 
   public Trigger hasGamePieceTrigger() {
     return new Trigger(this::hasGamePiece);
-  }
-
-  private double convertSensorPositionToActualPosition(double motorPosition) {
-    return motorPosition * 360. / 4096.;
-  }
-
-  private double convertSensorVelocityToActualVelocity(double motorVelocity) {
-      return convertSensorPositionToActualPosition(motorVelocity) * 10.;
-  }
-
-  private double convertActualPositionToSensorPosition(double actualPosition) {
-      return actualPosition * 4096. / 360.;
-  }
-
-  private double convertActualVelocityToSensorVelocity(double actualVelocity) {
-      return convertActualPositionToSensorPosition(actualVelocity) * 0.1;
   }
 
   public void aim(double angle) {
@@ -276,6 +274,11 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (m_pivotCoder.hasResetOccurred() || (DriverStation.isDisabled() && loopCount < 3_000 && (loopCount % 50 == 0))){
+      zeroPivotAngle();
+    }
+    loopCount++;
+
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
     SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
