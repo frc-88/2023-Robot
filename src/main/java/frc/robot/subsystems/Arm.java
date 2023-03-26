@@ -91,7 +91,7 @@ public class Arm extends SubsystemBase {
     }
 
     private Translation2d getWristPosition(double shoulderAngle, double elbowAngle) {
-        return new Translation2d(shoulderAngle, new Rotation2d(Math.toRadians(m_shoulder.getLength())))
+        return new Translation2d(m_shoulder.getLength(), new Rotation2d(Math.toRadians(shoulderAngle)))
                 .plus(new Translation2d(m_elbow.getLength(), new Rotation2d(Math.toRadians(elbowAngle))));
     }
 
@@ -115,6 +115,8 @@ public class Arm extends SubsystemBase {
             return new double[]{shoulderAngle, elbowAngle};
         }
 
+        elbowAngle = elbowAngle + 360;
+
         if (elbowAngle > shoulderAngle) {
             q2 = Math.acos(x);
             q1 = Math.atan(y / x) - Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
@@ -123,7 +125,7 @@ public class Arm extends SubsystemBase {
             q1 = Math.atan(y / x) + Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
         }
 
-        return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2)};
+        return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2) - 360.};
     }
 
     public void setAim(double x) {
