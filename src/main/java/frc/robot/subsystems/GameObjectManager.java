@@ -163,13 +163,13 @@ public class GameObjectManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Collection<Detection> detections = m_coprocessor.getAllDetections();
-        for (Detection d : detections) {
-            Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
-            Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
-            addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
-        }
-        removeInactiveGameObjects();
-        fillGridZones();
+        // Collection<Detection> detections = m_coprocessor.getAllDetections();
+        // for (Detection d : detections) {
+        //     Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
+        //     Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
+        //     addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
+        // }
+        // removeInactiveGameObjects();
+        // fillGridZones();
     }
 }

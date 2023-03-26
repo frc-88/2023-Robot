@@ -22,6 +22,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -49,8 +50,8 @@ public class Grabber extends SubsystemBase {
   //private final WPI_TalonSRX m_pivot = new WPI_TalonSRX(Constants.GRABBER_PIVOT_ID);
   //private final WPI_TalonSRX m_roller = new WPI_TalonSRX(Constants.GRABBER_ROLLER_ID);
 
-  private final CANSparkMax m_pivot = new CANSparkMax(Constants.GRABBER_PIVOT_ID, MotorType.kBrushless);
-  private final CANSparkMax m_roller = new CANSparkMax(Constants.GRABBER_ROLLER_ID, MotorType.kBrushless);
+  private final PWMSparkMax m_pivot = new PWMSparkMax(Constants.GRABBER_PIVOT_ID);
+  private final PWMSparkMax m_roller = new PWMSparkMax(Constants.GRABBER_ROLLER_ID);
   private final CANCoder m_pivotCoder = new CANCoder(Constants.PIVOT_CANCODER_ID, "1");
 
  private final PIDController m_pivotPID;
@@ -90,23 +91,14 @@ public class Grabber extends SubsystemBase {
     m_coastMode = coastMode;
     m_armStowed = armStowed;
 
-    m_pivot.restoreFactoryDefaults();
-    m_roller.restoreFactoryDefaults();
-
-    m_pivot.setInverted(true);
-    m_pivot.setIdleMode(IdleMode.kBrake);
-    m_pivot.setClosedLoopRampRate(0.1);
-
     m_pivotPID = new PIDController(p_pivotPID.getKP().getValue(), p_pivotPID.getKI().getValue(), p_pivotPID.getKD().getValue());
     p_pivotPID.getKP().addChangeHandler(m_pivotPID::setP);
     p_pivotPID.getKI().addChangeHandler(m_pivotPID::setI);
     p_pivotPID.getKD().addChangeHandler(m_pivotPID::setD);
-
-    m_roller.setSmartCurrentLimit(50);
   }
 
   public boolean isReady() {
-    return m_pivot.getBusVoltage() > 6 && m_roller.getBusVoltage() > 6;
+    return true;
   }
 
   public void setPivotForwards() {
@@ -284,12 +276,6 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_coastMode.getAsBoolean()) {
-      m_pivot.setIdleMode(IdleMode.kCoast);
-    } else {
-      m_pivot.setIdleMode(IdleMode.kBrake);
-    }
-
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
     SmartDashboard.putNumber("Grabber Aim", m_aimAngle);
