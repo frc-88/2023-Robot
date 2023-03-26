@@ -103,6 +103,7 @@ public class Arm extends SubsystemBase {
     private double[] getAimedAngles(double shoulderAngle, double elbowAngle) {
         Translation2d originalPosition = getWristPosition(shoulderAngle, elbowAngle);
 
+        elbowAngle = elbowAngle + 360;
         double l1 = m_shoulder.getLength();
         double l2 = m_elbow.getLength();
         double x = originalPosition.getX() + m_aimX;
@@ -112,16 +113,14 @@ public class Arm extends SubsystemBase {
 
         double q2_interim = (x*x + y*y - l1*l1 - l2*l2) / (2.*l1*l2);
         if (q2_interim > 1 || q2_interim < 0) {
-            return new double[]{shoulderAngle, elbowAngle};
+            return new double[]{shoulderAngle, elbowAngle - 360.};
         }
 
-        elbowAngle = elbowAngle + 360;
-
         if (elbowAngle > shoulderAngle) {
-            q2 = Math.acos(x);
+            q2 = Math.acos(q2_interim);
             q1 = Math.atan(y / x) - Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
         } else {
-            q2 = -Math.acos(x);
+            q2 = -Math.acos(q2_interim);
             q1 = Math.atan(y / x) + Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
         }
 
