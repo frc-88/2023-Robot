@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
@@ -10,16 +10,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.GameObjectManager;
-import frc.robot.subsystems.Grabber;
-import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.SwerveDrive;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
-public class Aiming {
+public class Aiming extends SubsystemBase {
 
     private final SwerveDrive m_drive;
     private final Arm m_arm;
@@ -61,13 +57,14 @@ public class Aiming {
         }
         return closestZone;
     }
-    public void giveWristAim(double outreach, boolean mid) {
+    public void giveAim(double outreach, boolean mid) {
         if (!m_enabled.getAsBoolean() && DriverStation.isTeleop()) {
-            noWristAim();
+            noAim();
             return;
         }
 
         double aimAngle;
+        double armAdjust;
         if (m_coneMode.getAsBoolean()) {
             if (mid) {
                 m_limelight.setRetroMidPipeline();
@@ -75,26 +72,32 @@ public class Aiming {
                 m_limelight.setRetroHighPipeline();
             }
             aimAngle = Math.toDegrees(Math.atan((getTargetOffset(mid) / p_aimHeight.getValue())));
+            armAdjust = getTargetDistance(mid) - getCalibratedDistance(mid);
         } else {
             m_limelight.setAprilTagPipeline();
             Pose2d botPose = m_ros.getBotPoseInches().plus(new Transform2d(new Translation2d(outreach, p_aimAdjustY.getValue()), new Rotation2d(0)));
             aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
+            armAdjust = 0;
         }
         m_grabber.aim(aimAngle); 
     }
 
-    public CommandBase aimGrabberFactory(double outreach, boolean mid) {
-        return new RunCommand(() -> giveWristAim(outreach, mid));
+    private double getCalibratedDistance(boolean mid) {
+        return mid ? 36 : 62;
     }
 
-    public void noWristAim() {
+    public CommandBase aimFactory(double outreach, boolean mid) {
+        return new RunCommand(() -> giveAim(outreach, mid));
+    }
+
+    public void noAim() {
         m_limelight.setAprilTagPipeline();
         double aimAngle = 0.;
         m_grabber.aim(aimAngle);
     }
 
-    public CommandBase noGrabberAimFactory() {
-        return new RunCommand(this::noWristAim);
+    public CommandBase noAimFactory() {
+        return new RunCommand(this::noAim);
     }
 
     private double getTargetDistance(boolean mid) {
@@ -119,7 +122,18 @@ public class Aiming {
         return m_arm.isAtTarget(10) 
             && m_grabber.isAtTarget()
             && m_enabled.getAsBoolean()
-            && ((m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - (mid ? 36 : 62)) < 2 && getTargetOffset(mid) < 5)
+            && ((m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - getCalibratedDistance(mid)) < 2 && getTargetOffset(mid) < 5)
                 || !m_coneMode.getAsBoolean());
+    }
+
+    @Override
+    public void periodic() {
+        if (m_limelight.isRetroMidPipelineActive()) {
+            SmartDashboard.putNumber("Aiming: Target Distance", getTargetDistance(true));
+            SmartDashboard.putNumber("Aiming: Target Offset", getTargetOffset(true));
+        } else if (m_limelight.isRetroHighPipelineActive()) {
+            SmartDashboard.putNumber("Aiming: Target Distance", getTargetDistance(false));
+            SmartDashboard.putNumber("Aiming: Target Offset", getTargetOffset(false));
+        }
     }
 }

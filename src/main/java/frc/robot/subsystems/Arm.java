@@ -106,23 +106,18 @@ public class Arm extends SubsystemBase {
         elbowAngle = elbowAngle + 360;
         double l1 = m_shoulder.getLength();
         double l2 = m_elbow.getLength();
-        double x = originalPosition.getX() + m_aimX;
+        double x = originalPosition.getX() - m_aimX;
         double y = originalPosition.getY();
-        double q1;
-        double q2;
 
         double q2_interim = (x*x + y*y - l1*l1 - l2*l2) / (2.*l1*l2);
-        if (q2_interim > 1 || q2_interim < 0) {
+        if (q2_interim < 0) {
             return new double[]{shoulderAngle, elbowAngle - 360.};
+        } else if (q2_interim > 1) {
+            q2_interim = 1;
         }
 
-        if (elbowAngle > shoulderAngle) {
-            q2 = Math.acos(q2_interim);
-            q1 = Math.atan(y / x) - Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
-        } else {
-            q2 = -Math.acos(q2_interim);
-            q1 = Math.atan(y / x) + Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
-        }
+        double q2 = Math.acos(q2_interim) * (elbowAngle > shoulderAngle ? 1 : -1);
+        double q1 = Math.atan2(y, x) - Math.atan2(l2*Math.sin(q2), l1 + l2*Math.cos(q2));
 
         return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2) - 360.};
     }

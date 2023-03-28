@@ -19,12 +19,12 @@ import frc.robot.commands.PlaySong;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.util.Aiming;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyDriverController;
 import frc.robot.commands.Autonomous;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.commands.Handoff;
+import frc.robot.subsystems.Aiming;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.GameObjectManager;
 import frc.robot.subsystems.Grabber;
@@ -172,37 +172,37 @@ public class RobotContainer {
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf)).whileTrue(m_grabber.grabConeFactory())
         .onFalse(m_grabber.grabConeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf)).whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
 
     m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromChute))
         .whileTrue(m_grabber.grabConeFactory())
         .onFalse(m_grabber.grabConeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.getFromChuteButton.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromChute))
         .whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
 
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.getConeFromShelf))
         .whileTrue(m_grabber.grabConeFactory())
         .onFalse(m_grabber.grabConeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.getFromShelfButton.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_arm.sendArmToState(ArmStates.getCubeFromShelf))
         .whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))
-        .whileTrue(m_aiming.noGrabberAimFactory())
+        .whileTrue(m_aiming.noAimFactory())
         .whileTrue(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()));
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(
@@ -217,7 +217,7 @@ public class RobotContainer {
                 .deadlineWith(m_grabber.dropConeFactory())
             )
         )
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH, true));
+        .whileTrue(m_aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeHigh)
@@ -231,26 +231,26 @@ public class RobotContainer {
                 .deadlineWith(m_grabber.dropConeFactory())
             )
         )
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH, false))
+        .whileTrue(m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false))
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0, true));
+        .whileTrue(m_aiming.aimFactory(0, true));
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddle))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_MIDDLE_OUTREACH, true));
+        .whileTrue(m_aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeHigh))
-        .whileTrue(m_aiming.aimGrabberFactory(Constants.AIM_HIGH_OUTREACH, false))
+        .whileTrue(m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false))
         .and(() -> m_coprocessor.isInCommunity(m_drive.getPoseEstimate()))
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory()
@@ -259,10 +259,10 @@ public class RobotContainer {
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront))
-        .whileTrue(m_aiming.noGrabberAimFactory());
+        .whileTrue(m_aiming.noAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront))
-        .whileTrue(m_aiming.aimGrabberFactory(0, true));
+        .whileTrue(m_aiming.aimFactory(0, true));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
@@ -310,7 +310,7 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
     m_intake.setDefaultCommand(m_intake.stowFactory());
-    m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stowGeneric).alongWith(m_aiming.noGrabberAimFactory()));
+    m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stowGeneric).alongWith(m_aiming.noAimFactory()));
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));
   }
 

@@ -63,6 +63,16 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
     limelightSwitch(0);
   }
 
+  public boolean isRetroMidPipelineActive() {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    return limeLightPipe.getInteger(0) == 1;
+  }
+
+  public boolean isRetroHighPipelineActive() {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    return limeLightPipe.getInteger(0) == 2;
+  }
+
   public CommandBase setRetroMidPipelineFactory() {
     return new InstantCommand(this::setRetroMidPipeline).ignoringDisable(true);
   }
