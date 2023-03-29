@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -162,13 +163,36 @@ public class GameObjectManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Collection<Detection> detections = m_coprocessor.getAllDetections();
-        for (Detection d : detections) {
-            Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
-            Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
-            addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
+        if (m_coprocessor.isTagGlobalPoseActive()) {
+            Collection<Detection> detections = m_coprocessor.getAllDetections();
+            for (Detection d : detections) {
+                Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
+                Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
+                addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
+            }
+            removeInactiveGameObjects();
+            fillGridZones();
+
+            int closestColumnIndex = 0;
+            double distance = 1000; 
+            for (int i = 0; i < 9; i++) {
+                if (gridZones.get(i).getX()-m_coprocessor.getTagGlobalPoseInches().getX() < distance) {
+                    closestColumnIndex = i;
+                    distance = gridZones.get(i).getX()-m_coprocessor.getTagGlobalPoseInches().getX();
+                }
+            }
+            GridZone low = gridZones.get(closestColumnIndex);
+            GridZone mid = gridZones.get(closestColumnIndex + 9);
+            GridZone high = gridZones.get(closestColumnIndex + 18);
+            SmartDashboard.putBoolean("Low Zone Filled", low.filled);
+            SmartDashboard.putBoolean("Mid Zone Filled", mid.filled);
+            SmartDashboard.putBoolean("High Zone Filled", high.filled);
+            SmartDashboard.putNumber("Number of seen game pieces", gameObjects.size());
+            SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
+            SmartDashboard.putNumber("Random Estimated Game Piece X", gameObjects.get(0).getX());
+            SmartDashboard.putNumber("Random Estimated Game Piece Y", gameObjects.get(0).getY());
+            SmartDashboard.putNumber("Random Estimated Game Piece Z", gameObjects.get(0).getZ());
+            SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
         }
-        removeInactiveGameObjects();
-        fillGridZones();
     }
 }

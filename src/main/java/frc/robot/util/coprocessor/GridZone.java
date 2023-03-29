@@ -6,7 +6,7 @@ public class GridZone {
     private double x = 0.0;
     private double y = 0.0;
     private double z = 0.0;
-    private double radius = 1.0;
+    private double radius = 7.5;
     public boolean filled = false;
 
     public GridZone(String type, String level, double x, double y, double z) {

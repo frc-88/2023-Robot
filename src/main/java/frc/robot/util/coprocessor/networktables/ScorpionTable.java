@@ -79,6 +79,10 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
 
     @Override
     public boolean isConnected() {
+        return isTagGlobalPoseActive();
+    }
+
+    public boolean isTagGlobalPoseActive() {
         return tagGlobalPoseTimer.isActive();
     }
 
