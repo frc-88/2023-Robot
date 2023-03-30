@@ -176,7 +176,7 @@ public class GameObjectManager extends SubsystemBase {
             int closestColumnIndex = 0;
             double distance = 1000; 
             for (int i = 0; i < 9; i++) {
-                if (gridZones.get(i).getX()-m_coprocessor.getTagGlobalPoseInches().getX() < distance) {
+                if (Math.abs(gridZones.get(i).getX()-m_coprocessor.getTagGlobalPoseInches().getX()) < distance) {
                     closestColumnIndex = i;
                     distance = gridZones.get(i).getX()-m_coprocessor.getTagGlobalPoseInches().getX();
                 }
