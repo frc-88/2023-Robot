@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.networktables.StringPublisher;
@@ -128,6 +129,8 @@ public class CoprocessorTable extends CoprocessorBase {
         zoneNoGoNamesPub = zonesTable.getStringArrayTopic("set_nogo").publish();
 
         detectionsTable = rootTable.getSubTable("detections");
+
+
     }
 
     private void updatePing() {
@@ -305,6 +308,10 @@ public class CoprocessorTable extends CoprocessorBase {
 
     private void updateDetections() {
         for (String name : detectionsTable.getSubTables()) {
+            NetworkTableValue[] values = detectionsTable.getEntry(name + "/update").readQueue();
+            if (values.length == 0) {
+                continue;
+            }
             NetworkTable detectionType = detectionsTable.getSubTable(name);
             for (String index : detectionType.getSubTables()) {
                 int index_number;
@@ -326,9 +333,14 @@ public class CoprocessorTable extends CoprocessorBase {
                     detectionType.getEntry(index + "/orientation/y").getDouble(0.0),
                     detectionType.getEntry(index + "/orientation/z").getDouble(0.0)
                 );
-                detectionManager.setDetection(name, index_number, detection);
+                addDetection(name, index_number, detection);
             }
         }
+    }
+
+    protected void addDetection(String name, int index_number, Detection detection) {
+        detectionManager.setDetection(name, index_number, detection);
+
     }
 
     private void updateZones() {
