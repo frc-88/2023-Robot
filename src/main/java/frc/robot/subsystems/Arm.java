@@ -78,6 +78,10 @@ public class Arm extends SubsystemBase {
         m_stowCommand = stowSimple();
     }
 
+    public boolean isReady() {
+        return m_shoulder.isZeroed() && m_elbow.isZeroed() && m_wrist.isZeroed() && isAtTarget(ArmStates.stowForHP, 40);
+    }
+
     public Translation2d getGrabberPosition(Translation2d shoulder, Translation2d elbow, Translation2d wrist) {
         return m_shoulderPosition.plus(shoulder).plus(elbow).plus(wrist);
     }
@@ -87,7 +91,7 @@ public class Arm extends SubsystemBase {
     }
 
     private Translation2d getWristPosition(double shoulderAngle, double elbowAngle) {
-        return new Translation2d(shoulderAngle, new Rotation2d(Math.toRadians(m_shoulder.getLength())))
+        return new Translation2d(m_shoulder.getLength(), new Rotation2d(Math.toRadians(shoulderAngle)))
                 .plus(new Translation2d(m_elbow.getLength(), new Rotation2d(Math.toRadians(elbowAngle))));
     }
 
@@ -99,27 +103,25 @@ public class Arm extends SubsystemBase {
     private double[] getAimedAngles(double shoulderAngle, double elbowAngle) {
         Translation2d originalPosition = getWristPosition(shoulderAngle, elbowAngle);
 
+        elbowAngle = elbowAngle + 360;
         double l1 = m_shoulder.getLength();
         double l2 = m_elbow.getLength();
-        double x = originalPosition.getX() + m_aimX;
+        double x = originalPosition.getX() - m_aimX;
         double y = originalPosition.getY();
-        double q1;
-        double q2;
 
         double q2_interim = (x*x + y*y - l1*l1 - l2*l2) / (2.*l1*l2);
-        if (q2_interim > 1 || q2_interim < 0) {
-            return new double[]{shoulderAngle, elbowAngle};
+        if (q2_interim < -1) {
+            q2_interim = -0.9999;
+        } else if (q2_interim > 1) {
+            q2_interim = 0.9999;
         }
 
-        if (elbowAngle > shoulderAngle) {
-            q2 = Math.acos(x);
-            q1 = Math.atan(y / x) - Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
-        } else {
-            q2 = -Math.acos(x);
-            q1 = Math.atan(y / x) + Math.atan((l2*Math.sin(q2)) / (l1 + l2*Math.cos(q2)));
-        }
+        System.out.println(q2_interim);
 
-        return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2)};
+        double q2 = Math.acos(q2_interim) * (elbowAngle > shoulderAngle ? 1 : -1);
+        double q1 = Math.atan2(y, x) - Math.atan2(l2*Math.sin(q2), l1 + l2*Math.cos(q2));
+
+        return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2) - 360.};
     }
 
     public void setAim(double x) {
@@ -165,14 +167,17 @@ public class Arm extends SubsystemBase {
 
     public void goToArmState(ArmState armState, double acceleration) {
         if (!isValidState(armState)) return;
+        if (!m_shoulder.isZeroed() || !m_elbow.isZeroed() || !m_wrist.isZeroed()) return;
 
         double shoulderAngle = armState.getShoulderAngle();
         double elbowAngle = armState.getElbowAngle();
         double wristAngle = armState.getWristAngle();
 
-        // double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
-        // shoulderAngle = aimedAngles[0];
-        // elbowAngle = aimedAngles[1];
+        if (Math.abs(m_aimX) > 0.1) {
+            double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
+            shoulderAngle = aimedAngles[0];
+            elbowAngle = aimedAngles[1];
+        }
 
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(shoulderAngle-m_shoulder.getAngle()), 
@@ -291,17 +296,17 @@ public class Arm extends SubsystemBase {
         ).andThen(new InstantCommand(this::resetStow));
     }
 
-    private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
+    private CommandBase sendArmToState(ArmState armState, BooleanSupplier until, double acceleration) {
         if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> isAtTarget(m_targetArmState, 15) ? m_stowCommand : stowSimple()).until(until);
             command.addRequirements(this);
             return command;
         } else {
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, armState.getAcceleration()), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, acceleration), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance(),
-                armState.getAcceleration(),
+                acceleration,
                 () -> !isAtTarget(ArmStates.stowFlat, 15) && !isAtTarget(ArmStates.stowForHP, 15) && !isAtTarget(ArmStates.stowWithPiece, 15) && !isAtTarget(ArmStates.stowForHandoff, 15)
             );
             command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
@@ -314,11 +319,15 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return sendArmToState(armState, () -> false);
+        return sendArmToState(armState, armState.getAcceleration());
+    }
+
+    public CommandBase sendArmToState(ArmState armState, double acceleration) {
+        return sendArmToState(armState, () -> false, acceleration);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState, () -> isAtTarget(armState));
+        return sendArmToState(armState, () -> isAtTarget(armState), armState.getAcceleration());
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {

@@ -112,6 +112,10 @@ public class Intake extends SubsystemBase {
       m_orchestra.addInstrument(m_outerRoller);
     }
 
+    public boolean isReady() {
+      return m_arm.getBusVoltage() > 6 && m_outerRoller.getBusVoltage() > 6 && m_innerRoller.getBusVoltage() > 6 && isArmUp();
+    }
+
     public void setCube() {
       m_coneMode = false;
     }
@@ -121,7 +125,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void intake() {
-      if (!hasGamePieceCentered()) {
+      if (!hasGamePieceCentered() || !m_coneMode) {
         if (!m_coneMode) {
           m_innerRoller.set(innerRollerCubeIntakeSpeed.getValue());
           m_outerRoller.set(outerRollerCubeIntakeSpeed.getValue());
@@ -221,12 +225,12 @@ public class Intake extends SubsystemBase {
         .until(this::hasGamePiece)
         .andThen(new RunCommand(() -> {intake(); armDown();}, this)
           .withTimeout(0.4)
-          .andThen(new RunCommand(() -> {intake(); armUp();}, this)
+          .andThen(new RunCommand(() -> {hold(); armUp();}, this)
             .until(this::hasGamePieceCentered)));
       CommandBase cubeCommand = new RunCommand(() -> {intake(); armDown();}, this)
         .until(this::hasGamePieceCentered)
-        .andThen(new RunCommand(() -> {hold(); armDown();}, this)
-          .withTimeout(0.4));
+        .andThen(new RunCommand(() -> {intake(); armDown();}, this)
+          .withTimeout(0.5));
       return new ConditionalCommand(coneCommand, cubeCommand, () -> m_coneMode).alongWith(new InstantCommand(() -> m_isIntaking = true)).andThen(new InstantCommand(() -> m_isIntaking = false))
           .withName("intake");
     }

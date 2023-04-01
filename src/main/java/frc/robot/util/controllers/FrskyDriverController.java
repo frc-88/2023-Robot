@@ -28,4 +28,9 @@ public class FrskyDriverController extends FrskyController implements DriverCont
         return topRightSwitch;
     }
     
+    @Override
+    public Trigger getPivotButton() {
+        return topLeftSwitch;
+    }
+    
 }
