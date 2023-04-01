@@ -308,6 +308,11 @@ public class CoprocessorTable extends CoprocessorBase {
 
     private void updateDetections() {
         for (String name : detectionsTable.getSubTables()) {
+            int count = (int)detectionsTable.getEntry(name + "/count").getDouble(0.0);
+            setDetectionCount(name, count);
+            if (count == 0) {
+                continue;
+            }
             NetworkTableValue[] values = detectionsTable.getEntry(name + "/update").readQueue();
             if (values.length == 0) {
                 continue;
@@ -341,6 +346,10 @@ public class CoprocessorTable extends CoprocessorBase {
     protected void addDetection(String name, int index_number, Detection detection) {
         detectionManager.setDetection(name, index_number, detection);
 
+    }
+
+    protected void setDetectionCount(String name, int count) {
+        detectionManager.setCount(name, count);
     }
 
     private void updateZones() {

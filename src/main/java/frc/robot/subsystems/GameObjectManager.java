@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
@@ -76,7 +78,7 @@ public class GameObjectManager extends SubsystemBase {
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        gameObjects.add(new GameObject(name, x, y, z, yaw));
+        gameObjects.add(new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw)); 
     }
 
     public void removeInactiveGameObjects() {
@@ -181,12 +183,23 @@ public class GameObjectManager extends SubsystemBase {
         return 0;
     }
 
+    private Pose2d toCornerCoordinates(Pose2d pose) {
+        Pose2d transformPose;
+        if (DriverStation.getAlliance() == Alliance.Blue) {
+            transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
+        } else  {
+            transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
+        }
+
+        return pose.relativeTo(transformPose);
+    }
+
     @Override
     public void periodic() {
         if (m_coprocessor.isTagGlobalPoseActive()) {
             Collection<Detection> detections = m_coprocessor.getAllDetections();
             for (Detection d : detections) {
-                Pose2d pos = new Pose2d(d.getX(), d.getY(), new Rotation2d(0.));
+                Pose2d pos = toCornerCoordinates(new Pose2d(d.getX(), d.getY(), new Rotation2d(0.)));
                 addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
             }
             removeInactiveGameObjects();
@@ -195,9 +208,9 @@ public class GameObjectManager extends SubsystemBase {
             
             double distance = Double.POSITIVE_INFINITY;
             for (int i = 0; i < 9; i++) {
-                if (Math.abs(gridZones.get(i).getX() - m_coprocessor.getTagGlobalPoseInches().getX()) < distance) {
+                if (Math.abs(gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY()) < distance) {
                     closestColumnIndex = i;
-                    distance = gridZones.get(i).getX() - m_coprocessor.getTagGlobalPoseInches().getX();
+                    distance = gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY();
                 }
             }
             
@@ -210,10 +223,11 @@ public class GameObjectManager extends SubsystemBase {
             SmartDashboard.putBoolean("Mid Zone Filled", mid.filled);
             SmartDashboard.putBoolean("High Zone Filled", high.filled);
             SmartDashboard.putNumber("Number of seen game pieces", gameObjects.size());
+            if (gameObjects.size() > 0) {
+                SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size()-1).getX());
+                SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size()-1).getY());
+            }
             // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
-            SmartDashboard.putNumber("Random Estimated Game Piece X", gameObjects.get(0).getX());
-            SmartDashboard.putNumber("Random Estimated Game Piece Y", gameObjects.get(0).getY());
-            SmartDashboard.putNumber("Random Estimated Game Piece Z", gameObjects.get(0).getZ());
             SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
         }
     }
