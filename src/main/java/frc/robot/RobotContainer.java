@@ -202,12 +202,11 @@ public class RobotContainer {
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow))
-        .whileTrue(m_aiming.noGrabberAimFactory())
-        .whileTrue(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()));
+        .whileTrue(m_aiming.noGrabberAimFactory());
     m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeMiddle)
-            .alongWith(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()))
+            .alongWith(m_grabber.holdConeFactory())
             .until(() -> m_aiming.readyToScore(true) && m_drive.notMoving())
             .andThen(
               m_arm.holdTargetState()
@@ -221,7 +220,7 @@ public class RobotContainer {
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeHigh)
-            .alongWith(m_grabber.centerConeFactory().andThen(m_grabber.holdConeFactory()))
+            .alongWith(m_grabber.holdConeFactory())
             .until(() -> m_aiming.readyToScore(false) && m_drive.notMoving())
             .andThen(
               m_arm.holdTargetState()
@@ -298,9 +297,6 @@ public class RobotContainer {
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
-
-    m_grabber.hasGamePieceTrigger().and(m_arm::isStowed).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
-        .whileTrue(m_grabber.centerConeFactory());
   }
 
   /////////////////////////////////////////////////////////////////////////////

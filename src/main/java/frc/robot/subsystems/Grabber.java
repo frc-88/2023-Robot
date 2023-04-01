@@ -14,9 +14,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -90,6 +87,8 @@ public class Grabber extends SubsystemBase {
 
   public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
     this.m_gamePieceSense = new DigitalInput(4);
+
+    m_roller.setInverted(true);
     
     m_coastMode = coastMode;
     m_armStowed = armStowed;
@@ -134,7 +133,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAngle() {
-    return m_pivotCoder.getPosition() - p_pivotOffset.getValue();
+    return m_pivotCoder.getPosition();
   }
 
   public double getPivotSpeed() {
@@ -142,11 +141,11 @@ public class Grabber extends SubsystemBase {
   }
 
   public double getPivotAbsoluteAngle() {
-    return m_pivotCoder.getAbsolutePosition();
+    return m_pivotCoder.getAbsolutePosition() - p_pivotOffset.getValue();
   }
 
   public void zeroPivotAngle() {
-    m_pivotCoder.setPosition(((getPivotAbsoluteAngle() - p_pivotOffset.getValue() + 630) % 360) - 270);
+    m_pivotCoder.setPosition(((getPivotAbsoluteAngle() + 630) % 360) - 270);
   }
 
   public void calibrateAbsolutePivot() {
