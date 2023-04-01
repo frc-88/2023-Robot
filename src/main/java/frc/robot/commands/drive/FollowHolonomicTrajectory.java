@@ -107,6 +107,7 @@ public class FollowHolonomicTrajectory extends CommandBase {
     if (m_stopOnTip && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
         (Math.signum(rollRate) != Math.signum(roll)) ) {
       m_cancel = true;
+      System.out.println("Auto Follow Cancel: Tipping");
     }
 
     Pose2d currentPose = m_drive.getOdometryPose();
