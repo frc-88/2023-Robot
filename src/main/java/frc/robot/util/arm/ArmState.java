@@ -19,7 +19,7 @@ public class ArmState {
     private DoublePreferenceConstant p_deployIntermediaryTolerance;
     private DoublePreferenceConstant p_retractIntermediaryTolerance;
 
-    ArmState(String name, double shoulder, double elbow, double wrist, double acceleration) {
+    public ArmState(String name, double shoulder, double elbow, double wrist, double acceleration) {
         m_name = name;
 
         m_shoulderAngle = new DoublePreferenceConstant("Arm/States/" + name + "/Shoulder Angle", shoulder);
