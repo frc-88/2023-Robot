@@ -292,17 +292,17 @@ public class Arm extends SubsystemBase {
         ).andThen(new InstantCommand(this::resetStow));
     }
 
-    private CommandBase sendArmToState(ArmState armState, BooleanSupplier until) {
+    private CommandBase sendArmToState(ArmState armState, BooleanSupplier until, double acceleration) {
         if (armState.isStow()) {
             CommandBase command = new ProxyCommand(() -> isAtTarget(m_targetArmState, 15) ? m_stowCommand : stowSimple()).until(until);
             command.addRequirements(this);
             return command;
         } else {
             CommandBase command = chainIntermediaries(
-                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, armState.getAcceleration()), this).until(until)),
+                new InstantCommand(() -> m_stowCommand = stowFrom(armState)).alongWith(new RunCommand(() -> goToArmState(armState, acceleration), this).until(until)),
                 armState.getDeployIntermediaries(),
                 armState.getDeployIntermediaryTolerance(),
-                armState.getAcceleration(),
+                acceleration,
                 () -> !isAtTarget(ArmStates.stowFlat, 15) && !isAtTarget(ArmStates.stowForHP, 15) && !isAtTarget(ArmStates.stowWithPiece, 15) && !isAtTarget(ArmStates.stowForHandoff, 15)
             );
             command = new InstantCommand(() -> {m_targetArmState = armState;}).alongWith(command);
@@ -315,11 +315,15 @@ public class Arm extends SubsystemBase {
     }
 
     public CommandBase sendArmToState(ArmState armState) {
-        return sendArmToState(armState, () -> false);
+        return sendArmToState(armState, armState.getAcceleration());
+    }
+
+    public CommandBase sendArmToState(ArmState armState, double acceleration) {
+        return sendArmToState(armState, () -> false, acceleration);
     }
 
     public CommandBase sendArmToStateAndEnd(ArmState armState) {
-        return sendArmToState(armState, () -> isAtTarget(armState));
+        return sendArmToState(armState, () -> isAtTarget(armState), armState.getAcceleration());
     }
 
     public void addToOrchestra(Orchestra m_orchestra) {

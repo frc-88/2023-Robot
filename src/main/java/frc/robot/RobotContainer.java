@@ -120,13 +120,8 @@ public class RobotContainer {
       m_autoCommandName = "Engage";
     }
 
-    // if (m_buttonBox.outgestButton.getAsBoolean() && !m_autoCommandName.equals("Center2Link")) {
-    //   m_autoCommand = Autonomous.center2Link(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-    //   m_autoCommandName = "Center2Link";
-    // }
-
     if (m_buttonBox.handoffButton.getAsBoolean() && !m_autoCommandName.equals("Center2Balance")) {
-      m_autoCommand = Autonomous.center2Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.center2HalfBalance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center2Balance";
     }
 
@@ -141,12 +136,12 @@ public class RobotContainer {
     }
 
     if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Charge1.5")) {
-      m_autoCommand = Autonomous.charge1balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.charge1HalfBalance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
       m_autoCommandName = "Charge1.5";
     }
 
     if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("WallSide")) {
-      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "WallSide";
     }
 
