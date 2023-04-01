@@ -110,11 +110,13 @@ public class Arm extends SubsystemBase {
         double y = originalPosition.getY();
 
         double q2_interim = (x*x + y*y - l1*l1 - l2*l2) / (2.*l1*l2);
-        if (q2_interim < 0) {
-            return new double[]{shoulderAngle, elbowAngle - 360.};
+        if (q2_interim < -1) {
+            q2_interim = -0.9999;
         } else if (q2_interim > 1) {
-            q2_interim = 1;
+            q2_interim = 0.9999;
         }
+
+        System.out.println(q2_interim);
 
         double q2 = Math.acos(q2_interim) * (elbowAngle > shoulderAngle ? 1 : -1);
         double q1 = Math.atan2(y, x) - Math.atan2(l2*Math.sin(q2), l1 + l2*Math.cos(q2));
@@ -171,9 +173,11 @@ public class Arm extends SubsystemBase {
         double elbowAngle = armState.getElbowAngle();
         double wristAngle = armState.getWristAngle();
 
-        // double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
-        // shoulderAngle = aimedAngles[0];
-        // elbowAngle = aimedAngles[1];
+        if (Math.abs(m_aimX) > 0.1) {
+            double[] aimedAngles = getAimedAngles(shoulderAngle, elbowAngle);
+            shoulderAngle = aimedAngles[0];
+            elbowAngle = aimedAngles[1];
+        }
 
         double greatestAngle = Collections.max(Arrays.asList(new Double[]{
             Math.abs(shoulderAngle-m_shoulder.getAngle()), 

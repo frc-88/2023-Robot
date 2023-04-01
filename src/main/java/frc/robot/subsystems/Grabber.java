@@ -86,7 +86,7 @@ public class Grabber extends SubsystemBase {
   private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
 
   public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
-    this.m_gamePieceSense = new DigitalInput(4);
+    this.m_gamePieceSense = new DigitalInput(3);
 
     m_roller.setInverted(true);
     

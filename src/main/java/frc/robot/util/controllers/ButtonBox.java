@@ -21,6 +21,8 @@ public class ButtonBox extends Joystick {
     private static int FORCE_PIVOT_BACKWARDS = 24;
     private static int ENABLE_AIMING = 23;
     private static int HP_MODE = 22;
+    private static int INDICATE_MID = 5;
+    private static int INDICATE_HIGH = 16;
 
 
 	public ButtonBox(int port) {
@@ -42,6 +44,8 @@ public class ButtonBox extends Joystick {
     public Trigger forcePivotBackwardsSwitch = new JoystickButton(this, FORCE_PIVOT_BACKWARDS);
     public Trigger enableAimingSwitch = new JoystickButton(this, ENABLE_AIMING);
     public Trigger hpModeSwitch = new JoystickButton(this, HP_MODE);
+    public Trigger indicateMid = new JoystickButton(this, INDICATE_MID);
+    public Trigger indicateHigh = new JoystickButton(this, INDICATE_HIGH);
 
 	public boolean isIntakeButtonPressed() {
 		return intakeButton.getAsBoolean();
