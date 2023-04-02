@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -29,16 +31,20 @@ public class Aiming extends SubsystemBase {
     private final BooleanSupplier m_coneMode;
     private final BooleanSupplier m_enabled;
 
-    private final DoublePreferenceConstant p_aimHeight
-        = new DoublePreferenceConstant("Aiming/Height", 8.);
+    private final DoublePreferenceConstant p_aimHeightMid
+        = new DoublePreferenceConstant("Aiming/HeightMid", 7.);
+    private final DoublePreferenceConstant p_aimHeightHigh
+        = new DoublePreferenceConstant("Aiming/HeightHigh", 4.);
     private final DoublePreferenceConstant p_aimAdjustY
         = new DoublePreferenceConstant("Aiming/AdjustY", 0);
     private final DoublePreferenceConstant p_aimAdjustYLimelight
         = new DoublePreferenceConstant("Aiming/AdjustYLimelight", 4);
 
     private final Timer m_pipelineTimer = new Timer();
+    private final Debouncer m_readyDebounce = new Debouncer(0.1, DebounceType.kRising);
 
-    private static final double MAX_DISTANCE_ERROR = 6;
+    private static final double MAX_DISTANCE_ERROR_MID = 8;
+    private static final double MAX_DISTANCE_ERROR_HIGH = 6;
     private static final double READY_TO_AIM_SEC = 1.5;
     private static final double READY_TO_SCORE_SEC = 2;
     
@@ -70,17 +76,12 @@ public class Aiming extends SubsystemBase {
         return closestZone;
     }
     public void giveAim(double outreach, boolean mid) {
-        if ((!m_enabled.getAsBoolean() && DriverStation.isTeleop()) || !m_pipelineTimer.hasElapsed(READY_TO_AIM_SEC)) {
-            noAim();
-            return;
-        }
-
         double aimAngle;
         double armAdjust;
         if (m_coneMode.getAsBoolean()) {
             setRetroPipeline(mid);
-            aimAngle = Math.toDegrees(Math.atan((getTargetOffset(mid) / p_aimHeight.getValue())));
-            armAdjust = Math.min(Math.max(getTargetDistance(mid) - getCalibratedDistance(mid), -MAX_DISTANCE_ERROR), MAX_DISTANCE_ERROR);
+            aimAngle = Math.toDegrees(Math.atan((getTargetOffset(mid) / (mid ? p_aimHeightMid : p_aimHeightHigh).getValue())));
+            armAdjust = Math.min(Math.max(getTargetDistance(mid) - getCalibratedDistance(mid), -getMaxDistanceError(mid)), getMaxDistanceError(mid));
         } else {
             m_limelight.setAprilTagPipeline();
             // Pose2d botPose = m_ros.getBotPoseInches().plus(new Transform2d(new Translation2d(outreach, p_aimAdjustY.getValue()), new Rotation2d(0)));
@@ -88,12 +89,22 @@ public class Aiming extends SubsystemBase {
             aimAngle = 0;
             armAdjust = 0;
         }
+
+        if ((!m_enabled.getAsBoolean() && DriverStation.isTeleop()) || !m_pipelineTimer.hasElapsed(READY_TO_AIM_SEC)) {
+            noAim();
+            return;
+        }
+
         m_grabber.aim(aimAngle);
         m_arm.setAim(armAdjust);
     }
 
     private double getCalibratedDistance(boolean mid) {
-        return mid ? 32.5 : 46;
+        return mid ? 41 : 52;
+    }
+
+    private double getMaxDistanceError(boolean mid) {
+        return mid ? MAX_DISTANCE_ERROR_MID : MAX_DISTANCE_ERROR_HIGH;
     }
 
     public CommandBase aimFactory(double outreach, boolean mid) {
@@ -128,11 +139,12 @@ public class Aiming extends SubsystemBase {
     }
 
     public boolean readyToScore(boolean mid) {
-        return m_arm.isAtTarget(10) 
+        boolean ret =  m_arm.isAtTarget(5) 
             && m_grabber.isAtTarget()
             && m_enabled.getAsBoolean()
             && m_pipelineTimer.hasElapsed(READY_TO_SCORE_SEC)
-            && (m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - getCalibratedDistance(mid)) < MAX_DISTANCE_ERROR && getTargetOffset(mid) < 5);
+            && (m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - getCalibratedDistance(mid)) < getMaxDistanceError(mid) && Math.abs(getTargetOffset(mid)) < 8);
+        return m_readyDebounce.calculate(ret);
     }
 
     public void setRetroPipeline(boolean mid) {

@@ -100,7 +100,7 @@ public class RobotContainer {
     }
     m_arm.resetMotionMagic();
     m_arm.resetStow();
-    m_aiming.noAim();
+    m_aiming.noAimFactory().schedule();
   }
 
   public void disableInit() {
@@ -250,7 +250,8 @@ public class RobotContainer {
         )
         .whileTrue(m_aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true))
         .onTrue(m_intake.downFactory())
-        .onFalse(m_intake.downFactory().withTimeout(0.25));;
+        .onFalse(m_intake.downFactory().withTimeout(0.25))
+        .onFalse(new WaitCommand(0.2).andThen(m_aiming.noAimFactory()));
     m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeHigh)
@@ -266,7 +267,8 @@ public class RobotContainer {
         )
         .whileTrue(m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false))
         .onTrue(m_intake.downFactory())
-        .onFalse(m_intake.downFactory().withTimeout(0.25));
+        .onFalse(m_intake.downFactory().withTimeout(0.25))
+        .onFalse(m_aiming.noAimFactory());
 
     m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
@@ -293,8 +295,8 @@ public class RobotContainer {
     m_buttonBox.gamepieceSwitch.negate().and(m_grabber.hasGamePieceTrigger())
         .whileTrue(m_candleSubsystem.holdingCubeFactory());
 
-    m_buttonBox.indicateMid.whileTrue(new RepeatCommand(m_aiming.setRetroPipelineFactory(true)));
-    m_buttonBox.indicateHigh.whileTrue(new RepeatCommand(m_aiming.setRetroPipelineFactory(false)));
+    m_buttonBox.indicateMid.whileTrue(new RepeatCommand(m_aiming.setRetroPipelineFactory(true)).ignoringDisable(true));
+    m_buttonBox.indicateHigh.whileTrue(new RepeatCommand(m_aiming.setRetroPipelineFactory(false)).ignoringDisable(true));
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -388,9 +390,9 @@ public class RobotContainer {
     SmartDashboard.putData("April Tag Pipeline", m_limelight_back.setAprilTagPipelineFactory());
 
     SmartDashboard.putData("Aim Mid", m_aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
-        .ignoringDisable(true).until(DriverStation::isEnabled).andThen(m_limelight_back.setAprilTagPipelineFactory()));
+        .ignoringDisable(true));
     SmartDashboard.putData("Aim High", m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false)
-        .ignoringDisable(true).until(DriverStation::isEnabled).andThen(m_limelight_back.setAprilTagPipelineFactory()));
+        .ignoringDisable(true));
   }
   
   private void configurePeriodics(Robot robot) {
