@@ -74,7 +74,7 @@ public class GameObjectManager extends SubsystemBase {
         // ScorpionTable.switchYAlliance(zone.getY()),
         // zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
 
-        for (GridZone gridZone : redGridZones) {
+        for (GridZone gridZone : blueGridZones) {
             System.out.println(String.format(
                 "%s,%s,%f,%f,%f",
                 gridZone.getType(),
