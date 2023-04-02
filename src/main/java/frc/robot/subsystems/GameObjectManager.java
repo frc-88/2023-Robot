@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -63,8 +65,8 @@ public class GameObjectManager extends SubsystemBase {
         ArrayList<GridZone> redGridZones = new ArrayList<>();
 
         for (GridZone blueGridZone : blueGridZones) {
-            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), blueGridZone.getX(),
-                    ScorpionTable.switchYAlliance(blueGridZone.getY()), blueGridZone.getZ()));
+            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), flipToOppositeAlliance(blueGridZone.getX()),
+                    blueGridZone.getY(), blueGridZone.getZ()));
         }
 
         // redGridZones = redGridZones.stream().map((GridZone zone) -> new
@@ -72,9 +74,9 @@ public class GameObjectManager extends SubsystemBase {
         // ScorpionTable.switchYAlliance(zone.getY()),
         // zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
 
-        for (GridZone gridZone : blueGridZones) {
+        for (GridZone gridZone : redGridZones) {
             System.out.println(String.format(
-                "%s\t%s\t%f\t%f\t%f",
+                "%s,%s,%f,%f,%f",
                 gridZone.getType(),
                 gridZone.getLevel(),
                 gridZone.getX(),
@@ -88,6 +90,17 @@ public class GameObjectManager extends SubsystemBase {
         } else if (DriverStation.getAlliance() == Alliance.Red) {
             gridZones = redGridZones;
         }
+
+        Detection d = new Detection("test", 0, new Pose3d(1.0, 0.0, 0.0, new Rotation3d()));
+        System.out.println(String.format("input: %f,%f,%f", d.getX(), d.getY(), d.getZ()));
+        Pose2d pos = toCornerCoordinates(new Pose2d(d.getX(), d.getY(), new Rotation2d(0.)));
+        System.out.println(String.format("corner: %f,%f", pos.getX(), pos.getY()));
+        addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
+        System.out.println(String.format("game object: %f,%f,%f", gameObjects.get(0).getX(), gameObjects.get(0).getY(), gameObjects.get(0).getZ()));
+    }
+
+    private double flipToOppositeAlliance(double x) {
+        return 332.0 - x;
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
