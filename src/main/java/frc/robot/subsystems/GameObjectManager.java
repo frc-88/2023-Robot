@@ -30,43 +30,43 @@ public class GameObjectManager extends SubsystemBase {
         m_coprocessor = coprocessor;
 
         gameObjects = new ArrayList<>();
-        ArrayList<GridZone> blueGridZones = new ArrayList<>();
-
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
-        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
-        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
-        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
-        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
-
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
-        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
-        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
-        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
-        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
-
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
-        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
-
         ArrayList<GridZone> redGridZones = new ArrayList<>();
 
-        for (GridZone blueGridZone : blueGridZones) {
-            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), flipToOppositeAlliance(blueGridZone.getX()),
-                    blueGridZone.getY(), blueGridZone.getZ()));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
+
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
+
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
+        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
+
+        ArrayList<GridZone> blueGridZones = new ArrayList<>();
+
+        for (GridZone redGridZone : redGridZones) {
+            blueGridZones.add(new GridZone(redGridZone.getType(), redGridZone.getLevel(),
+                    ScorpionTable.switchXAlliance(redGridZone.getX()), redGridZone.getY(), redGridZone.getZ()));
         }
 
         // redGridZones = redGridZones.stream().map((GridZone zone) -> new
@@ -86,7 +86,7 @@ public class GameObjectManager extends SubsystemBase {
         }
 
         if (DriverStation.getAlliance() == Alliance.Blue) {
-            gridZones = blueGridZones;
+            gridZones = redGridZones;
         } else if (DriverStation.getAlliance() == Alliance.Red) {
             gridZones = redGridZones;
         }
@@ -97,10 +97,6 @@ public class GameObjectManager extends SubsystemBase {
         System.out.println(String.format("corner: %f,%f", pos.getX(), pos.getY()));
         addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
         System.out.println(String.format("game object: %f,%f,%f", gameObjects.get(0).getX(), gameObjects.get(0).getY(), gameObjects.get(0).getZ()));
-    }
-
-    private double flipToOppositeAlliance(double x) {
-        return 332.0 - x;
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
