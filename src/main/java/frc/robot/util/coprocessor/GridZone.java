@@ -6,7 +6,6 @@ public class GridZone {
     private double x = 0.0;
     private double y = 0.0;
     private double z = 0.0;
-    private double radius = 7.5;
     public boolean filled = false;
 
     public GridZone(String type, String level, double x, double y, double z) {
@@ -37,13 +36,11 @@ public class GridZone {
         return z;
     }
 
-    public boolean contains(GameObject gameObject) {
-        double dist = 
-            Math.sqrt(Math.pow((gameObject.getX()-x),2)+Math.pow((gameObject.getY()-y),2)+Math.pow((gameObject.getZ()-z),2));
-        if (dist < radius) {
-            return true;
-        } else {
-            return false;
-        }
+    public double getDistance(GameObject gameObject) {
+        return Math.sqrt(
+                Math.pow((gameObject.getX() - x), 2) + 
+                Math.pow((gameObject.getY() - y), 2) +
+                Math.pow((gameObject.getZ() - z), 2)
+            );
     }
 }

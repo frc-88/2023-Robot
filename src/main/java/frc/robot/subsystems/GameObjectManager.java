@@ -16,11 +16,13 @@ import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.detections.Detection;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
+import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
     private ScorpionTable m_coprocessor;
+    private final DoublePreferenceConstant radiusThreshold = new DoublePreferenceConstant("Game Object Zone Radius", 6.5);
 
     public GameObjectManager(ScorpionTable coprocessor) {
         m_coprocessor = coprocessor;
@@ -93,7 +95,8 @@ public class GameObjectManager extends SubsystemBase {
         for (GridZone gridZone : gridZones) {
             gridZone.filled = false;
             for (GameObject gameObject : gameObjects) {
-                if (gridZone.contains(gameObject)
+                double distance = gridZone.getDistance(gameObject);
+                if (distance < radiusThreshold.getValue()
                         && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
                     gridZone.filled = true;
                 }
@@ -110,7 +113,11 @@ public class GameObjectManager extends SubsystemBase {
         for (GridZone gridZone : columnGridZones) {
             gridZone.filled = false;
             for (GameObject gameObject : gameObjects) {
-                if (gridZone.contains(gameObject)
+                double distance = gridZone.getDistance(gameObject);
+                // System.out.println(String.format("name: %s, distance: %f", gameObject.getName(), distance));
+                // System.out.println(String.format("GridX: %f, GridY: %f", gridZone.getX(), gridZone.getY()));
+                // System.out.println(String.format("ObjectX: %f, ObjectY: %f", gameObject.getX(), gameObject.getY()));
+                if (distance < radiusThreshold.getValue()
                         && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
                     gridZone.filled = true;
                 }
