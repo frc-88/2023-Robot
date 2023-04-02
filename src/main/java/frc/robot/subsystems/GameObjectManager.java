@@ -72,6 +72,17 @@ public class GameObjectManager extends SubsystemBase {
         // ScorpionTable.switchYAlliance(zone.getY()),
         // zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
 
+        for (GridZone gridZone : blueGridZones) {
+            System.out.println(String.format(
+                "%s\t%s\t%f\t%f\t%f",
+                gridZone.getType(),
+                gridZone.getLevel(),
+                gridZone.getX(),
+                gridZone.getY(),
+                gridZone.getZ()
+            ));
+        }
+
         if (DriverStation.getAlliance() == Alliance.Blue) {
             gridZones = blueGridZones;
         } else if (DriverStation.getAlliance() == Alliance.Red) {
