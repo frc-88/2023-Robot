@@ -4,12 +4,10 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -20,10 +18,10 @@ import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class Aiming extends SubsystemBase {
 
-    private final SwerveDrive m_drive;
+    //private final SwerveDrive m_drive; this is seemingly not used so I'm going to comment it out.
     private final Arm m_arm;
     private final Grabber m_grabber;
-    private final ScorpionTable m_ros;
+    //private final ScorpionTable m_ros; this is seemingly not used so I'm going to comment it out.
     private final Limelight m_limelight;
     private final GameObjectManager m_objects;
     private final BooleanSupplier m_coneMode;
@@ -31,8 +29,8 @@ public class Aiming extends SubsystemBase {
 
     private final DoublePreferenceConstant p_aimHeight
         = new DoublePreferenceConstant("Aiming/Height", 8.);
-    private final DoublePreferenceConstant p_aimAdjustY
-        = new DoublePreferenceConstant("Aiming/AdjustY", 0);
+    //private final DoublePreferenceConstant p_aimAdjustY
+    //    = new DoublePreferenceConstant("Aiming/AdjustY", 0); this is seemingly not used so I'm going to comment it out.
     private final DoublePreferenceConstant p_aimAdjustYLimelight
         = new DoublePreferenceConstant("Aiming/AdjustYLimelight", 4);
 
@@ -43,11 +41,11 @@ public class Aiming extends SubsystemBase {
     private static final double READY_TO_SCORE_SEC = 2;
     
     public Aiming(SwerveDrive drive, Arm arm, Grabber grabber, ScorpionTable ros, Limelight limelight, GameObjectManager objectManager, BooleanSupplier coneMode, BooleanSupplier enabled) {
-        m_drive = drive;
+        //m_drive = drive; linked to above removal.
         m_arm = arm;
         m_grabber = grabber;
         m_limelight = limelight;
-        m_ros = ros;
+        //m_ros = ros; linked to above removal.
         m_objects = objectManager;
         m_coneMode = coneMode;
         m_enabled = enabled;

@@ -25,9 +25,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.Helpers;
 import frc.robot.util.coprocessor.LaserScanObstacleTracker;
-import frc.robot.util.coprocessor.VelocityCommand;
-import frc.robot.util.coprocessor.ZoneInfo;
-import frc.robot.util.coprocessor.ZoneManager;
 import frc.robot.util.coprocessor.detections.Detection;
 import frc.robot.util.coprocessor.CoprocessorBase;
 

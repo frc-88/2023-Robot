@@ -12,7 +12,7 @@ import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
 public final class Falcon500DriveControllerFactoryBuilder {
     private static final double TICKS_PER_ROTATION = 2048.0;
-    private static final double WHEEL_RADIUS = 0.0508;
+    //private static final double WHEEL_RADIUS = 0.0508; this is seemingly not used so I'm going to comment it out.
 
     private static final int CAN_TIMEOUT_MS = 250;
     private static final int STATUS_FRAME_GENERAL_PERIOD_MS = 250;
