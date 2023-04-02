@@ -176,6 +176,7 @@ public class Lights extends SubsystemBase {
 
                 case 7:
                     larsonColor(255, 0, 255);
+                    m_limelight.setAprilTagPipeline();
                     if (approximatelyEqual(m_limelight.getBotPose(), m_coprocessor.getBotPose()) && counter++ > 75) {
                         m_state++;
                         counter = 0;

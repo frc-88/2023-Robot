@@ -26,6 +26,7 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private final Trajectory m_trajectory;
   private final Rotation2d m_rotation;
   private final boolean m_resetOdometry;
+  private final boolean m_stopOnTip;
   private final Timer m_timer = new Timer();
 
   private final static PIDPreferenceConstants p_vxPID = new PIDPreferenceConstants("Auto/vxPID/");
@@ -36,22 +37,34 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private final static DoublePreferenceConstant p_xTolerance = new DoublePreferenceConstant("Auto/Tolerance/x", 0.1);
   private final static DoublePreferenceConstant p_yTolerance = new DoublePreferenceConstant("Auto/Tolerance/y", 0.1);
   private final static DoublePreferenceConstant p_thetaTolerance = new DoublePreferenceConstant("Auto/Tolerance/theta", 0.05);
+  private final static DoublePreferenceConstant p_rollRateTolerance = new DoublePreferenceConstant("Auto/Tolerance/roll rate", 0.25);
+
 
   private HolonomicDriveController m_controller;
   private boolean m_cancel = false;
+  private double m_lastRoll;
 
   /** Creates a new FollowHolonomicTrajectory. */
-  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, Rotation2d startRotation,  Rotation2d endRotation, boolean resetOdometry) {
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, Rotation2d startRotation,  Rotation2d endRotation, boolean resetOdometry, boolean stopOnTip) {
     m_drive = drive;
     m_trajectory = trajectory;
     m_rotation = endRotation.minus(startRotation);
     m_resetOdometry = resetOdometry;
+    m_stopOnTip = stopOnTip;
 
     addRequirements(m_drive);
   }
 
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, Rotation2d startRotation,  Rotation2d endRotation, boolean resetOdometry) {
+    this(drive, trajectory, startRotation, endRotation, resetOdometry, false);
+  }
+
+  public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry, boolean stopOnTip) {
+    this(drive, trajectory, new Rotation2d(), new Rotation2d(), resetOdometry, stopOnTip);
+  }
+
   public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, boolean resetOdometry) {
-    this(drive, trajectory, new Rotation2d(), new Rotation2d(), resetOdometry);
+    this(drive, trajectory, new Rotation2d(), new Rotation2d(), resetOdometry, false);
   }
 
   // Called when the command is initially scheduled.
@@ -77,6 +90,8 @@ public class FollowHolonomicTrajectory extends CommandBase {
       }
     }
 
+    m_lastRoll = m_drive.getNavX().getRoll();
+
     m_controller.setEnabled(true);
     m_timer.reset();
     m_timer.start();
@@ -85,6 +100,16 @@ public class FollowHolonomicTrajectory extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double roll = m_drive.getNavX().getRoll();
+    double rollRate = roll - m_lastRoll;
+    m_lastRoll = roll;
+
+    if (m_stopOnTip && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
+        (Math.signum(rollRate) != Math.signum(roll)) ) {
+      m_cancel = true;
+      System.out.println("Auto Follow Cancel: Tipping");
+    }
+
     Pose2d currentPose = m_drive.getOdometryPose();
     Trajectory.State desiredState = m_trajectory.sample(m_timer.get());
     Rotation2d targetRotation = new Rotation2d(m_timer.get() * m_rotation.getRadians() / m_trajectory.getTotalTimeSeconds());
@@ -102,6 +127,8 @@ public class FollowHolonomicTrajectory extends CommandBase {
     SmartDashboard.putNumber("Auto:Commanded vX", targetSpeeds.vxMetersPerSecond);
     SmartDashboard.putNumber("Auto:Commanded vY", targetSpeeds.vyMetersPerSecond);
     SmartDashboard.putNumber("Auto:Commanded omega", targetSpeeds.omegaRadiansPerSecond);
+
+    SmartDashboard.putNumber("Auto:Rollm rate", rollRate);
 
     if (!m_cancel) m_drive.drive(targetSpeeds);
   }

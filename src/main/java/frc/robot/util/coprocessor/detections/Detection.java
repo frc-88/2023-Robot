@@ -1,5 +1,9 @@
 package frc.robot.util.coprocessor.detections;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
+import edu.wpi.first.math.geometry.Rotation3d;
+
 public class Detection {
     // All poses are assumed to be in the base_link frame
     // (center of the robot projected onto the ground)
@@ -14,13 +18,6 @@ public class Detection {
         this.pose = pose;
     }
     
-    public Detection(String name, int index, Position position, Orientation orientation) {
-        this.name = name;
-        this.index = index;
-        this.pose.position = position;
-        this.pose.orientation = orientation;
-    }
-
     public Detection(
         String name,
         int index,
@@ -34,13 +31,17 @@ public class Detection {
     ) {
         this.name = name;
         this.index = index;
-        pose.position.x = position_x;
-        pose.position.y = position_y;
-        pose.position.z = position_z;
-        pose.orientation.w = orientation_w;
-        pose.orientation.x = orientation_x;
-        pose.orientation.y = orientation_y;
-        pose.orientation.z = orientation_z;
+        pose = new Pose3d(
+            position_x,
+            position_y,
+            position_z,
+            new Rotation3d(new Quaternion(
+                orientation_w,
+                orientation_x,
+                orientation_y,
+                orientation_z)
+            )
+        );
     }
 
     public String getName() {
@@ -51,16 +52,31 @@ public class Detection {
         return index;
     }
 
-
-    public Position getPosition() {
-        return pose.position;
-    }
-
-    public Orientation getOrientation() {
-        return pose.orientation;
-    }
-
     public Pose3d getPose() {
         return pose;
+    }
+
+    public double getX() {
+        return pose.getX();
+    }
+
+    public double getY() {
+        return pose.getY();
+    }
+
+    public double getZ() {
+        return pose.getZ();
+    }
+
+    public void setX(double x) {
+        pose = new Pose3d(x, pose.getY(), pose.getZ(), pose.getRotation());
+    }
+
+    public void setY(double y) {
+        pose = new Pose3d(pose.getX(), y, pose.getZ(), pose.getRotation());
+    }
+
+    public void setZ(double z) {
+        pose = new Pose3d(pose.getX(), pose.getY(), z, pose.getRotation());
     }
 }

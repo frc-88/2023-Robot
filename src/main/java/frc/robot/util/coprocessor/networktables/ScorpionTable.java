@@ -5,7 +5,9 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
@@ -19,6 +21,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
+import frc.robot.util.coprocessor.detections.Detection;
 
 
 public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
@@ -66,6 +69,15 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         return getTagGlobalPose().relativeTo(transformPose);
     }
 
+    @Override
+    protected void addDetection(String name, int index_number, Detection detection) {
+        Pose2d detectionPos = detection.getPose().toPose2d();    
+        Pose2d globalPos = detectionPos.transformBy(new Transform2d(getTagGlobalPose(), new Pose2d()));
+        Detection globalDetection = new Detection(name, index_number, new Pose3d(globalPos));
+        globalDetection.setZ(detection.getPose().getZ());
+        detectionManager.setDetection(name, index_number, globalDetection);
+    }
+
     public Pose2d getBotPoseInches() {
         return getBotPose().times(39.3701);
     }
@@ -79,6 +91,10 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
 
     @Override
     public boolean isConnected() {
+        return isTagGlobalPoseActive();
+    }
+
+    public boolean isTagGlobalPoseActive() {
         return tagGlobalPoseTimer.isActive();
     }
 

@@ -2,27 +2,31 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
 import frc.robot.util.coprocessor.detections.Detection;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
+import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
     private ScorpionTable m_coprocessor;
+    private final DoublePreferenceConstant radiusThreshold = new DoublePreferenceConstant("Game Object Zone Radius", 6.5);
 
     public GameObjectManager(ScorpionTable coprocessor) {
         m_coprocessor = coprocessor;
-        
+
         gameObjects = new ArrayList<>();
         ArrayList<GridZone> blueGridZones = new ArrayList<>();
 
@@ -58,38 +62,63 @@ public class GameObjectManager extends SubsystemBase {
 
         ArrayList<GridZone> redGridZones = new ArrayList<>();
 
-        for(GridZone blueGridZone:blueGridZones) {
-            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), blueGridZone.getX(), ScorpionTable.switchYAlliance(blueGridZone.getY()), blueGridZone.getZ()));
+        for (GridZone blueGridZone : blueGridZones) {
+            redGridZones.add(new GridZone(blueGridZone.getType(), blueGridZone.getLevel(), blueGridZone.getX(),
+                    ScorpionTable.switchYAlliance(blueGridZone.getY()), blueGridZone.getZ()));
         }
-        
-        //redGridZones = redGridZones.stream().map((GridZone zone) -> new GridZone(zone.getType(), zone.getLevel(), zone.getX(), 
-        //    ScorpionTable.switchYAlliance(zone.getY()), zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
 
-        if(DriverStation.getAlliance() == Alliance.Blue) {
+        // redGridZones = redGridZones.stream().map((GridZone zone) -> new
+        // GridZone(zone.getType(), zone.getLevel(), zone.getX(),
+        // ScorpionTable.switchYAlliance(zone.getY()),
+        // zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
+
+        if (DriverStation.getAlliance() == Alliance.Blue) {
             gridZones = blueGridZones;
-        }
-        else if(DriverStation.getAlliance() == Alliance.Red) { 
+        } else if (DriverStation.getAlliance() == Alliance.Red) {
             gridZones = redGridZones;
         }
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        // gameObjects.add(new GameObject(name, x, y, z, yaw));
+        gameObjects.add(new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw)); 
     }
 
     public void removeInactiveGameObjects() {
-        // for (GameObject gameObject : gameObjects) {
-        //     if (!gameObject.isValid()) {
-        //         gameObjects.remove(gameObject);
-        //     }
-        // }
+        for (int i = gameObjects.size() - 1; i >= 0; i--) {
+            if (!gameObjects.get(i).isValid()) {
+                gameObjects.remove(i);
+            }
+        }
     }
 
     public void fillGridZones() {
         for (GridZone gridZone : gridZones) {
             gridZone.filled = false;
             for (GameObject gameObject : gameObjects) {
-                if (gridZone.contains(gameObject) && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
+                double distance = gridZone.getDistance(gameObject);
+                if (distance < radiusThreshold.getValue()
+                        && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
+                    gridZone.filled = true;
+                }
+            }
+        }
+    }
+
+    public void fillGridZonesColumn(int columnIndex) {
+        ArrayList<GridZone> columnGridZones = new ArrayList<GridZone>();
+
+        columnGridZones.add(gridZones.get(columnIndex));
+        columnGridZones.add(gridZones.get(columnIndex + 9));
+        columnGridZones.add(gridZones.get(columnIndex + 18));
+        for (GridZone gridZone : columnGridZones) {
+            gridZone.filled = false;
+            for (GameObject gameObject : gameObjects) {
+                double distance = gridZone.getDistance(gameObject);
+                // System.out.println(String.format("name: %s, distance: %f", gameObject.getName(), distance));
+                // System.out.println(String.format("GridX: %f, GridY: %f", gridZone.getX(), gridZone.getY()));
+                // System.out.println(String.format("ObjectX: %f, ObjectY: %f", gameObject.getX(), gameObject.getY()));
+                if (distance < radiusThreshold.getValue()
+                        && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
                     gridZone.filled = true;
                 }
             }
@@ -100,28 +129,28 @@ public class GameObjectManager extends SubsystemBase {
         ArrayList<Integer> links = new ArrayList<>();
         for (int i = 1; i < 8; i++) {
             if (gridZones.get(i).filled) {
-                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
-                    links.add(i+1);
-                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
-                    links.add(i-1);
+                if (gridZones.get(i - 1).filled && !gridZones.get(i + 1).filled && !links.contains(i + 1)) {
+                    links.add(i + 1);
+                } else if (gridZones.get(i + 1).filled && !gridZones.get(i - 1).filled && !links.contains(i - 1)) {
+                    links.add(i - 1);
                 }
             }
         }
         for (int i = 9; i < 17; i++) {
             if (gridZones.get(i).filled) {
-                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
-                    links.add(i+1);
-                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
-                    links.add(i-1);
+                if (gridZones.get(i - 1).filled && !gridZones.get(i + 1).filled && !links.contains(i + 1)) {
+                    links.add(i + 1);
+                } else if (gridZones.get(i + 1).filled && !gridZones.get(i - 1).filled && !links.contains(i - 1)) {
+                    links.add(i - 1);
                 }
             }
         }
         for (int i = 19; i < 26; i++) {
             if (gridZones.get(i).filled) {
-                if (gridZones.get(i-1).filled && !gridZones.get(i+1).filled && !links.contains(i+1)) {
-                    links.add(i+1);
-                } else if (gridZones.get(i+1).filled && !gridZones.get(i-1).filled && !links.contains(i-1)) {
-                    links.add(i-1);
+                if (gridZones.get(i - 1).filled && !gridZones.get(i + 1).filled && !links.contains(i + 1)) {
+                    links.add(i + 1);
+                } else if (gridZones.get(i + 1).filled && !gridZones.get(i - 1).filled && !links.contains(i - 1)) {
+                    links.add(i - 1);
                 }
             }
         }
@@ -161,15 +190,52 @@ public class GameObjectManager extends SubsystemBase {
         return 0;
     }
 
+    private Pose2d toCornerCoordinates(Pose2d pose) {
+        Pose2d transformPose;
+        if (DriverStation.getAlliance() == Alliance.Blue) {
+            transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
+        } else  {
+            transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
+        }
+
+        return pose.relativeTo(transformPose);
+    }
+
     @Override
     public void periodic() {
-        // Collection<Detection> detections = m_coprocessor.getAllDetections();
-        // for (Detection d : detections) {
-        //     Pose2d pos = new Pose2d(d.getPosition().x, d.getPosition().y, new Rotation2d(0.));
-        //     Pose2d globalpos = pos.transformBy(new Transform2d(m_coprocessor.getTagGlobalPose(), new Pose2d()));
-        //     addGameObject(d.getName(), globalpos.getX(), globalpos.getY(), d.getPosition().z, 0);
-        // }
-        // removeInactiveGameObjects();
-        // fillGridZones();
+        if (m_coprocessor.isTagGlobalPoseActive()) {
+            Collection<Detection> detections = m_coprocessor.getAllDetections();
+            for (Detection d : detections) {
+                Pose2d pos = toCornerCoordinates(new Pose2d(d.getX(), d.getY(), new Rotation2d(0.)));
+                addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
+            }
+            removeInactiveGameObjects();
+
+            int closestColumnIndex = 0;
+            
+            double distance = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < 9; i++) {
+                if (Math.abs(gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY()) < distance) {
+                    closestColumnIndex = i;
+                    distance = gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY();
+                }
+            }
+            
+            fillGridZonesColumn(closestColumnIndex);
+
+            GridZone low = gridZones.get(closestColumnIndex);
+            GridZone mid = gridZones.get(closestColumnIndex + 9);
+            GridZone high = gridZones.get(closestColumnIndex + 18);
+            SmartDashboard.putBoolean("Low Zone Filled", low.filled);
+            SmartDashboard.putBoolean("Mid Zone Filled", mid.filled);
+            SmartDashboard.putBoolean("High Zone Filled", high.filled);
+            SmartDashboard.putNumber("Number of seen game pieces", gameObjects.size());
+            if (gameObjects.size() > 0) {
+                SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size()-1).getX());
+                SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size()-1).getY());
+            }
+            // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
+            SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
+        }
     }
 }
