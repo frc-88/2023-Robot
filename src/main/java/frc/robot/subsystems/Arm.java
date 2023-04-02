@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.math.geometry.Rotation2d;

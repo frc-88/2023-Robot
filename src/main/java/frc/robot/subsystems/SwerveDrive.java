@@ -29,7 +29,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -137,7 +136,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
         private SwerveDrivePoseEstimator m_poseEstimator;
         private Pose2d m_pose;
         private boolean m_pivot = false;
-        private boolean m_odometryReset = false;
+        //private boolean m_odometryReset = false; this is seemingly not used so I'm going to comment it out.
 
         private Pose2d m_traj_pose;
         private Pose2d m_traj_reset_pose;
@@ -280,7 +279,7 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                                 startPose);
                 m_poseEstimator.resetPosition(startGyro, getSwerveModulePositions(), startPose);
                 m_fieldOffset = startPose.getRotation().getDegrees() - startGyro.getDegrees();
-                m_odometryReset = true;
+                //m_odometryReset = true; linked to above removal.
         }
 
         public void resetTrajectoryPose(Pose2d startPose) {

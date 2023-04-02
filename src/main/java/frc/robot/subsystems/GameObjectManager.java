@@ -1,27 +1,20 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
 import frc.robot.util.coprocessor.GridZone;
-import frc.robot.util.coprocessor.detections.Detection;
 import frc.robot.util.coprocessor.networktables.ScorpionTable;
 
 public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
-    private ScorpionTable m_coprocessor;
+    //private ScorpionTable m_coprocessor; this is seemingly not used so I'm going to comment it out.
 
     public GameObjectManager(ScorpionTable coprocessor) {
-        m_coprocessor = coprocessor;
+        //m_coprocessor = coprocessor; linked to above removal.
         
         gameObjects = new ArrayList<>();
         ArrayList<GridZone> blueGridZones = new ArrayList<>();

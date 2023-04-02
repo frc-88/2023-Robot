@@ -20,7 +20,7 @@ public class FollowTrajectory extends CommandBase {
   private RamseteController m_controller = new RamseteController();
   private Timer m_timer = new Timer();
   private double m_duration;
-  private Pose2d m_endPose;
+  //private Pose2d m_endPose; this is seemingly not used so I'm going to comment it out.
   private int m_state;
 
   private static boolean forceResetOdometry = false;
@@ -31,7 +31,7 @@ public class FollowTrajectory extends CommandBase {
     m_resetOdometry = resetOdometry;
     m_trajectory = trajectory;
     m_duration = m_trajectory.getTotalTimeSeconds();
-    m_endPose = m_trajectory.sample(m_duration).poseMeters;
+    //m_endPose = m_trajectory.sample(m_duration).poseMeters; linked to above removal, put back if necessary.
 
     addRequirements(m_drive);
   }

@@ -5,14 +5,6 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -21,7 +13,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -40,7 +31,7 @@ import frc.robot.util.preferenceconstants.PIDPreferenceConstants;
 
 public class Grabber extends SubsystemBase {
 
-  private final BooleanSupplier m_coastMode;
+  //private final BooleanSupplier m_coastMode;
   private final BooleanSupplier m_armStowed;
 
   private final DigitalInput m_gamePieceSense;
@@ -90,7 +81,7 @@ public class Grabber extends SubsystemBase {
 
     m_roller.setInverted(true);
     
-    m_coastMode = coastMode;
+    //m_coastMode = coastMode;
     m_armStowed = armStowed;
 
     m_pivotPID = new PIDController(p_pivotPID.getKP().getValue(), p_pivotPID.getKI().getValue(), p_pivotPID.getKD().getValue());
@@ -124,9 +115,9 @@ public class Grabber extends SubsystemBase {
     m_pivot.set(m_pivotPID.calculate(getPivotAngle(), m_lastPivotPosition - m_aimAngle));
   }
 
-  private void lockPivot() {
-    m_pivotLocked = true;
-  }
+  // private void lockPivot() {
+  //   m_pivotLocked = true; this is seemingly not used so I'm going to comment it out.
+  // }
 
   private void unlockPivot() {
     m_pivotLocked = false;
