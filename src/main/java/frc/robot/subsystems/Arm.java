@@ -361,6 +361,10 @@ public class Arm extends SubsystemBase {
         m_orchestra.addInstrument(m_wrist.getMotor());
     }
 
+    public double getAimX() {
+		return m_aimX;
+	}
+
     @Override
     public void periodic() {
         if (DriverStation.isDisabled()) {

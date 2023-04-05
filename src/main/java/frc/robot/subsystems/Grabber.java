@@ -200,6 +200,10 @@ public class Grabber extends SubsystemBase {
     m_aimAngle = angle;
   }
 
+  public double getAim() {
+    return m_aimAngle;
+  }
+
   // COMMAND FACTORIES
 
   public CommandBase calibrateAbsolutePivotFactory() {
@@ -287,4 +291,5 @@ public class Grabber extends SubsystemBase {
   public boolean isAtTarget() {
     return Math.abs(m_pivotPID.getPositionError()) < 5;
   }
+
 }

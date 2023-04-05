@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -221,7 +222,8 @@ public class Autonomous {
                 ).withTimeout(.5),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                printAiming(arm, grabber)
                 ).withTimeout(0.1),
             arm.stowFrom(ArmStates.scoreConeMiddle).withTimeout(0.5).deadlineWith(
                 intake.downFactory(),
@@ -255,7 +257,8 @@ public class Autonomous {
                     ).withTimeout(.5),
                 arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                     intake.downFactory(), grabber.dropConeFactory(),
-                    aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                    aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                    printAiming(arm, grabber)
                     ).withTimeout(0.1),
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallGrid7ToMidfield.wpilib.json"), false)
                 .deadlineWith(intake.stowFactory(), arm.stowSimple(), grabber.dropConeFactory(), aiming.noAimFactory(),
@@ -283,12 +286,13 @@ public class Autonomous {
                     )
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
-                    intake.downFactory(), grabber.grabConeFactory(),
-                    aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
-                    ).withTimeout(.6),
+                intake.downFactory(), grabber.grabConeFactory(),
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                printAiming(arm, grabber)
                 ).withTimeout(0.1),
             ending
         );
@@ -323,7 +327,8 @@ public class Autonomous {
                 ).withTimeout(.9),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                printAiming(arm, grabber)
                 ).withTimeout(0.1)
         );
     }
@@ -337,5 +342,9 @@ public class Autonomous {
                 intake.downFactory()),
             arm.holdTargetState().alongWith(grabber.dropCubeFactory(), intake.downFactory()).withTimeout(0.05)
         );
+    }
+
+    private static CommandBase printAiming(Arm arm, Grabber grabber) {
+        return new InstantCommand(() -> System.out.println("%@% AIMING - ARM: " + arm.getAimX() + " - PIVOT: " + grabber.getAim() + " %@%"));
     }
 }
