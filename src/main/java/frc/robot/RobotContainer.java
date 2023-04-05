@@ -130,19 +130,29 @@ public class RobotContainer {
       m_autoCommandName = "Center3";
     }
 
+    if (m_buttonBox.getFromShelfButton.getAsBoolean() && !m_autoCommandName.equals("Center3Half")) {
+      m_autoCommand = Autonomous.center3Half(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
+      m_autoCommandName = "Center3Half";
+    }
+
     if (m_buttonBox.scoreButton.getAsBoolean() && !m_autoCommandName.equals("Center3Balance")) {
       m_autoCommand = Autonomous.center3Balance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Center3Balance";
     }
 
-    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Charge1.5")) {
+    if (m_buttonBox.setMiddle.getAsBoolean() && !m_autoCommandName.equals("Charge1Half")) {
       m_autoCommand = Autonomous.charge1HalfBalance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
-      m_autoCommandName = "Charge1.5";
+      m_autoCommandName = "Charge1Half";
     }
 
-    if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("WallSide")) {
-      m_autoCommand = Autonomous.wall2(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
-      m_autoCommandName = "WallSide";
+    if (m_buttonBox.getFromChuteButton.getAsBoolean() && !m_autoCommandName.equals("Charge1Mobility")) {
+      m_autoCommand = Autonomous.charge1MobilityBalance(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_coprocessor);
+      m_autoCommandName = "Charge1Mobility";
+    }
+
+    if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("Wall3")) {
+      m_autoCommand = Autonomous.wall3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
+      m_autoCommandName = "Wall3";
     }
 
     SmartDashboard.putString("Auto", m_autoCommandName);
@@ -195,7 +205,7 @@ public class RobotContainer {
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeMiddle)
             .alongWith(m_grabber.holdConeFactory())
-            .until(() -> m_aiming.readyToScore(true) && m_drive.notMoving())
+            .until(() -> m_aiming.readyToScore(true))
             .andThen(
               m_arm.holdTargetState()
                 .alongWith(m_grabber.dropConeFactory())
@@ -213,7 +223,7 @@ public class RobotContainer {
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeHigh)
             .alongWith(m_grabber.holdConeFactory())
-            .until(() -> m_aiming.readyToScore(false) && m_drive.notMoving())
+            .until(() -> m_aiming.readyToScore(false))
             .andThen(
               m_arm.holdTargetState()
                 .alongWith(m_grabber.dropConeFactory())
@@ -239,7 +249,7 @@ public class RobotContainer {
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeMiddle)
             .alongWith(m_grabber.holdCubeFactory())
-            .until(() -> m_aiming.readyToScore(true) && m_drive.notMoving())
+            .until(() -> m_aiming.readyToScore(true))
             .andThen(
               m_arm.holdTargetState()
                 .alongWith(m_grabber.dropCubeFactory())
@@ -256,7 +266,7 @@ public class RobotContainer {
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeHigh)
             .alongWith(m_grabber.holdCubeFactory())
-            .until(() -> m_aiming.readyToScore(false) && m_drive.notMoving())
+            .until(() -> m_aiming.readyToScore(false))
             .andThen(
               m_arm.holdTargetState()
                 .alongWith(m_grabber.dropCubeFactory())
@@ -308,9 +318,9 @@ public class RobotContainer {
     m_buttonBox.forcePivotBackwardsSwitch.and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.forcePivotBackwardsFactory()));
     m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
 
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled)
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
-    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled)
+    m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
   }
 

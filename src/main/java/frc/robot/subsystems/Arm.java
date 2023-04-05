@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix.music.Orchestra;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -50,6 +51,7 @@ public class Arm extends SubsystemBase {
     private int loopCount = 0;
 
     private double m_aimX = 0;
+    private SlewRateLimiter m_aimLimiter = new SlewRateLimiter(10);
 
     public Arm() {
         this.m_coastButton = new DigitalInput(0);
@@ -101,7 +103,11 @@ public class Arm extends SubsystemBase {
     }
 
     private double[] getAimedAngles(double shoulderAngle, double elbowAngle) {
-        if (Math.abs(m_aimX) < 0.1 || m_targetArmState.isStow()) {
+        if (m_targetArmState.isStow() || m_wrist.getAngle() < 110) {
+            m_aimX = 0;
+            m_aimLimiter.reset(0);
+            return new double[]{shoulderAngle, elbowAngle};
+        } else if (Math.abs(m_aimX) < 0.1) {
             return new double[]{shoulderAngle, elbowAngle};
         }
 
@@ -126,8 +132,13 @@ public class Arm extends SubsystemBase {
         return new double[]{Math.toDegrees(q1), Math.toDegrees(q1 + q2) - 360.};
     }
 
+    public void resetAim() {
+        m_aimX = 0;
+        m_aimLimiter.reset(0);
+    }
+
     public void setAim(double x) {
-        m_aimX = x;
+        m_aimX = m_aimLimiter.calculate(x);
     }
 
     public boolean isValidState(ArmState armState) {    
@@ -230,7 +241,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean isStowed() {
-        return m_targetArmState.isStow() && isAtTarget(m_targetArmState, 30);
+        return m_targetArmState.isStow() && isAtTarget(30);
     }
 
     public boolean coastModeEnabled() {
@@ -272,11 +283,13 @@ public class Arm extends SubsystemBase {
             double m_acceleration;
             @Override
             public void initialize() {
+                resetAim();
                 m_acceleration = m_targetArmState.getAcceleration();
                 m_targetArmState = getCurrentStow();
             }
 
             public void execute() {
+                m_targetArmState = getCurrentStow();
                 goToArmState(getCurrentStow(), m_acceleration);
             }
         };

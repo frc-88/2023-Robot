@@ -41,10 +41,10 @@ public class Aiming extends SubsystemBase {
         = new DoublePreferenceConstant("Aiming/AdjustYLimelight", 4);
 
     private final Timer m_pipelineTimer = new Timer();
-    private final Debouncer m_readyDebounce = new Debouncer(0.1, DebounceType.kRising);
+    private final Debouncer m_readyDebounce = new Debouncer(0.3, DebounceType.kRising);
 
-    private static final double MAX_DISTANCE_ERROR_MID = 8;
-    private static final double MAX_DISTANCE_ERROR_HIGH = 6;
+    private static final double MAX_DISTANCE_ERROR_MID = 7;
+    private static final double MAX_DISTANCE_ERROR_HIGH = 7;
     private static final double READY_TO_AIM_SEC = 1.5;
     private static final double READY_TO_SCORE_SEC = 2;
     
@@ -100,11 +100,15 @@ public class Aiming extends SubsystemBase {
     }
 
     private double getCalibratedDistance(boolean mid) {
-        return mid ? 41 : 52;
+        return mid ? 39.9 : 52.4;
     }
 
     private double getMaxDistanceError(boolean mid) {
         return mid ? MAX_DISTANCE_ERROR_MID : MAX_DISTANCE_ERROR_HIGH;
+    }
+
+    private double getMaxOffsetError(boolean mid) {
+        return mid ? 8 : 6;
     }
 
     public CommandBase aimFactory(double outreach, boolean mid) {
@@ -113,7 +117,7 @@ public class Aiming extends SubsystemBase {
 
     public void noAim() {
         m_grabber.aim(0);
-        m_arm.setAim(0);
+        m_arm.resetAim();
     }
 
     public CommandBase noAimFactory() {
@@ -139,11 +143,12 @@ public class Aiming extends SubsystemBase {
     }
 
     public boolean readyToScore(boolean mid) {
-        boolean ret =  m_arm.isAtTarget(5) 
+        boolean ret =  m_arm.isAtTarget(8) 
             && m_grabber.isAtTarget()
+            && m_drive.notMoving()
             && m_enabled.getAsBoolean()
             && m_pipelineTimer.hasElapsed(READY_TO_SCORE_SEC)
-            && (m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - getCalibratedDistance(mid)) < getMaxDistanceError(mid) && Math.abs(getTargetOffset(mid)) < 8);
+            && (m_coneMode.getAsBoolean() && Math.abs(getTargetDistance(mid) - getCalibratedDistance(mid)) < getMaxDistanceError(mid) && Math.abs(getTargetOffset(mid)) < getMaxOffsetError(mid));
         return m_readyDebounce.calculate(ret);
     }
 
