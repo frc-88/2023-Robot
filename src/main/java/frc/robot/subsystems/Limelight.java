@@ -42,7 +42,7 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   }
 
   public double getTY() {
-    return Math.toRadians(LimelightHelpers.getTY(m_name) + 24);
+    return Math.toRadians(LimelightHelpers.getTY(m_name) + 26);
   }
 
 
@@ -61,6 +61,21 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
 
   public void setAprilTagPipeline() {
     limelightSwitch(0);
+  }
+
+  public boolean isAprilTagPipelineActive() {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    return limeLightPipe.getInteger(0) == 0;
+  }
+
+  public boolean isRetroMidPipelineActive() {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    return limeLightPipe.getInteger(0) == 1;
+  }
+
+  public boolean isRetroHighPipelineActive() {
+    NetworkTableEntry limeLightPipe = limelightTable.getEntry("pipeline");
+    return limeLightPipe.getInteger(0) == 2;
   }
 
   public CommandBase setRetroMidPipelineFactory() {
