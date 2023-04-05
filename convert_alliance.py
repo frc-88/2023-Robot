@@ -3,7 +3,7 @@ import glob
 
 
 JSON_PATH = "src\\main\\deploy\\pathplanner\\"
-CONVERT_FROM_RED = True
+CONVERT_FROM_RED = False
 FIELD_WIDTH = 16.54
 Y_ADJUST = 0
 X_ADJUST = 0
