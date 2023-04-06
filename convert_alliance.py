@@ -21,11 +21,11 @@ for file_to_convert in files_to_convert:
             waypoint["anchorPoint"]["x"] = waypoint["anchorPoint"]["x"] + X_ADJUST
             waypoint["anchorPoint"]["y"] = waypoint["anchorPoint"]["y"] + Y_ADJUST
         if waypoint["nextControl"] is not None:
-            waypoint["nextPoint"]["x"] = waypoint["nextPoint"]["x"] + X_ADJUST
-            waypoint["nextPoint"]["y"] = waypoint["nextPoint"]["y"] + Y_ADJUST
+            waypoint["nextControl"]["x"] = waypoint["nextControl"]["x"] + X_ADJUST
+            waypoint["nextControl"]["y"] = waypoint["nextControl"]["y"] + Y_ADJUST
         if waypoint["prevControl"] is not None:
-            waypoint["prevPoint"]["x"] = waypoint["prevPoint"]["x"] + X_ADJUST
-            waypoint["prevPoint"]["y"] = waypoint["prevPoint"]["y"] + Y_ADJUST
+            waypoint["prevControl"]["x"] = waypoint["prevControl"]["x"] + X_ADJUST
+            waypoint["prevControl"]["y"] = waypoint["prevControl"]["y"] + Y_ADJUST
             
     with open(file_to_convert, 'w') as f:
         json.dump(data, f, indent=4)
