@@ -3,17 +3,24 @@ package frc.robot.util.coprocessor;
 public class GridZone {
     private String type = "";
     private String level = "";
+    private String contents = "";
     private double x = 0.0;
     private double y = 0.0;
     private double z = 0.0;
     public boolean filled = false;
 
-    public GridZone(String type, String level, double x, double y, double z) {
+    public GridZone(String type, String level, String contents, double x, double y, double z) {
         this.type = type;
         this.level = level;
+        this.contents = contents;
+
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 
     public String getType() {
@@ -22,6 +29,10 @@ public class GridZone {
 
     public String getLevel() {
         return level;
+    }
+
+    public String getContents() {
+        return contents;
     }
 
     public double getX() {
