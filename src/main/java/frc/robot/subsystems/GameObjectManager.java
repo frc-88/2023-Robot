@@ -30,40 +30,40 @@ public class GameObjectManager extends SubsystemBase {
         gameObjects = new ArrayList<>();
         ArrayList<GridZone> redGridZones = new ArrayList<>();
 
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 20., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", "EMPTY", 14.32, 42., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 64., 46.));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 86., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", "EMPTY", 14.32, 108., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 130., 46.));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 152., 46.));
+        redGridZones.add(new GridZone("CUBE", "HIGH", "EMPTY", 14.32, 174., 35.5));
+        redGridZones.add(new GridZone("CONE", "HIGH", "EMPTY", 14.32, 196., 46.));
 
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 20., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", "EMPTY", 31.35, 42., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 64., 34.));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 86., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", "EMPTY", 31.35, 108., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 130., 34.));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 152., 34.));
+        redGridZones.add(new GridZone("CUBE", "MIDDLE", "EMPTY", 31.35, 174., 23.53));
+        redGridZones.add(new GridZone("CONE", "MIDDLE", "EMPTY", 31.35, 196., 34.));
 
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 20., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 42., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 64., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 86., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 108., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 130., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 152., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 174., 0.));
+        redGridZones.add(new GridZone("HYBRID", "LOW", "EMPTY", 46.91, 196., 0.));
 
         ArrayList<GridZone> blueGridZones = new ArrayList<>();
 
         for (GridZone redGridZone : redGridZones) {
-            blueGridZones.add(new GridZone(redGridZone.getType(), redGridZone.getLevel(),
+            blueGridZones.add(new GridZone(redGridZone.getType(), redGridZone.getLevel(), redGridZone.getContents(),
                     ScorpionTable.switchXAlliance(redGridZone.getX()), redGridZone.getY(), redGridZone.getZ()));
         }
 
@@ -80,7 +80,22 @@ public class GameObjectManager extends SubsystemBase {
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        gameObjects.add(new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw)); 
+        boolean onGrid = false;
+        GameObject gameObject = new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw);
+
+        for (GridZone gridZone : gridZones) {
+            double distance = gridZone.getDistance(gameObject);
+            if (distance < radiusThreshold.getValue()
+                    && (gridZone.getType() == gameObject.getName() || gridZone.getType() == "HYBRID")) {
+                onGrid = true;
+                gridZone.filled = true;
+                gridZone.setContents(gameObject.getName());
+            }
+        }
+
+        if (!onGrid) {
+            gameObjects.add(gameObject);
+        }
     }
 
     public void removeInactiveGameObjects() {
@@ -97,8 +112,9 @@ public class GameObjectManager extends SubsystemBase {
             for (GameObject gameObject : gameObjects) {
                 double distance = gridZone.getDistance(gameObject);
                 if (distance < radiusThreshold.getValue()
-                        && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
+                        && (gridZone.getType() == gameObject.getName() || gridZone.getType() == "HYBRID")) {
                     gridZone.filled = true;
+                    gridZone.setContents(gameObject.getName());
                 }
             }
         }
@@ -204,11 +220,13 @@ public class GameObjectManager extends SubsystemBase {
     @Override
     public void periodic() {
         if (m_coprocessor.isTagGlobalPoseActive()) {
+
             Collection<Detection> detections = m_coprocessor.getAllDetections();
             for (Detection d : detections) {
                 Pose2d pos = toCornerCoordinates(new Pose2d(d.getX(), d.getY(), new Rotation2d(0.)));
                 addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
             }
+
             removeInactiveGameObjects();
 
             int closestColumnIndex = 0;
@@ -221,7 +239,7 @@ public class GameObjectManager extends SubsystemBase {
                 }
             }
             
-            fillGridZonesColumn(closestColumnIndex);
+            // fillGridZonesColumn(closestColumnIndex);
 
             GridZone low = gridZones.get(closestColumnIndex);
             GridZone mid = gridZones.get(closestColumnIndex + 9);
@@ -237,5 +255,11 @@ public class GameObjectManager extends SubsystemBase {
             // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
             SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
         }
+
+        for (GridZone gridZone : gridZones) {
+            int index = gridZones.indexOf(gridZone);
+            SmartDashboard.putString("Gridzone" + index, gridZone.getContents());
+        }
+
     }
 }
