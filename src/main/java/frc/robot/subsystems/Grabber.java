@@ -122,7 +122,7 @@ public class Grabber extends SubsystemBase {
     if (!m_pivotLocked && m_armStowed.getAsBoolean()) {
       m_lastPivotPosition = m_pivotForwards ? 0 : -180;
     }
-    m_pivot.set(m_pivotPID.calculate(getPivotAngle(), m_lastPivotPosition - m_aimAngle));
+    m_pivot.set(m_pivotPID.calculate(getPivotAngle(), m_lastPivotPosition - (m_lastPivotPosition < -90 ? m_aimAngle : 0)));
   }
 
   private void lockPivot() {
@@ -278,7 +278,7 @@ public class Grabber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_pivotCoder.hasResetOccurred() || (DriverStation.isDisabled() && loopCount < 3_000 && (loopCount % 50 == 0))){
+    if (m_pivotCoder.hasResetOccurred() || (DriverStation.isDisabled() && loopCount < 3_000 && (loopCount % 50 == 0)) || (getPivotSpeed() < 5 && (Math.abs(getPivotAbsoluteAngle() - getPivotAngle()) % 360) > 2)){
       zeroPivotAngle();
     }
     loopCount++;

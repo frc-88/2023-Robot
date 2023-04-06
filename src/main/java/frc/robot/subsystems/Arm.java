@@ -103,7 +103,7 @@ public class Arm extends SubsystemBase {
     }
 
     private double[] getAimedAngles(double shoulderAngle, double elbowAngle) {
-        if (m_targetArmState.isStow() || m_wrist.getAngle() < 110) {
+        if (m_targetArmState.isStow() || m_wrist.getAngle() < 120) {
             m_aimX = 0;
             m_aimLimiter.reset(0);
             return new double[]{shoulderAngle, elbowAngle};
@@ -278,14 +278,17 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    public CommandBase stowSimple() {
+    public CommandBase stowSimple(DoubleSupplier acceleration) {
         return new CommandBase() {
             double m_acceleration;
             @Override
             public void initialize() {
                 resetAim();
-                m_acceleration = m_targetArmState.getAcceleration();
+                m_acceleration = acceleration.getAsDouble();
                 m_targetArmState = getCurrentStow();
+                m_shoulder.setPercentOutput(0);
+                m_elbow.setPercentOutput(0);
+                m_wrist.setPercentOutput(0);
             }
 
             public void execute() {
@@ -293,6 +296,10 @@ public class Arm extends SubsystemBase {
                 goToArmState(getCurrentStow(), m_acceleration);
             }
         };
+    }
+
+    public CommandBase stowSimple() {
+        return stowSimple(m_targetArmState::getAcceleration);
     }
 
     private CommandBase chainIntermediaries(CommandBase initialCommand, List<ArmState> intermediaries, DoubleSupplier tolerance, double acceleration, BooleanSupplier unless) {
@@ -311,14 +318,18 @@ public class Arm extends SubsystemBase {
         return command;
     }
 
-    public CommandBase stowFrom(ArmState from) {
+    public CommandBase stowFrom(ArmState from, DoubleSupplier acceleration) {
         return chainIntermediaries(
-            stowSimple(),
+            stowSimple(acceleration),
             from.getRetractIntermediaries(),
             from.getRetractIntermediaryTolerance(),
             from.getAcceleration(),
             () -> false
         ).andThen(new InstantCommand(this::resetStow));
+    }
+
+    public CommandBase stowFrom(ArmState from) {
+        return stowFrom(from, m_targetArmState::getAcceleration);
     }
 
     private CommandBase sendArmToState(ArmState armState, BooleanSupplier until, DoubleSupplier acceleration) {

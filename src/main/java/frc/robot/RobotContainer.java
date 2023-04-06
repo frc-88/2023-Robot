@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.AutoBalancePID;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
@@ -403,6 +404,8 @@ public class RobotContainer {
         .ignoringDisable(true));
     SmartDashboard.putData("Aim High", m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false)
         .ignoringDisable(true));
+
+    SmartDashboard.putData("Balance PID", new AutoBalancePID(m_drive));
   }
   
   private void configurePeriodics(Robot robot) {
