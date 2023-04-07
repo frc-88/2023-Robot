@@ -10,7 +10,7 @@ X_ADJUST = 0
 
 files_to_convert = ["CenterEngage.path"]
 #Uncomment to do all files
-files_to_convert = glob.glob(JSON_PATH + ("Red" if CONVERT_FROM_RED else "Blue") + "*.path")
+files_to_convert = glob.glob(JSON_PATH + ("Red" if CONVERT_FROM_RED else "Blue") + "Center*.path")
 
 for file_to_convert in files_to_convert:
     with open(file_to_convert) as f:
