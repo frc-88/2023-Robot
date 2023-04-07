@@ -287,7 +287,7 @@ public class Autonomous {
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                arm.aimFactory(alliance.equals("Blue") ? 2 : 0).alongWith(grabber.applyAim(alliance.equals("Blue") ? -47.6 : 45))
+                arm.aimFactory(alliance.equals("Blue") ? 2 : 2).alongWith(grabber.applyAim(alliance.equals("Blue") ? -47.6 : 45))
                 ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
