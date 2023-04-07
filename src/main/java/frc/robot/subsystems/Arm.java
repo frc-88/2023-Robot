@@ -376,6 +376,10 @@ public class Arm extends SubsystemBase {
 		return m_aimX;
 	}
 
+    public CommandBase aimFactory(double x) {
+        return new InstantCommand(() -> setAim(x));
+    }
+
     @Override
     public void periodic() {
         if (DriverStation.isDisabled()) {

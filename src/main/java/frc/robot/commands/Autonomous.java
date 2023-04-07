@@ -287,7 +287,7 @@ public class Autonomous {
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                arm.aimFactory(alliance.equals("Blue") ? 2 : 0).alongWith(grabber.applyAim(alliance.equals("Blue") ? -47.6 : 45))
                 ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
@@ -323,11 +323,11 @@ public class Autonomous {
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
                 grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                arm.aimFactory(alliance.equals("Blue") ? 0 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? 0 : 41.7))
                 ).withTimeout(.9),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
+                arm.aimFactory(alliance.equals("Blue") ? 0 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? 0 : 41.7)).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1)
         );
