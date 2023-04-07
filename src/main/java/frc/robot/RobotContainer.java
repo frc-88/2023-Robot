@@ -87,11 +87,6 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingBackwards().getAsBoolean() && DriverStation.isTeleop()) {
-      new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
-    } else if (DriverStation.isTeleop()) {
-      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
-    }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
       m_intake.setCone();
@@ -315,10 +310,6 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private void configureTriggers() {
-    m_drive.isFacingForwards().and(m_buttonBox.forcePivotForwardsSwitch.negate()).and(m_buttonBox.forcePivotBackwardsSwitch.negate()).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
-    m_buttonBox.forcePivotBackwardsSwitch.and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.forcePivotBackwardsFactory()));
-    m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
-
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
@@ -374,9 +365,6 @@ public class RobotContainer {
 
     // Grabber
     SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
-    SmartDashboard.putData("Set Grabber Forwards", m_grabber.setPivotForwardsFactory());
-    SmartDashboard.putData("Set Grabber Backwards", m_grabber.setPivotBackwardsFactory());
-    SmartDashboard.putData("Force Grabber Backwards", m_grabber.forcePivotBackwardsFactory());
     SmartDashboard.putData("Grab Cone", m_grabber.grabConeFactory());
     SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());

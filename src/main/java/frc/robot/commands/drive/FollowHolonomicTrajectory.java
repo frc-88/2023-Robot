@@ -104,8 +104,6 @@ public class FollowHolonomicTrajectory extends CommandBase {
     double rollRate = roll - m_lastRoll;
     m_lastRoll = roll;
 
-    System.out.println(roll + " - " + rollRate);
-
     if (m_stopOnTip && Math.abs(roll) < 10 && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
         (Math.signum(rollRate) != Math.signum(roll)) ) {
       m_cancel = true;

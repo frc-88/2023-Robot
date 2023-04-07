@@ -42,6 +42,8 @@ public class Grabber extends SubsystemBase {
 
   private final BooleanSupplier m_coastMode;
   private final BooleanSupplier m_armStowed;
+  private final BooleanSupplier m_forceForwards;
+  private final BooleanSupplier m_forceBackwards;
 
   private final DigitalInput m_gamePieceSense;
 
@@ -86,13 +88,15 @@ public class Grabber extends SubsystemBase {
   private Debouncer m_hasGamePieceDebounce = new Debouncer(p_hasGamePieceDebounceTime.getValue(), DebounceType.kRising);
   private Debouncer m_extraDebounce = new Debouncer(1, DebounceType.kRising);
 
-  public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed) {
+  public Grabber(BooleanSupplier coastMode, BooleanSupplier armStowed, BooleanSupplier forceForwards, BooleanSupplier forceBackwards) {
     this.m_gamePieceSense = new DigitalInput(3);
 
     m_roller.setInverted(false);
     
     m_coastMode = coastMode;
     m_armStowed = armStowed;
+    m_forceForwards = forceForwards;
+    m_forceBackwards = forceBackwards;
 
     m_pivotPID = new PIDController(p_pivotPID.getKP().getValue(), p_pivotPID.getKI().getValue(), p_pivotPID.getKD().getValue());
     p_pivotPID.getKP().addChangeHandler(m_pivotPID::setP);
@@ -255,16 +259,6 @@ public class Grabber extends SubsystemBase {
   }
 
   public CommandBase setPivotBackwardsFactory() {
-    return new InstantCommand(() -> {
-      if (hasGamePiece()) {
-        setPivotBackwards();
-      } else {
-        setPivotForwards();
-      }
-    });
-  }
-
-  public CommandBase forcePivotBackwardsFactory() {
     return new InstantCommand(this::setPivotBackwards);
   }
 
@@ -282,6 +276,19 @@ public class Grabber extends SubsystemBase {
       zeroPivotAngle();
     }
     loopCount++;
+
+    if (DriverStation.isTeleopEnabled()) {
+      if (m_forceBackwards.getAsBoolean()) {
+        setPivotBackwards();
+      } else if (m_forceForwards.getAsBoolean()) {
+        setPivotForwards();
+      } else if (hasGamePiece()) {
+        setPivotBackwards();
+      } else {
+        setPivotForwards();
+      }
+    }
+
 
     SmartDashboard.putNumber("Grabber Pivot Angle", getPivotAngle());
     SmartDashboard.putBoolean("Grabber Has Game Piece", hasGamePiece());
