@@ -211,7 +211,7 @@ public class Autonomous {
                     new Handoff(intake, arm, grabber, true, false),
                     arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                         intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                        grabber.holdConeFactory(), 
+                        grabber.grabConeFactory(), 
                         grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                         aiming.noAimFactory()))
                 )
@@ -246,7 +246,7 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
+                            grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
@@ -280,7 +280,7 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
+                            grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
@@ -315,7 +315,7 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
+                            grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
