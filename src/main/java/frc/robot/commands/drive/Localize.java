@@ -37,7 +37,8 @@ public class Localize extends CommandBase {
       m_drive.resetPosition(new Pose2d(m_source.getBotPose().getTranslation(), new Rotation2d(0)));
     } else {
       System.err.println("Did not localize");
-      FollowTrajectory.forceResetOdometry();
+      m_drive.zeroGyroscope();
+      FollowHolonomicTrajectory.forceResetOdometry();
     }
 
     m_drive.updateOdometry();

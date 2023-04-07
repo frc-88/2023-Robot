@@ -88,7 +88,6 @@ public class Aiming extends SubsystemBase {
             // aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
             aimAngle = 0;
             armAdjust = 0;
-            System.out.println("Cube mode");
         }
 
         if ((!m_enabled.getAsBoolean() && DriverStation.isTeleop()) || !m_pipelineTimer.hasElapsed(READY_TO_AIM_SEC)) {
@@ -98,8 +97,6 @@ public class Aiming extends SubsystemBase {
 
         m_grabber.aim(aimAngle);
         m_arm.setAim(armAdjust);
-
-        System.out.println("Aiming: " + aimAngle);
     }
 
     private double getCalibratedDistance(boolean mid) {
@@ -141,7 +138,6 @@ public class Aiming extends SubsystemBase {
 
     private double getTargetOffset(boolean mid) {
         double ret = getTargetDistance(mid)*Math.tan(m_limelight.getTX()) + p_aimAdjustYLimelight.getValue();
-        System.out.println("Offset: " + ret);
         SmartDashboard.putNumber("Aiming: Target Offset", ret);
         return ret;
     }

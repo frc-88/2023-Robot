@@ -63,7 +63,7 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
-  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
+  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed, m_buttonBox.forcePivotForwardsSwitch, m_buttonBox.forcePivotBackwardsSwitch);
   private final Limelight m_limelight_front = new Limelight(Constants.LIMELIGHT_FRONT_NAME);
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionTable m_coprocessor = new ScorpionTable(m_drive, m_drive.getNavX(), Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT, Constants.COPROCESSOR_UPDATE_DELAY);
@@ -195,9 +195,9 @@ public class RobotContainer {
         .whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1));
 
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeMiddle)
             .alongWith(m_grabber.holdConeFactory())
@@ -215,7 +215,7 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new RepeatCommand(m_aiming.setAprilTagPipelineFactory()).withTimeout(0.5));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeHigh)
             .alongWith(m_grabber.holdConeFactory())
@@ -234,14 +234,9 @@ public class RobotContainer {
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new RepeatCommand(m_aiming.setAprilTagPipelineFactory()).withTimeout(0.5));
 
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
-
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeMiddle)
             .alongWith(m_grabber.holdCubeFactory())
@@ -258,7 +253,7 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new WaitCommand(0.2).andThen(m_aiming.noAimFactory()));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeHigh)
             .alongWith(m_grabber.holdCubeFactory())
@@ -275,11 +270,6 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(m_aiming.noAimFactory());
-
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
