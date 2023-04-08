@@ -1,0 +1,4 @@
+int32 DISABLED=0
+int32 AUTONOMOUS=1
+int32 TELEOP=2
+int32 type

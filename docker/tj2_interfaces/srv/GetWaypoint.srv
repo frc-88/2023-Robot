@@ -1,0 +1,4 @@
+string name
+---
+tj2_interfaces/Waypoint waypoint
+bool success

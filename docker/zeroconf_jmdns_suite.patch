@@ -1,0 +1,25 @@
+From eda45df18599a2cb028d6fb7e3effffcb9318a22 Mon Sep 17 00:00:00 2001
+From: Woz4tetra <woz4tetra@gmail.com>
+Date: Thu, 23 Mar 2023 01:40:58 -0400
+Subject: [PATCH] fix
+
+---
+ jmdns/src/main/java/javax/jmdns/impl/DNSOutgoing.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/jmdns/src/main/java/javax/jmdns/impl/DNSOutgoing.java b/jmdns/src/main/java/javax/jmdns/impl/DNSOutgoing.java
+index c3ba24e..ac2e8fb 100644
+--- a/jmdns/src/main/java/javax/jmdns/impl/DNSOutgoing.java
++++ b/jmdns/src/main/java/javax/jmdns/impl/DNSOutgoing.java
+@@ -52,7 +52,7 @@ public final class DNSOutgoing extends DNSMessage {
+             }
+         }
+ 
+-        void writeBytes(byte data[]) {
++        public void writeBytes(byte data[]) {
+             if (data != null) {
+                 writeBytes(data, 0, data.length);
+             }
+-- 
+2.25.1
+

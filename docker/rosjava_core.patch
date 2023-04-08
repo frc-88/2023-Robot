@@ -1,0 +1,56 @@
+From 3adc39b700f140951923b12047b18166f721dd8c Mon Sep 17 00:00:00 2001
+From: Woz4tetra <woz4tetra@gmail.com>
+Date: Thu, 23 Mar 2023 01:38:22 -0400
+Subject: [PATCH] fix build script
+
+---
+ build.gradle | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/build.gradle b/build.gradle
+index 4f62fac0..12447174 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -19,7 +19,38 @@ task wrapper(type: Wrapper) {
+ }
+ 
+ buildscript {
+-  apply from: "https://github.com/rosjava/rosjava_bootstrap/raw/kinetic/buildscript.gradle"
++  String rosMavenPath = System.getenv("ROS_MAVEN_PATH")
++    String rosMavenRepository = System.getenv("ROS_MAVEN_REPOSITORY")
++    repositories {
++        if (rosMavenPath != null) {
++            rosMavenPath.tokenize(":").each { path ->
++                maven {
++                    // We can't use uri() here because we aren't running inside something
++                    // that implements the Script interface.
++                    url "file:${path}"
++                }
++            }
++        }
++        maven {
++            url "http://repository.springsource.com/maven/bundles/release"
++        }
++        maven {
++            url "http://repository.springsource.com/maven/bundles/external"
++        }
++        if (rosMavenRepository != null) {
++            maven {
++                url rosMavenRepository
++            }
++        }
++        maven {
++            url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
++        }
++        google()
++        jcenter()
++    }
++    dependencies {
++        classpath "org.ros.rosjava_bootstrap:gradle_plugins:[0.3,0.4)"
++    }
+ }
+ 
+ apply plugin: "catkin"
+-- 
+2.25.1
+

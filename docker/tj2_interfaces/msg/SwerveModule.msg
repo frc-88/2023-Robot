@@ -1,0 +1,9 @@
+string module_index
+float64 azimuth_position
+float64 azimuth_velocity
+float64 wheel_velocity
+float64 azimuth_position_ref
+float64 azimuth_velocity_ref
+float64 wheel_velocity_ref
+tj2_interfaces/SwerveMotor motor_lo_0
+tj2_interfaces/SwerveMotor motor_hi_1

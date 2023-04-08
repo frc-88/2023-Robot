@@ -1,0 +1,27 @@
+From 52e861f1bb0141f845180cef1c61531a09d10634 Mon Sep 17 00:00:00 2001
+From: Woz4tetra <woz4tetra@gmail.com>
+Date: Thu, 23 Mar 2023 01:27:50 -0400
+Subject: [PATCH] update source
+
+---
+ build.gradle | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/build.gradle b/build.gradle
+index cf7739c..6c501c6 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -28,8 +28,8 @@ subprojects {
+   apply plugin: "idea"
+   apply plugin: "eclipse"
+ 
+-  sourceCompatibility = 1.6
+-  targetCompatibility = 1.6
++  sourceCompatibility = 1.7
++  targetCompatibility = 1.7
+ 
+   // These external repositories are copied from bootstrap.gradle.
+   repositories {
+-- 
+2.25.1
+

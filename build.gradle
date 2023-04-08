@@ -8,6 +8,15 @@ targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven {
+        url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+    }
+}
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -68,6 +77,17 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    implementation 'org.ros.rosjava_core:rosjava:0.3.6'
+    implementation 'org.ros.rosjava_bootstrap:message_generation:0.3.3'
+    implementation 'org.ros.rosjava_messages:std_msgs:0.5.11'
+    implementation 'org.ros.rosjava_messages:sensor_msgs:1.10.+'
+    implementation 'org.ros.rosjava_messages:nav_msgs:1.10.+'
+    implementation 'org.ros.rosjava_messages:tf2_msgs:0.5.9'
+    implementation 'org.ros.rosjava_messages:geometry_msgs:1.10.+'
+    implementation 'org.ros.rosjava_messages:visualization_msgs:1.10.+'
+
+    implementation files('libs/tj2_interfaces_msgs.jar')
 }
 
 test {

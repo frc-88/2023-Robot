@@ -1,0 +1,4 @@
+string[] names
+---
+tj2_interfaces/WaypointArray waypoints
+bool success
