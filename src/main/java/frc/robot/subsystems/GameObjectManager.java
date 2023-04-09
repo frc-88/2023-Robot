@@ -22,7 +22,8 @@ public class GameObjectManager extends SubsystemBase {
     public ArrayList<GameObject> gameObjects;
     public ArrayList<GridZone> gridZones;
     private ScorpionTable m_coprocessor;
-    private final DoublePreferenceConstant radiusThreshold = new DoublePreferenceConstant("Game Object Zone Radius", 6.5);
+    private final DoublePreferenceConstant radiusThreshold = new DoublePreferenceConstant("Game Object Zone Radius",
+            6.5);
 
     public GameObjectManager(ScorpionTable coprocessor) {
         m_coprocessor = coprocessor;
@@ -80,7 +81,8 @@ public class GameObjectManager extends SubsystemBase {
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        gameObjects.add(new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw)); 
+        gameObjects.add(
+                new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw));
     }
 
     public void removeInactiveGameObjects() {
@@ -114,9 +116,12 @@ public class GameObjectManager extends SubsystemBase {
             gridZone.filled = false;
             for (GameObject gameObject : gameObjects) {
                 double distance = gridZone.getDistance(gameObject);
-                // System.out.println(String.format("name: %s, distance: %f", gameObject.getName(), distance));
-                // System.out.println(String.format("GridX: %f, GridY: %f", gridZone.getX(), gridZone.getY()));
-                // System.out.println(String.format("ObjectX: %f, ObjectY: %f", gameObject.getX(), gameObject.getY()));
+                // System.out.println(String.format("name: %s, distance: %f",
+                // gameObject.getName(), distance));
+                // System.out.println(String.format("GridX: %f, GridY: %f", gridZone.getX(),
+                // gridZone.getY()));
+                // System.out.println(String.format("ObjectX: %f, ObjectY: %f",
+                // gameObject.getX(), gameObject.getY()));
                 if (distance < radiusThreshold.getValue()
                         && (gridZone.getType() == gameObject.getName() || gridZone.getLevel() == "LOW")) {
                     gridZone.filled = true;
@@ -193,9 +198,9 @@ public class GameObjectManager extends SubsystemBase {
     private Pose2d toCornerCoordinates(Pose2d pose) {
         Pose2d transformPose;
         if (DriverStation.getAlliance() == Alliance.Blue) {
-            transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
-        } else  {
-            transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
+            transformPose = new Pose2d(8.27, 4.01, Rotation2d.fromDegrees(180));
+        } else {
+            transformPose = new Pose2d(-8.27, -4.01, new Rotation2d());
         }
 
         return pose.relativeTo(transformPose);
@@ -212,15 +217,17 @@ public class GameObjectManager extends SubsystemBase {
             removeInactiveGameObjects();
 
             int closestColumnIndex = 0;
-            
+
             double distance = Double.POSITIVE_INFINITY;
             for (int i = 0; i < 9; i++) {
-                if (Math.abs(gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY()) < distance) {
+                double checkDistance = Math
+                        .abs(gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY());
+                if (checkDistance < distance) {
                     closestColumnIndex = i;
-                    distance = gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY();
+                    distance = checkDistance;
                 }
             }
-            
+
             fillGridZonesColumn(closestColumnIndex);
 
             GridZone low = gridZones.get(closestColumnIndex);
@@ -231,8 +238,8 @@ public class GameObjectManager extends SubsystemBase {
             SmartDashboard.putBoolean("High Zone Filled", high.filled);
             SmartDashboard.putNumber("Number of seen game pieces", gameObjects.size());
             if (gameObjects.size() > 0) {
-                SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size()-1).getX());
-                SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size()-1).getY());
+                SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size() - 1).getX());
+                SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size() - 1).getY());
             }
             // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
             SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
