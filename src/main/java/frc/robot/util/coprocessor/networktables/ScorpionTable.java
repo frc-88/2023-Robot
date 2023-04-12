@@ -5,8 +5,9 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.PubSubOption;
@@ -19,7 +20,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.util.BotPoseProvider;
 import frc.robot.util.coprocessor.ChassisInterface;
 import frc.robot.util.coprocessor.MessageTimer;
-
+import frc.robot.util.coprocessor.detections.Detection;
 
 public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     private SwerveDrive swerve;
@@ -33,11 +34,12 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     private final double kGravity = 9.81;
 
     public ScorpionTable(SwerveDrive swerve, AHRS imu, String address, int port, double updateInterval) {
-        super((ChassisInterface)swerve, address, port, updateInterval);
+        super((ChassisInterface) swerve, address, port, updateInterval);
         this.swerve = swerve;
         this.imu = imu;
 
-        tagGlobalPoseSub = rootTable.getDoubleArrayTopic("tag_global").subscribe(new double []{0.0, 0.0, 0.0, 0.0}, PubSubOption.sendAll(true), PubSubOption.periodic(this.updateInterval));
+        tagGlobalPoseSub = rootTable.getDoubleArrayTopic("tag_global").subscribe(new double[] { 0.0, 0.0, 0.0, 0.0 },
+                PubSubOption.sendAll(true), PubSubOption.periodic(this.updateInterval));
     }
 
     // ---
@@ -50,20 +52,35 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     }
 
     public Pose2d getTagGlobalPoseInches() {
-        return tagGlobalPose.times(39.3701);
+        Pose2d tagPose = getTagGlobalPose();
+        Pose2d tagPoseInches = new Pose2d(
+                Units.metersToInches(tagPose.getX()),
+                Units.metersToInches(tagPose.getY()),
+                tagPose.getRotation());
+        return tagPoseInches;
     }
 
-    // Origin is at the right corner near the driver station from the persepective of the driver
+    // Origin is at the right corner near the driver station from the persepective
+    // of the driver
     @Override
     public Pose2d getBotPose() {
         Pose2d transformPose;
         if (isBlue()) {
-            transformPose = new Pose2d(8.27,4.01, Rotation2d.fromDegrees(180));
-        } else  {
-            transformPose = new Pose2d(-8.27,-4.01, new Rotation2d());
+            transformPose = new Pose2d(8.27, 4.01, Rotation2d.fromDegrees(180));
+        } else {
+            transformPose = new Pose2d(-8.27, -4.01, new Rotation2d());
         }
 
         return getTagGlobalPose().relativeTo(transformPose);
+    }
+
+    @Override
+    protected void addDetection(String name, int index_number, Detection detection) {
+        Pose2d detectionPos = detection.getPose().toPose2d();
+        Pose2d globalPos = detectionPos.transformBy(new Transform2d(new Pose2d(), getTagGlobalPose()));
+        Detection globalDetection = new Detection(name, index_number, new Pose3d(globalPos));
+        globalDetection.setZ(detection.getPose().getZ());
+        detectionManager.setDetection(name, index_number, globalDetection);
     }
 
     public Pose2d getBotPoseInches() {
@@ -71,14 +88,19 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     }
 
     public InstantCommand rosLocalize(SwerveDrive drive) {
-        return new InstantCommand (
-          () -> {
-            drive.resetPosition(getBotPose());},
-          drive);
+        return new InstantCommand(
+                () -> {
+                    drive.resetPosition(getBotPose());
+                },
+                drive);
     }
 
     @Override
     public boolean isConnected() {
+        return isTagGlobalPoseActive();
+    }
+
+    public boolean isTagGlobalPoseActive() {
         return tagGlobalPoseTimer.isActive();
     }
 
@@ -95,18 +117,22 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
         if (isBlue()) {
             result = pos.getY() < communityYStartBlue
                     && (pos.getX() < shortXLimit
-                        || (pos.getY() < communityYBumpBlue && pos.getX() < longXLimit));
+                            || (pos.getY() < communityYBumpBlue && pos.getX() < longXLimit));
         } else {
             result = pos.getY() > communityYStartRed
                     && (pos.getX() < shortXLimit
-                        || (pos.getY() > communityYBumpRed && pos.getX() < longXLimit));
+                            || (pos.getY() > communityYBumpRed && pos.getX() < longXLimit));
         }
 
         return inCommunityDebouncer.calculate(result);
     }
 
     public static double switchYAlliance(double y) {
-        return 27.*12. - y;
+        return 54. * 12. - y;
+    }
+
+    public static double switchXAlliance(double x) {
+        return 27. * 12. - x;
     }
 
     private void updateTagGlobalPose() {
@@ -136,23 +162,22 @@ public class ScorpionTable extends CoprocessorTable implements BotPoseProvider {
     public void update() {
         super.update();
         sendImu(
-            Units.degreesToRadians(imu.getRoll()),
-            Units.degreesToRadians(imu.getPitch()),
-            Units.degreesToRadians(-imu.getYaw()),
-            Units.degreesToRadians(-imu.getRate()),
-            imu.getWorldLinearAccelX() * kGravity,
-            imu.getWorldLinearAccelY() * kGravity
-        );
+                Units.degreesToRadians(imu.getRoll()),
+                Units.degreesToRadians(imu.getPitch()),
+                Units.degreesToRadians(-imu.getYaw()),
+                Units.degreesToRadians(-imu.getRate()),
+                imu.getWorldLinearAccelX() * kGravity,
+                imu.getWorldLinearAccelY() * kGravity);
         updateTagGlobalPose();
 
         Pose2d botPose = getBotPose();
-        SmartDashboard.putNumber("ROS:X",botPose.getX());
-        SmartDashboard.putNumber("ROS:Y",botPose.getY());
-        SmartDashboard.putNumber("ROS:Rotation",botPose.getRotation().getDegrees());
+        SmartDashboard.putNumber("ROS:X", botPose.getX());
+        SmartDashboard.putNumber("ROS:Y", botPose.getY());
+        SmartDashboard.putNumber("ROS:Rotation", botPose.getRotation().getDegrees());
         SmartDashboard.putBoolean("ROS:TagGlobalPoseActive", isConnected());
     }
 
     public void updateSlow() {
-        setNoGoZones(new String[] {"<!team>_score_zone", "<!team>_zone", "<!team>_safe_zone"});
+        setNoGoZones(new String[] { "<!team>_score_zone", "<!team>_zone", "<!team>_safe_zone" });
     }
 }

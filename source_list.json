@@ -1,0 +1,8 @@
+{
+    "sources": [
+        "tj2_interfaces/GameObjectsStamped",
+        "tj2_interfaces/Match",
+        "tj2_interfaces/MatchPeriod",
+        "tj2_interfaces/NavX"
+    ]
+}
