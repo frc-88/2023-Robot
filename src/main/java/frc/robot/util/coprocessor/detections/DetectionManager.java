@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DetectionManager {
     private Map<String, List<Detection>> detections;
     private Map<String, Integer> detectionCounts;
-    
+
     public DetectionManager() {
         detections = new HashMap<>();
         detectionCounts = new HashMap<>();
@@ -25,8 +24,7 @@ public class DetectionManager {
                 detectionList.add(new Detection(name, index, new Pose3d()));
             }
             detectionList.set(index, detection);
-        }
-        else {
+        } else {
             detections.put(name, new ArrayList<>());
         }
     }
@@ -42,8 +40,7 @@ public class DetectionManager {
     public boolean doesDetectionExist(String name, int index) {
         if (doesNameExist(name)) {
             return index < detections.get(name).size();
-        }
-        else {
+        } else {
             return false;
         }
     }

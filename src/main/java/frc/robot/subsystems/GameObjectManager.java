@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.coprocessor.GameObject;
@@ -24,65 +22,65 @@ public class GameObjectManager extends SubsystemBase {
     private ScorpionTable m_coprocessor;
     private final DoublePreferenceConstant radiusThreshold = new DoublePreferenceConstant("Game Object Zone Radius",
             6.5);
+    ArrayList<GridZone> blueGridZones = new ArrayList<>();
+    ArrayList<GridZone> redGridZones = new ArrayList<>();
 
     public GameObjectManager(ScorpionTable coprocessor) {
         m_coprocessor = coprocessor;
 
         gameObjects = new ArrayList<>();
-        ArrayList<GridZone> redGridZones = new ArrayList<>();
 
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
-        redGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
-        redGridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 20., 46.));
+        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 42., 35.5));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 64., 46.));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 86., 46.));
+        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 108., 35.5));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 130., 46.));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 152., 46.));
+        blueGridZones.add(new GridZone("CUBE", "HIGH", 14.32, 174., 35.5));
+        blueGridZones.add(new GridZone("CONE", "HIGH", 14.32, 196., 46.));
 
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
-        redGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
-        redGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 20., 34.));
+        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 42., 23.53));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 64., 34.));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 86., 34.));
+        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 108., 23.53));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 130., 34.));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 152., 34.));
+        blueGridZones.add(new GridZone("CUBE", "MIDDLE", 31.35, 174., 23.53));
+        blueGridZones.add(new GridZone("CONE", "MIDDLE", 31.35, 196., 34.));
 
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
-        redGridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 20., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 42., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 64., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 86., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 108., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 130., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 152., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 174., 0.));
+        blueGridZones.add(new GridZone("EITHER", "LOW", 46.91, 196., 0.));
 
-        ArrayList<GridZone> blueGridZones = new ArrayList<>();
-
-        for (GridZone redGridZone : redGridZones) {
-            blueGridZones.add(new GridZone(redGridZone.getType(), redGridZone.getLevel(),
+        for (GridZone redGridZone : blueGridZones) {
+            redGridZones.add(new GridZone(redGridZone.getType(), redGridZone.getLevel(),
                     ScorpionTable.switchXAlliance(redGridZone.getX()), redGridZone.getY(), redGridZone.getZ()));
         }
+
+        gridZones = blueGridZones;
 
         // redGridZones = redGridZones.stream().map((GridZone zone) -> new
         // GridZone(zone.getType(), zone.getLevel(), zone.getX(),
         // ScorpionTable.switchYAlliance(zone.getY()),
         // zone.getZ())).collect(Collectors.toCollection(ArrayList::new));
-
-        if (DriverStation.getAlliance() == Alliance.Blue) {
-            gridZones = redGridZones;
-        } else if (DriverStation.getAlliance() == Alliance.Red) {
-            gridZones = redGridZones;
-        }
     }
 
     public void addGameObject(String name, double x, double y, double z, double yaw) {
-        gameObjects.add(
-                new GameObject(name, Units.metersToInches(x), Units.metersToInches(y), Units.metersToInches(z), yaw));
+        Pose2d detectPose = new Pose2d(x, y, new Rotation2d(yaw));
+        Pose2d pos = detectPose;
+        // Pose2d pos = toCornerCoordinates(detectPose);
+        // GameObject obj = new GameObject(name, pos.getX()), pos.getY(), z, yaw);
+        GameObject obj = new GameObject(name, Units.metersToInches(pos.getX()), Units.metersToInches(pos.getY()),
+                Units.metersToInches(z), yaw);
+        gameObjects.add(obj);
     }
 
     public void removeInactiveGameObjects() {
@@ -197,52 +195,81 @@ public class GameObjectManager extends SubsystemBase {
 
     private Pose2d toCornerCoordinates(Pose2d pose) {
         Pose2d transformPose;
-        if (DriverStation.getAlliance() == Alliance.Blue) {
-            transformPose = new Pose2d(8.27, 4.01, Rotation2d.fromDegrees(180));
-        } else {
-            transformPose = new Pose2d(-8.27, -4.01, new Rotation2d());
-        }
-
+        transformPose = new Pose2d(8.27, 4.01, Rotation2d.fromDegrees(-180));
         return pose.relativeTo(transformPose);
     }
 
     @Override
     public void periodic() {
-        if (m_coprocessor.isTagGlobalPoseActive()) {
-            Collection<Detection> detections = m_coprocessor.getAllDetections();
-            for (Detection d : detections) {
-                Pose2d pos = toCornerCoordinates(new Pose2d(d.getX(), d.getY(), new Rotation2d(0.)));
-                addGameObject(d.getName(), pos.getX(), pos.getY(), d.getZ(), 0);
-            }
-            removeInactiveGameObjects();
-
-            int closestColumnIndex = 0;
-
-            double distance = Double.POSITIVE_INFINITY;
-            for (int i = 0; i < 9; i++) {
-                double checkDistance = Math
-                        .abs(gridZones.get(i).getY() - m_coprocessor.getTagGlobalPoseInches().getY());
-                if (checkDistance < distance) {
-                    closestColumnIndex = i;
-                    distance = checkDistance;
-                }
-            }
-
-            fillGridZonesColumn(closestColumnIndex);
-
-            GridZone low = gridZones.get(closestColumnIndex);
-            GridZone mid = gridZones.get(closestColumnIndex + 9);
-            GridZone high = gridZones.get(closestColumnIndex + 18);
-            SmartDashboard.putBoolean("Low Zone Filled", low.filled);
-            SmartDashboard.putBoolean("Mid Zone Filled", mid.filled);
-            SmartDashboard.putBoolean("High Zone Filled", high.filled);
-            SmartDashboard.putNumber("Number of seen game pieces", gameObjects.size());
-            if (gameObjects.size() > 0) {
-                SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size() - 1).getX());
-                SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size() - 1).getY());
-            }
-            // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
-            SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
+        if (DriverStation.getAlliance() == Alliance.Blue) {
+            gridZones = blueGridZones;
+        } else if (DriverStation.getAlliance() == Alliance.Red) {
+            gridZones = redGridZones;
         }
+
+        boolean isActive = m_coprocessor.isTagGlobalPoseActive();
+        SmartDashboard.putBoolean("isTagGlobalPoseActive", isActive);
+
+        if (!isActive) {
+            return;
+        }
+        Collection<Detection> detections = m_coprocessor.getAllDetections();
+        Detection lastDetection = null;
+        for (Detection d : detections) {
+            lastDetection = d;
+            addGameObject(d.getName(), d.getX(), d.getY(), d.getZ(), 0);
+        }
+        removeInactiveGameObjects();
+
+        int closestColumnIndex = 0;
+        Pose2d tagPoseMeters = m_coprocessor.getTagGlobalPose();
+        Pose2d tagPoseMetersCorner = toCornerCoordinates(tagPoseMeters);
+        Pose2d tagPoseCornerInches = new Pose2d(
+                Units.metersToInches(tagPoseMetersCorner.getX()),
+                Units.metersToInches(tagPoseMetersCorner.getY()),
+                tagPoseMetersCorner.getRotation());
+
+        double distance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < 9; i++) {
+            double checkDistance = Math.abs(gridZones.get(i).getY() - tagPoseCornerInches.getY());
+            if (checkDistance < distance) {
+                closestColumnIndex = i;
+                distance = checkDistance;
+            }
+        }
+
+        fillGridZonesColumn(closestColumnIndex);
+
+        GridZone low = gridZones.get(closestColumnIndex);
+        GridZone mid = gridZones.get(closestColumnIndex + 9);
+        GridZone high = gridZones.get(closestColumnIndex + 18);
+
+        SmartDashboard.putString("Alliance", DriverStation.getAlliance() == Alliance.Blue ? "blue" : "red");
+        SmartDashboard.putBoolean("Low Zone Filled", low.filled);
+        SmartDashboard.putBoolean("Mid Zone Filled", mid.filled);
+        SmartDashboard.putBoolean("High Zone Filled", high.filled);
+        SmartDashboard.putNumber("Robot corner relative X", tagPoseCornerInches.getX());
+        SmartDashboard.putNumber("Robot corner relative Y", tagPoseCornerInches.getY());
+        SmartDashboard.putNumber("Number of seen game pieces", detections.size());
+        SmartDashboard.putNumber("Number of tracked game pieces", gameObjects.size());
+        if (gameObjects.size() > 0) {
+            SmartDashboard.putNumber("Random Game Object X", gameObjects.get(gameObjects.size() - 1).getX());
+            SmartDashboard.putNumber("Random Game Object Y", gameObjects.get(gameObjects.size() - 1).getY());
+        }
+        if (lastDetection != null) {
+            SmartDashboard.putNumber("Random Detection X", lastDetection.getX());
+            SmartDashboard.putNumber("Random Detection Y", lastDetection.getY());
+        }
+        // SmartDashboard.putNumber("Optimal piece placement index", bestPlace());
+        SmartDashboard.putNumber("Closest Distance", distance);
+        SmartDashboard.putNumber("Closest Column Index", closestColumnIndex);
+        SmartDashboard.putNumberArray("Closest Grid Zone X", new double[] {
+                gridZones.get(closestColumnIndex).getX(),
+                gridZones.get(closestColumnIndex + 9).getX(),
+                gridZones.get(closestColumnIndex + 18).getX() });
+        SmartDashboard.putNumberArray("Closest Grid Zone Y", new double[] {
+                gridZones.get(closestColumnIndex).getY(),
+                gridZones.get(closestColumnIndex + 9).getY(),
+                gridZones.get(closestColumnIndex + 18).getY() });
     }
 }
