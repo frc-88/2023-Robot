@@ -25,7 +25,6 @@ import frc.robot.commands.Autonomous;
 import frc.robot.commands.Handoff;
 import frc.robot.subsystems.Aiming;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.GameObjectManager;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Limelight;
@@ -65,10 +64,9 @@ public class RobotContainer {
   private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
   private final Limelight m_limelight_front = new Limelight(Constants.LIMELIGHT_FRONT_NAME);
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
-  private final ScorpionCoprocessorBridge m_ros_interface = new ScorpionCoprocessorBridge(m_drive);
-  private final GameObjectManager m_manager = new GameObjectManager(m_ros_interface);
-  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_ros_interface, m_limelight_back, () -> m_autoCommandName);
-  private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_ros_interface, m_limelight_back, m_manager, m_buttonBox.gamepieceSwitch, m_buttonBox.enableAimingSwitch);
+  private final ScorpionCoprocessorBridge m_coprocessor = new ScorpionCoprocessorBridge(m_drive);
+  private final Lights m_candleSubsystem = new Lights(m_drive, m_intake, m_arm, m_grabber, m_coprocessor, m_limelight_back, () -> m_autoCommandName);
+  private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_limelight_back, m_buttonBox.gamepieceSwitch, m_buttonBox.enableAimingSwitch);
 
 
   public RobotContainer(Robot robot) {
@@ -406,8 +404,7 @@ public class RobotContainer {
   }
   
   private void configurePeriodics(Robot robot) {
-    robot.addPeriodic(m_coprocessor::update, Constants.COPROCESSOR_UPDATE_DELAY, Constants.COPROCESSOR_UPDATE_DELAY_OFFSET);
-    robot.addPeriodic(m_coprocessor::updateSlow, Constants.COPROCESSOR_SLOW_UPDATE_DELAY, Constants.COPROCESSOR_SLOW_UPDATE_DELAY_OFFSET);
+    
   }
 
 } 

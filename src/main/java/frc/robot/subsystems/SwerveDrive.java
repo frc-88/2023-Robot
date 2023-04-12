@@ -29,7 +29,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -46,8 +45,6 @@ import frc.robot.commands.drive.GrantDriveCommand;
 import frc.robot.commands.drive.SwerveDriveCommand;
 import frc.robot.util.controllers.DriverController;
 import frc.robot.util.controllers.FrskyController;
-import frc.robot.util.coprocessor.ChassisInterface;
-import frc.robot.util.coprocessor.VelocityCommand;
 import frc.robot.util.drive.DriveUtils;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
@@ -57,7 +54,7 @@ import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
  * it's sideways, of course!
  */
 
-public class SwerveDrive extends SubsystemBase implements ChassisInterface{
+public class SwerveDrive extends SubsystemBase {
         /**
          * The maximum voltage that will be delivered to the drive motors.
          * 
@@ -506,12 +503,6 @@ public class SwerveDrive extends SubsystemBase implements ChassisInterface{
                 SmartDashboard.putNumber("poseY", getPoseEstimate().getY());
                 SmartDashboard.putNumber("poseTheta", getPoseEstimate().getRotation().getDegrees());
                 SmartDashboard.putNumber("field offset", m_fieldOffset);
-        }
-
-        @Override
-        public void drive(VelocityCommand command) {
-                // TODO Auto-generated method stub
-                
         }
 
         public boolean notMoving() {
