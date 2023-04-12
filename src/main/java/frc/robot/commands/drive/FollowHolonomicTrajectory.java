@@ -84,7 +84,7 @@ public class FollowHolonomicTrajectory extends CommandBase {
       m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
     } else {
       Transform2d offset = m_drive.getOdometryPose().minus(m_trajectory.getInitialPose());
-      if (offset.getTranslation().getDistance(new Translation2d()) > 3.0 || offset.getRotation().getDegrees() > 45.0 ) {
+      if (offset.getTranslation().getDistance(new Translation2d()) > 6.0) {
         System.out.println("!!!canceling holomic trajectory!!!");
         m_cancel = true;
       }
@@ -104,10 +104,12 @@ public class FollowHolonomicTrajectory extends CommandBase {
     double rollRate = roll - m_lastRoll;
     m_lastRoll = roll;
 
-    if (m_stopOnTip && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
+    System.out.println(roll + " - " + rollRate);
+
+    if (m_stopOnTip && Math.abs(roll) < 10 && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
         (Math.signum(rollRate) != Math.signum(roll)) ) {
       m_cancel = true;
-      System.out.println("Auto Follow Cancel: Tipping");
+      System.out.println("!!Auto Follow Cancel: Tipping");
     }
 
     Pose2d currentPose = m_drive.getOdometryPose();

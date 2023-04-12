@@ -127,7 +127,7 @@ public class ArmJoint {
         m_motor.configMotionCruiseVelocity(convertActualVelocityToMotorVelocity(speed));
         m_motor.configMotionAcceleration(convertActualVelocityToMotorVelocity(acceleration));
         
-        m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle), DemandType.ArbitraryFeedForward, p_gravityCompensation.getValue() * Math.cos(Math.toRadians(getAngle())));
+        m_motor.set(TalonFXControlMode.MotionMagic, convertActualPositionToMotorPosition(angle));
     }
 
     public void setMotionMagic(double angle) {

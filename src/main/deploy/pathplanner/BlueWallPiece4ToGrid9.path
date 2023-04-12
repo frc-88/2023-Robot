@@ -3,12 +3,12 @@
     {
       "anchorPoint": {
         "x": 7.04,
-        "y": 0.9
+        "y": 0.95
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.051234190407311,
-        "y": 0.9101987990235539
+        "y": 0.9601987990235539
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -24,12 +24,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.78,
-        "y": 0.4997411521540604
+        "x": 1.85,
+        "y": 0.8
       },
       "prevControl": {
-        "x": 3.972741790063731,
-        "y": 0.5099399511776144
+        "x": 4.042741790063731,
+        "y": 0.810198799023554
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -45,8 +45,8 @@
       }
     }
   ],
-  "maxVelocity": 2.0,
-  "maxAcceleration": 1.0,
+  "maxVelocity": 4.0,
+  "maxAcceleration": 2.5,
   "isReversed": true,
   "markers": []
 }
