@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -30,19 +31,12 @@ import frc.team88.ros.messages.std_msgs.Header;
 
 public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseProvider {
     private final SwerveDrive m_drive;
-    private final ROSNetworkTablesBridge m_ros_interface = new ROSNetworkTablesBridge(
-            Constants.COPROCESSOR_ADDRESS,
-            Constants.COPROCESSOR_PORT,
-            Constants.COPROCESSOR_UPDATE_DELAY);
-    private final BridgeSubscriber<Twist> m_twistSub = new BridgeSubscriber<>(m_ros_interface, "/tj2/cmd_vel",
-            Twist.class);
-    private final BridgePublisher<Odometry> m_odomPub = new BridgePublisher<>(m_ros_interface, "/tj2/odom");
-    private final BridgeSubscriber<Float64> m_pingSendSub = new BridgeSubscriber<>(m_ros_interface,
-            "/tj2/ping_send",
-            Float64.class);
-    private final BridgePublisher<Float64> m_pingReturnPub = new BridgePublisher<>(m_ros_interface,
-            "/tj2/ping_return");
-    private final TFListenerCompact m_tfListenerCompact = new TFListenerCompact(m_ros_interface, "/tf_compact");
+    private final ROSNetworkTablesBridge m_ros_interface;
+    private final BridgeSubscriber<Twist> m_twistSub;
+    private final BridgePublisher<Odometry> m_odomPub;
+    private final BridgeSubscriber<Float64> m_pingSendSub;
+    private final BridgePublisher<Float64> m_pingReturnPub;
+    private final TFListenerCompact m_tfListenerCompact;
 
     private long prevPingTime = 0;
     private final long PING_TIMEOUT = 1_000_000;
@@ -74,6 +68,21 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
 
     public ScorpionCoprocessorBridge(
             SwerveDrive drive) {
+        NetworkTableInstance instance = NetworkTableInstance.create();
+        instance.startClient3("bridge");
+        instance.setServer(Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT);
+        m_ros_interface = new ROSNetworkTablesBridge(instance.getTable(""), Constants.COPROCESSOR_UPDATE_DELAY);
+
+        m_twistSub = new BridgeSubscriber<>(m_ros_interface, "/tj2/cmd_vel",
+                Twist.class);
+        m_odomPub = new BridgePublisher<>(m_ros_interface, "/tj2/odom");
+        m_pingSendSub = new BridgeSubscriber<>(m_ros_interface,
+                "/tj2/ping_send",
+                Float64.class);
+        m_pingReturnPub = new BridgePublisher<>(m_ros_interface,
+                "/tj2/ping_return");
+        m_tfListenerCompact = new TFListenerCompact(m_ros_interface, "/tf_compact");
+
         m_drive = drive;
     }
 
@@ -109,7 +118,7 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
 
         m_odomPub.send(odomMsg);
     }
-    
+
     public boolean isConnected() {
         return prevPingTime != 0 && getTime() - prevPingTime < PING_TIMEOUT;
     }
@@ -124,7 +133,7 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
             prevTagGlobalTime = tfStamped.timestamp;
             Pose3d pose = new Pose3d(tfStamped.transform.getTranslation(), tfStamped.transform.getRotation());
             return pose.toPose2d();
-            
+
         } else {
             return new Pose2d();
         }
