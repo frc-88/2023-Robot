@@ -287,11 +287,11 @@ public class Autonomous {
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                arm.aimFactory(alliance.equals("Blue") ? 2 : 2).alongWith(grabber.applyAim(alliance.equals("Blue") ? -47.6 : 45))
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45)))
                 ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45))).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1),
             ending
@@ -323,11 +323,11 @@ public class Autonomous {
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
                 grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()),
-                arm.aimFactory(alliance.equals("Blue") ? 0 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? 0 : 41.7))
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35)))
                 ).withTimeout(.9),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                arm.aimFactory(alliance.equals("Blue") ? 0 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? 0 : 41.7)).withTimeout(0.05).andThen(aiming.noAimFactory()),
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35))).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1)
         );
