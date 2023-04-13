@@ -44,6 +44,9 @@ public class FollowHolonomicTrajectory extends CommandBase {
   private boolean m_cancel = false;
   private double m_lastRoll;
 
+  private static boolean forceResetOdometry = false;
+  private static boolean ignoreLocalizationErrors = false;
+
   /** Creates a new FollowHolonomicTrajectory. */
   public FollowHolonomicTrajectory(SwerveDrive drive, Trajectory trajectory, Rotation2d startRotation,  Rotation2d endRotation, boolean resetOdometry, boolean stopOnTip) {
     m_drive = drive;
@@ -80,11 +83,11 @@ public class FollowHolonomicTrajectory extends CommandBase {
 
     m_controller.setTolerance(new Pose2d(p_xTolerance.getValue(), p_yTolerance.getValue(), Rotation2d.fromDegrees(p_thetaTolerance.getValue())));
 
-    if (m_resetOdometry) {
+    if (m_resetOdometry  || forceResetOdometry) {
       m_drive.resetTrajectoryPose(m_trajectory.getInitialPose());
     } else {
       Transform2d offset = m_drive.getOdometryPose().minus(m_trajectory.getInitialPose());
-      if (offset.getTranslation().getDistance(new Translation2d()) > 6.0) {
+      if (!ignoreLocalizationErrors && offset.getTranslation().getDistance(new Translation2d()) > 6.0) {
         System.out.println("!!!canceling holomic trajectory!!!");
         m_cancel = true;
       }
@@ -103,8 +106,6 @@ public class FollowHolonomicTrajectory extends CommandBase {
     double roll = m_drive.getNavX().getRoll();
     double rollRate = roll - m_lastRoll;
     m_lastRoll = roll;
-
-    System.out.println(roll + " - " + rollRate);
 
     if (m_stopOnTip && Math.abs(roll) < 10 && (Math.abs(rollRate) > Math.abs(p_rollRateTolerance.getValue())) &&
         (Math.signum(rollRate) != Math.signum(roll)) ) {
@@ -145,5 +146,10 @@ public class FollowHolonomicTrajectory extends CommandBase {
   @Override
   public boolean isFinished() {
     return  m_timer.get() > m_trajectory.getTotalTimeSeconds() || m_cancel;
+  }
+
+  public static void forceResetOdometry() {
+    forceResetOdometry = true;
+    ignoreLocalizationErrors = true;
   }
 }
