@@ -25,5 +25,6 @@ public class ArmStates {
     public static final ArmState scoreCubeLow = new ArmState("Score Cube Low", 64.3, -118.8, 160.7, 600);
     public static final ArmState scoreCubeMiddleFront = new ArmState("Score Cube Middle Front", 80, -80, 70, 300);
     public static final ArmState scoreCubeLowFront = new ArmState("Score Cube Low Front", 80, -80, 70, 300);
+    public static final ArmState wristFlick = new ArmState("Wrist Flick", stowWithPiece.getShoulderAngle(), stowWithPiece.getElbowAngle(), 90, 800);
     public static final ArmState autoPrepScoreCone = new ArmState("Auto Prep Score Cone", 80, -80, 70, 300);
 }

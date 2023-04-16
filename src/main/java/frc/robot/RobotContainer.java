@@ -146,7 +146,7 @@ public class RobotContainer {
       m_autoCommandName = "Charge1Mobility";
     }
 
-    if (m_buttonBox.setFlat.getAsBoolean() && !m_autoCommandName.equals("Wall3")) {
+    if (m_buttonBox.wristFlick.getAsBoolean() && !m_autoCommandName.equals("Wall3")) {
       m_autoCommand = Autonomous.wall3(m_drive, m_intake, m_arm, m_grabber, m_candleSubsystem, m_aiming, m_coprocessor);
       m_autoCommandName = "Wall3";
     }
@@ -271,17 +271,22 @@ public class RobotContainer {
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(m_aiming.noAimFactory());
 
-    m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
-
     m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
         m_buttonBox.handoffButton.and(m_buttonBox.gamepieceSwitch.negate())
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, false, false));
 
-    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch)
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.wristFlick.negate()).and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_grabber.dropConeFactory());
-    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.gamepieceSwitch.negate())
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.wristFlick.negate()).and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_grabber.dropCubeFactory());
+
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.wristFlick).and(m_buttonBox.gamepieceSwitch)
+        .whileTrue(m_arm.sendArmToState(ArmStates.wristFlick))
+        .whileTrue(m_grabber.holdConeFactory().withTimeout(0.1).andThen(m_grabber.dropConeFactory()));
+    m_buttonBox.scoreButton.or(m_driverController.getScoreButton()).and(m_buttonBox.wristFlick).and(m_buttonBox.gamepieceSwitch.negate())
+        .whileTrue(m_arm.sendArmToState(ArmStates.wristFlick))
+        .whileTrue(m_grabber.holdCubeFactory().withTimeout(0.1).andThen(m_grabber.dropCubeFactory()));
 
     m_buttonBox.gamepieceSwitch.and(m_grabber.hasGamePieceTrigger().negate())
         .whileTrue(m_candleSubsystem.wantConeFactory());
