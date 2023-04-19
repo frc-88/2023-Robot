@@ -9,12 +9,12 @@ public class ButtonBox extends Joystick {
     private static int INTAKE = 10;
     private static int OUTGEST = 18;
     private static int HANDOFF = 8;
-    private static int GRAB_FROM_SHELF = 6;
+    private static int GRAB_FROM_SHELF = 20;
     private static int GRAB_FROM_CHUTE = 12;
     private static int SET_LOW = 11;
     private static int SET_MIDDLE = 2;
     private static int SET_HIGH = 15;
-    private static int SCORE = 20;
+    private static int SCORE = 6;
     private static int SET_FLAT = 19;
     private static int GAMEPIECE_SWITCH = 17;
     private static int FORCE_PIVOT_FORWARDS = 25;
