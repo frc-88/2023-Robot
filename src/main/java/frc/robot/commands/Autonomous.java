@@ -287,11 +287,11 @@ public class Autonomous {
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45)))
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
                 ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45))).withTimeout(0.05).andThen(aiming.noAimFactory()),
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1),
             ending
@@ -323,11 +323,11 @@ public class Autonomous {
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
                 grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()),
-                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35)))
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
                 ).withTimeout(.9),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35))).withTimeout(0.05).andThen(aiming.noAimFactory()),
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1)
         );
