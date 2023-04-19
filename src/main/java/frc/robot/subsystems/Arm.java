@@ -255,15 +255,15 @@ public class Arm extends SubsystemBase {
     // COMMAND FACTORIES
 
     public CommandBase calibrateShoulderFactory() {
-        return new InstantCommand(() -> m_shoulder.calibrateAbsolute(90)).ignoringDisable(true);
+        return new InstantCommand(() -> m_shoulder.calibrateAbsolute(SmartDashboard.getNumber("Arm Cal Pos", 90))).ignoringDisable(true);
     }
 
     public CommandBase calibrateElbowFactory() {
-        return new InstantCommand(() -> m_elbow.calibrateAbsolute(90)).ignoringDisable(true);
+        return new InstantCommand(() -> m_elbow.calibrateAbsolute(SmartDashboard.getNumber("Arm Cal Pos", 90))).ignoringDisable(true);
     }
 
     public CommandBase calibrateWristFactory() {
-        return new InstantCommand(() -> m_wrist.calibrateAbsolute(90)).ignoringDisable(true);
+        return new InstantCommand(() -> m_wrist.calibrateAbsolute(SmartDashboard.getNumber("Arm Cal Pos", 90))).ignoringDisable(true);
     }
 
     public ArmState getCurrentStow() {
@@ -388,6 +388,7 @@ public class Arm extends SubsystemBase {
             if (!coastModeEnabled() && loopCount < 2500) {
                 switch (loopCount % 60) {
                     case 0:
+                        SmartDashboard.putNumber("Arm Cal Pos", SmartDashboard.getNumber("Arm Cal Pos", 90));
                         m_shoulder.configureMotor();
                         break;
                     case 20:
