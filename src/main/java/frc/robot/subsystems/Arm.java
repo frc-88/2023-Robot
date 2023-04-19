@@ -51,7 +51,7 @@ public class Arm extends SubsystemBase {
     private int loopCount = 0;
 
     private double m_aimX = 0;
-    private SlewRateLimiter m_aimLimiter = new SlewRateLimiter(10);
+    private SlewRateLimiter m_aimLimiter = new SlewRateLimiter(8);
 
     public Arm() {
         this.m_coastButton = new DigitalInput(0);

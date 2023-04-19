@@ -42,7 +42,7 @@ public class Limelight extends SubsystemBase implements BotPoseProvider {
   }
 
   public double getTY() {
-    return Math.toRadians(LimelightHelpers.getTY(m_name) + 25.8);
+    return Math.toRadians(LimelightHelpers.getTY(m_name) + 25.1);
   }
 
 
