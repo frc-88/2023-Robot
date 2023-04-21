@@ -210,7 +210,7 @@ public class Autonomous {
                     intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).withTimeout(0.1),
                     new Handoff(intake, arm, grabber, true, false),
                     arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
-                        intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
+                        intake.handoffFactory().withTimeout(0.3).andThen(intake.downFactory()), 
                         grabber.grabConeFactory(), 
                         grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                         aiming.noAimFactory()))
@@ -225,7 +225,7 @@ public class Autonomous {
                 aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1),
-            arm.stowFrom(ArmStates.scoreConeMiddle, () -> 300).withTimeout(0.5).deadlineWith(
+            arm.stowFrom(ArmStates.scoreConeMiddle, () -> 300).withTimeout(0.25).deadlineWith(
                 intake.downFactory(),
                 grabber.dropConeFactory(),
                 aiming.noAimFactory())
@@ -245,7 +245,7 @@ public class Autonomous {
                         intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).withTimeout(0.25),
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
-                            intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
+                            intake.handoffFactory().withTimeout(0.3).andThen(intake.downFactory()), 
                             grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
@@ -279,7 +279,7 @@ public class Autonomous {
                         intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).withTimeout(0.25),
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
-                            intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
+                            intake.handoffFactory().withTimeout(0.3).andThen(intake.downFactory()), 
                             grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
@@ -314,7 +314,7 @@ public class Autonomous {
                         intake.stowFactory().alongWith(arm.stowSimple(), grabber.holdConeFactory()).until(intake::isArmUp).withTimeout(0.5),
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
-                            intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
+                            intake.handoffFactory().withTimeout(0.3).andThen(intake.downFactory()), 
                             grabber.grabConeFactory(), 
                             grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
