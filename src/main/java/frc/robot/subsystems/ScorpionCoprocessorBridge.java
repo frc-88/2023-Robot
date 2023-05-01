@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.util.BotPoseProvider;
 import frc.team88.ros.bridge.BridgePublisher;
 import frc.team88.ros.bridge.BridgeSubscriber;
@@ -17,7 +16,7 @@ import frc.team88.ros.bridge.ROSNetworkTablesBridge;
 import frc.team88.ros.conversions.ROSConversions;
 import frc.team88.ros.conversions.TFListenerCompact;
 import frc.team88.ros.conversions.Transform3dStamped;
-import frc.team88.ros.messages.Time;
+import frc.team88.ros.messages.TimePrimitive;
 import frc.team88.ros.messages.geometry_msgs.Point;
 import frc.team88.ros.messages.geometry_msgs.Pose;
 import frc.team88.ros.messages.geometry_msgs.PoseWithCovariance;
@@ -32,7 +31,6 @@ import frc.team88.ros.messages.std_msgs.Header;
 public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseProvider {
     private final SwerveDrive m_drive;
     private final ROSNetworkTablesBridge m_ros_interface;
-    private final BridgeSubscriber<Twist> m_twistSub;
     private final BridgePublisher<Odometry> m_odomPub;
     private final BridgeSubscriber<Float64> m_pingSendSub;
     private final BridgePublisher<Float64> m_pingReturnPub;
@@ -44,11 +42,13 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
     private long prevTagGlobalTime = 0;
     private final long TAG_GLOBAL_POSE_TIMEOUT = 250_000;
 
+    private final double UPDATE_INTERVAL = 0.02;
+
     public final String MAP_FRAME = "map";
     public final String ODOM_FRAME = "odom";
     public final String BASE_FRAME = "base_link";
     public final String TAG_FIELD_FRAME = "field";
-    private final Odometry odomMsg = new Odometry(new Header(0, new Time(), ODOM_FRAME), BASE_FRAME,
+    private final Odometry m_odomMsg = new Odometry(new Header(0, new TimePrimitive(), ODOM_FRAME), BASE_FRAME,
             new PoseWithCovariance(new Pose(new Point(0, 0, 0), new Quaternion(0, 0, 0, 1)), new Double[] {
                     5e-2, 0.0, 0.0, 0.0, 0.0, 0.0,
                     0.0, 5e-2, 0.0, 0.0, 0.0, 0.0,
@@ -68,26 +68,16 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
 
     public ScorpionCoprocessorBridge(
             SwerveDrive drive) {
-        NetworkTableInstance instance = NetworkTableInstance.create();
-        instance.startClient3("bridge");
-        instance.setServer(Constants.COPROCESSOR_ADDRESS, Constants.COPROCESSOR_PORT);
-        m_ros_interface = new ROSNetworkTablesBridge(instance.getTable(""), Constants.COPROCESSOR_UPDATE_DELAY);
+        NetworkTableInstance instance = NetworkTableInstance.getDefault();
 
-        m_twistSub = new BridgeSubscriber<>(m_ros_interface, "/tj2/cmd_vel",
-                Twist.class);
-        m_odomPub = new BridgePublisher<>(m_ros_interface, "/tj2/odom");
-        m_pingSendSub = new BridgeSubscriber<>(m_ros_interface,
-                "/tj2/ping_send",
-                Float64.class);
-        m_pingReturnPub = new BridgePublisher<>(m_ros_interface,
-                "/tj2/ping_return");
+        m_ros_interface = new ROSNetworkTablesBridge(instance.getTable(""), UPDATE_INTERVAL);
+
+        m_odomPub = new BridgePublisher<>(m_ros_interface, "odom");
+        m_pingSendSub = new BridgeSubscriber<>(m_ros_interface, "ping_send", Float64.class);
+        m_pingReturnPub = new BridgePublisher<>(m_ros_interface, "ping_return");
         m_tfListenerCompact = new TFListenerCompact(m_ros_interface, "/tf_compact");
 
         m_drive = drive;
-    }
-
-    public BridgeSubscriber<Twist> getTwistSub() {
-        return m_twistSub;
     }
 
     public TFListenerCompact getTFListener() {
@@ -110,13 +100,13 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
         Pose2d pose = m_drive.getOdometryPose();
         ChassisSpeeds velocity = m_drive.getChassisSpeeds();
 
-        odomMsg.setHeader(m_odomPub.getHeader(ODOM_FRAME));
-        odomMsg.getPose().setPose(ROSConversions.wpiToRosPose(new Pose3d(pose)));
-        odomMsg.getTwist().getTwist()
+        m_odomMsg.setHeader(m_odomPub.getHeader(ODOM_FRAME));
+        m_odomMsg.getPose().setPose(ROSConversions.wpiToRosPose(new Pose3d(pose)));
+        m_odomMsg.getTwist().getTwist()
                 .setLinear(new Vector3(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond, 0.0));
-        odomMsg.getTwist().getTwist().setAngular(new Vector3(0.0, 0.0, velocity.omegaRadiansPerSecond));
+        m_odomMsg.getTwist().getTwist().setAngular(new Vector3(0.0, 0.0, velocity.omegaRadiansPerSecond));
 
-        m_odomPub.send(odomMsg);
+        m_odomPub.send(m_odomMsg);
     }
 
     public boolean isConnected() {
