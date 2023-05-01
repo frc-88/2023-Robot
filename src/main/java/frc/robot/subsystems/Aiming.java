@@ -33,7 +33,7 @@ public class Aiming extends SubsystemBase {
         = new DoublePreferenceConstant("Aiming/AdjustYLimelight", 4);
 
     private final Timer m_pipelineTimer = new Timer();
-    private final Debouncer m_readyDebounce = new Debouncer(0.3, DebounceType.kRising);
+    private final Debouncer m_readyDebounce = new Debouncer(0.4, DebounceType.kRising);
 
     private static final double MAX_DISTANCE_ERROR_MID = 7;
     private static final double MAX_DISTANCE_ERROR_HIGH = 7;
@@ -76,7 +76,7 @@ public class Aiming extends SubsystemBase {
     }
 
     private double getCalibratedDistance(boolean mid) {
-        return mid ? 39.9 : 52.4;
+        return mid ? 39.4 : 53;
     }
 
     private double getMaxDistanceError(boolean mid) {

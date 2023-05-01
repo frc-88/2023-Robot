@@ -111,7 +111,7 @@ public class Autonomous {
                     new Handoff(intake, arm, grabber, true, true),
                     arm.stowSimple()
                         .alongWith(intake.stowFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()),
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                            grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             )
         );
@@ -120,7 +120,7 @@ public class Autonomous {
     private static SequentialCommandGroup center3(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, Aiming aiming, BotPoseProvider source) {
         return center3Base(alliance, drive, intake, arm, grabber, candle, aiming, source,
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid3ToMidfield.wpilib.json"), false)
-                .deadlineWith(intake.stowFactory(), arm.stowSimple(), grabber.holdConeFactory(), aiming.noAimFactory(),
+                .deadlineWith(intake.stowFactory(), arm.stowSimple(() -> 300), grabber.holdConeFactory(), aiming.noAimFactory(),
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot()))
         );
     }
@@ -129,7 +129,7 @@ public class Autonomous {
         return center3Base(alliance, drive, intake, arm, grabber, candle, aiming, source,
             new SequentialCommandGroup(
                 new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid3ToPiece3.wpilib.json"), new Rotation2d(), Rotation2d.fromDegrees(alliance.equals("Blue") ? -80 : 80), false)
-                    .deadlineWith(intake.intakeFactory(), arm.stowSimple(), grabber.holdConeFactory(), aiming.noAimFactory(),
+                    .deadlineWith(intake.intakeFactory(), arm.stowSimple(() -> 300), grabber.holdConeFactory(), aiming.noAimFactory(),
                         grabber.setPivotForwardsFactory().andThen(grabber.forcePivot()))
                 // new ParallelDeadlineGroup(
                 //     new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece3ToGrid1.wpilib.json"), false),
@@ -147,7 +147,7 @@ public class Autonomous {
     private static SequentialCommandGroup center3Balance(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, Aiming aiming, BotPoseProvider source) {
         return center3Base(alliance, drive, intake, arm, grabber, candle, aiming, source,
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid3ToEngage.wpilib.json"), false, true)
-                .deadlineWith(intake.downFactory(), arm.stowSimple(), grabber.holdConeFactory(), aiming.noAimFactory(),
+                .deadlineWith(intake.downFactory(), arm.stowSimple(() -> 300), grabber.holdConeFactory(), aiming.noAimFactory(),
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot()))
                 .andThen(new AutoBalancePID(drive).alongWith(intake.downFactory(), arm.stowSimple(), grabber.holdConeFactory()))
         );
@@ -190,7 +190,7 @@ public class Autonomous {
                     new Handoff(intake, arm, grabber, true, true),
                     arm.stowSimple()
                         .alongWith(intake.stowFactory(), grabber.grabConeFactory().andThen(grabber.holdConeFactory()),
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()))
+                            grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()))
                 )
             ),
             new AutoBalancePID(drive).alongWith(intake.stowFactory(), grabber.holdConeFactory())
@@ -211,8 +211,8 @@ public class Autonomous {
                     new Handoff(intake, arm, grabber, true, false),
                     arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                         intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                        grabber.holdConeFactory(), 
-                        grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(),
+                        grabber.grabConeFactory(), 
+                        grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                         aiming.noAimFactory()))
                 )
             ),
@@ -222,10 +222,10 @@ public class Autonomous {
                 ).withTimeout(.5),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1),
-            arm.stowFrom(ArmStates.scoreConeMiddle).withTimeout(0.5).deadlineWith(
+            arm.stowFrom(ArmStates.scoreConeMiddle, () -> 300).withTimeout(0.5).deadlineWith(
                 intake.downFactory(),
                 grabber.dropConeFactory(),
                 aiming.noAimFactory())
@@ -246,8 +246,8 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(),
+                            grabber.grabConeFactory(), 
+                            grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
                 ),
@@ -257,11 +257,11 @@ public class Autonomous {
                     ).withTimeout(.5),
                 arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                     intake.downFactory(), grabber.dropConeFactory(),
-                    aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                    aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true).withTimeout(0.05).andThen(aiming.noAimFactory()),
                     printAiming(arm, grabber)
                     ).withTimeout(0.1),
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallGrid7ToMidfield.wpilib.json"), false)
-                .deadlineWith(intake.stowFactory(), arm.stowSimple(), grabber.dropConeFactory(), aiming.noAimFactory(),
+                .deadlineWith(intake.stowFactory(), arm.stowSimple(() -> 300), grabber.dropConeFactory(), aiming.noAimFactory(),
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot()))
         );
     }
@@ -270,7 +270,7 @@ public class Autonomous {
         return new SequentialCommandGroup(
             centerBaseTo1Mid(alliance, drive, intake, arm, grabber, candle, aiming, source),
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterGrid1ToPiece2.wpilib.json"), new Rotation2d(), Rotation2d.fromDegrees(alliance.equals("Blue") ? -35 : 35), false)
-                .deadlineWith(intake.intakeFactory(), arm.stowSimple(), grabber.holdConeFactory(), aiming.noAimFactory(),
+                .deadlineWith(intake.intakeFactory(), arm.stowSimple(() -> 300), grabber.holdConeFactory(), aiming.noAimFactory(),
                     grabber.setPivotForwardsFactory().andThen(grabber.forcePivot())),
             new ParallelDeadlineGroup(
                 new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "CenterPiece2ToGrid3.wpilib.json"), false),
@@ -280,18 +280,18 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle, 400).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(),
+                            grabber.grabConeFactory(), 
+                            grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45)))
                 ).withTimeout(.6),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 4 : 5).alongWith(grabber.applyAim(alliance.equals("Blue") ? -30 : 45))).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1),
             ending
@@ -315,19 +315,19 @@ public class Autonomous {
                         new Handoff(intake, arm, grabber, true, false),
                         arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                             intake.handoffFactory().withTimeout(0.25).andThen(intake.downFactory()), 
-                            grabber.holdConeFactory(), 
-                            grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot(),
+                            grabber.grabConeFactory(), 
+                            grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot(),
                             aiming.noAimFactory()))
                     )
             ),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.grabConeFactory(),
-                grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot()),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true)
+                grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot()),
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35)))
                 ).withTimeout(.9),
             arm.sendArmToState(ArmStates.scoreConeMiddle).alongWith(
                 intake.downFactory(), grabber.dropConeFactory(),
-                aiming.aimFactory(Constants.AIM_MIDDLE_OUTREACH, true),
+                new RepeatCommand(arm.aimFactory(alliance.equals("Blue") ? 3 : 3).alongWith(grabber.applyAim(alliance.equals("Blue") ? -10 : 35))).withTimeout(0.05).andThen(aiming.noAimFactory()),
                 printAiming(arm, grabber)
                 ).withTimeout(0.1)
         );
@@ -337,7 +337,7 @@ public class Autonomous {
         return new SequentialCommandGroup(
             new Localize(drive, source).withTimeout(0.05).alongWith(
                 arm.sendArmToState(ArmStates.scoreCubeMiddle).withTimeout(0.1),
-                grabber.forcePivotBackwardsFactory().andThen(grabber.forcePivot())).deadlineWith(
+                grabber.setPivotBackwardsFactory().andThen(grabber.forcePivot())).deadlineWith(
                 grabber.holdCubeFactory(),
                 intake.downFactory()),
             arm.holdTargetState().alongWith(grabber.dropCubeFactory(), intake.downFactory()).withTimeout(0.05)

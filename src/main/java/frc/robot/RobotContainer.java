@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Lights;
 import frc.robot.commands.PlaySong;
+import frc.robot.commands.drive.AutoBalancePID;
 import frc.robot.commands.drive.AutoBalanceSimple;
 import frc.robot.commands.drive.Localize;
 import frc.robot.subsystems.SwerveDrive;
@@ -61,7 +62,7 @@ public class RobotContainer {
   private final SwerveDrive m_drive = new SwerveDrive();
   private final Intake m_intake = new Intake();
   private final Arm m_arm = new Arm();
-  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed);
+  private final Grabber m_grabber = new Grabber(m_arm::coastModeEnabled, m_arm::isStowed, m_buttonBox.forcePivotForwardsSwitch, m_buttonBox.forcePivotBackwardsSwitch);
   private final Limelight m_limelight_front = new Limelight(Constants.LIMELIGHT_FRONT_NAME);
   private final Limelight m_limelight_back = new Limelight(Constants.LIMELIGHT_BACK_NAME);
   private final ScorpionCoprocessorBridge m_coprocessor = new ScorpionCoprocessorBridge(m_drive);
@@ -84,11 +85,6 @@ public class RobotContainer {
   }
 
   public void enableInit() {
-    if (m_drive.isFacingBackwards().getAsBoolean() && DriverStation.isTeleop()) {
-      new RepeatCommand(m_grabber.setPivotForwardsFactory()).schedule();
-    } else if (DriverStation.isTeleop()) {
-      new RepeatCommand(m_grabber.setPivotBackwardsFactory()).schedule();
-    }
     if (m_buttonBox.gamepieceSwitch.getAsBoolean()) {
       m_candleSubsystem.wantConeFactory().schedule();
       m_intake.setCone();
@@ -197,9 +193,9 @@ public class RobotContainer {
         .whileTrue(m_grabber.grabCubeFactory())
         .onFalse(m_grabber.grabCubeFactory().withTimeout(1));
 
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeMiddle)
             .alongWith(m_grabber.holdConeFactory())
@@ -217,7 +213,7 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new RepeatCommand(m_aiming.setAprilTagPipelineFactory()).withTimeout(0.5));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingForwards())
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch)
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreConeHigh)
             .alongWith(m_grabber.holdConeFactory())
@@ -236,14 +232,9 @@ public class RobotContainer {
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new RepeatCommand(m_aiming.setAprilTagPipelineFactory()).withTimeout(0.5));
 
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeLowFront));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreConeMiddleFront));
-
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLow));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeMiddle)
             .alongWith(m_grabber.holdCubeFactory())
@@ -260,7 +251,7 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(new WaitCommand(0.2).andThen(m_aiming.noAimFactory()));
-    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingForwards())
+    m_buttonBox.setHigh.and(m_buttonBox.gamepieceSwitch.negate())
         .whileTrue(
           m_arm.sendArmToState(ArmStates.scoreCubeHigh)
             .alongWith(m_grabber.holdCubeFactory())
@@ -277,11 +268,6 @@ public class RobotContainer {
         .onTrue(m_intake.downFactory())
         .onFalse(m_intake.downFactory().withTimeout(0.25))
         .onFalse(m_aiming.noAimFactory());
-
-    m_buttonBox.setLow.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeLowFront));
-    m_buttonBox.setMiddle.and(m_buttonBox.gamepieceSwitch.negate()).and(m_drive.isFacingBackwards())
-        .whileTrue(m_arm.sendArmToState(ArmStates.scoreCubeMiddleFront));
 
     m_buttonBox.setFlat.whileTrue(m_arm.sendArmToState(ArmStates.flat));
 
@@ -312,10 +298,6 @@ public class RobotContainer {
   /////////////////////////////////////////////////////////////////////////////
 
   private void configureTriggers() {
-    m_drive.isFacingForwards().and(m_buttonBox.forcePivotForwardsSwitch.negate()).and(m_buttonBox.forcePivotBackwardsSwitch.negate()).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotBackwardsFactory()));
-    m_buttonBox.forcePivotBackwardsSwitch.and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.forcePivotBackwardsFactory()));
-    m_drive.isFacingBackwards().and(m_buttonBox.forcePivotBackwardsSwitch.negate()).or(m_buttonBox.forcePivotForwardsSwitch).and(DriverStation::isTeleopEnabled).whileTrue(new RepeatCommand(m_grabber.setPivotForwardsFactory()));
-
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
         .onTrue(new Handoff(m_intake, m_arm, m_grabber, true, false));
     m_intake.holdAndHasPiece().and(m_grabber.hasGamePieceTrigger().negate()).and(m_buttonBox.gamepieceSwitch.negate()).and(DriverStation::isTeleopEnabled).and(m_arm::isStowed)
@@ -371,9 +353,6 @@ public class RobotContainer {
 
     // Grabber
     SmartDashboard.putData("!!Calibrate Grabber Pivot Absolute!!", m_grabber.calibrateAbsolutePivotFactory());
-    SmartDashboard.putData("Set Grabber Forwards", m_grabber.setPivotForwardsFactory());
-    SmartDashboard.putData("Set Grabber Backwards", m_grabber.setPivotBackwardsFactory());
-    SmartDashboard.putData("Force Grabber Backwards", m_grabber.forcePivotBackwardsFactory());
     SmartDashboard.putData("Grab Cone", m_grabber.grabConeFactory());
     SmartDashboard.putData("Grab Cube", m_grabber.grabCubeFactory());
     SmartDashboard.putData("Drop Cone", m_grabber.dropConeFactory());
@@ -401,6 +380,8 @@ public class RobotContainer {
         .ignoringDisable(true));
     SmartDashboard.putData("Aim High", m_aiming.aimFactory(Constants.AIM_HIGH_OUTREACH, false)
         .ignoringDisable(true));
+
+    SmartDashboard.putData("Balance PID", new AutoBalancePID(m_drive));
   }
   
   private void configurePeriodics(Robot robot) {
