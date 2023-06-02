@@ -4,20 +4,13 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.coprocessor.GridZone;
-import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 
 public class Aiming extends SubsystemBase {
@@ -25,9 +18,8 @@ public class Aiming extends SubsystemBase {
     private final SwerveDrive m_drive;
     private final Arm m_arm;
     private final Grabber m_grabber;
-    private final ScorpionTable m_ros;
+    private final ScorpionCoprocessorBridge m_ros;
     private final Limelight m_limelight;
-    private final GameObjectManager m_objects;
     private final BooleanSupplier m_coneMode;
     private final BooleanSupplier m_enabled;
 
@@ -48,13 +40,12 @@ public class Aiming extends SubsystemBase {
     private static final double READY_TO_AIM_SEC = 1.5;
     private static final double READY_TO_SCORE_SEC = 2;
     
-    public Aiming(SwerveDrive drive, Arm arm, Grabber grabber, ScorpionTable ros, Limelight limelight, GameObjectManager objectManager, BooleanSupplier coneMode, BooleanSupplier enabled) {
+    public Aiming(SwerveDrive drive, Arm arm, Grabber grabber, ScorpionCoprocessorBridge ros, Limelight limelight, BooleanSupplier coneMode, BooleanSupplier enabled) {
         m_drive = drive;
         m_arm = arm;
         m_grabber = grabber;
         m_limelight = limelight;
         m_ros = ros;
-        m_objects = objectManager;
         m_coneMode = coneMode;
         m_enabled = enabled;
 
@@ -62,19 +53,6 @@ public class Aiming extends SubsystemBase {
         m_pipelineTimer.reset();
     }
 
-    public Pose2d getNearestScorePoint(Pose2d botPose) {
-        Pose2d closestZone = new Pose2d();
-        double closestZoneDistance = 1000; //unreasonably high number to have something to compare to
-        for(GridZone gridZone : m_objects.gridZones) {
-            gridZone.getY();
-            double distance = Math.sqrt(Math.pow(botPose.getX() - gridZone.getX(), 2) + Math.pow(botPose.getY() - gridZone.getY(), 2));
-            if(distance < closestZoneDistance) {
-                closestZone = new Pose2d(new Translation2d(gridZone.getX(), gridZone.getY()), new Rotation2d(0.));
-                closestZoneDistance = distance;
-            }
-        }
-        return closestZone;
-    }
     public void giveAim(double outreach, boolean mid) {
         double aimAngle;
         double armAdjust;
@@ -84,8 +62,6 @@ public class Aiming extends SubsystemBase {
             armAdjust = Math.min(Math.max(getTargetDistance(mid) - getCalibratedDistance(mid), -getMaxDistanceError(mid)), getMaxDistanceError(mid));
         } else {
             m_limelight.setAprilTagPipeline();
-            // Pose2d botPose = m_ros.getBotPoseInches().plus(new Transform2d(new Translation2d(outreach, p_aimAdjustY.getValue()), new Rotation2d(0)));
-            // aimAngle = Math.toDegrees(Math.atan((getNearestScorePoint(botPose).getY()-botPose.getY()) / p_aimHeight.getValue()));
             aimAngle = 0;
             armAdjust = 0;
         }
