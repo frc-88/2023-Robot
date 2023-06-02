@@ -150,6 +150,7 @@ public class Grabber extends SubsystemBase {
   }
 
   public void zeroPivotAngle() {
+    System.out.println("Zeroing pivot");
     m_pivotCoder.setPosition(((getPivotAbsoluteAngle() + 630) % 360) - 270);
   }
 
