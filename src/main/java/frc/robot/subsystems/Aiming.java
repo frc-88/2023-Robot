@@ -76,7 +76,7 @@ public class Aiming extends SubsystemBase {
     }
 
     private double getCalibratedDistance(boolean mid) {
-        return mid ? 40.7 : 53.6;
+        return mid ? 37 : 53.6;
     }
 
     private double getMaxDistanceError(boolean mid) {
