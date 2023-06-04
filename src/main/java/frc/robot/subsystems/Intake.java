@@ -99,7 +99,7 @@ public class Intake extends SubsystemBase {
     m_arm.setInverted(true);
     m_arm.overrideLimitSwitchesEnable(false);
 
-    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 60, 60, .1);
+    StatorCurrentLimitConfiguration sclc = new StatorCurrentLimitConfiguration(true, 80, 60, .1);
 
     m_innerRoller.configStatorCurrentLimit(sclc);
     m_outerRoller.configStatorCurrentLimit(sclc);
