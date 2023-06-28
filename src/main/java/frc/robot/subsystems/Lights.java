@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.util.coprocessor.networktables.ScorpionTable;
 import frc.robot.util.preferenceconstants.DoublePreferenceConstant;
 import frc.robot.util.preferenceconstants.IntPreferenceConstant;
 
@@ -46,7 +45,7 @@ public class Lights extends SubsystemBase {
     private Intake m_intake;
     private Arm m_arm;
     private Grabber m_grabber;
-    private ScorpionTable m_coprocessor;
+    private ScorpionCoprocessorBridge m_coprocessor;
     private Limelight m_limelight;
     private Supplier<String> m_autoName;
 
@@ -64,7 +63,7 @@ public class Lights extends SubsystemBase {
         Empty
     }
 
-    public Lights(SwerveDrive swerve, Intake intake, Arm arm, Grabber grabber, ScorpionTable coprocessor, Limelight limelight, Supplier<String> autoName) {
+    public Lights(SwerveDrive swerve, Intake intake, Arm arm, Grabber grabber, ScorpionCoprocessorBridge coprocessor, Limelight limelight, Supplier<String> autoName) {
         m_swerve = swerve;
         m_intake = intake;
         m_arm = arm;

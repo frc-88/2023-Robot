@@ -1,0 +1,24 @@
+{
+    "sources": [
+        "tj2_interfaces/Match",
+        "tj2_interfaces/MatchPeriod",
+        "tj2_interfaces/NavX"
+    ],
+    "repos": [
+        {
+            "local-name": "std_msgs",
+            "uri": "https://github.com/ros/std_msgs.git",
+            "version": "kinetic-devel"
+        },
+        {
+            "local-name": "common_msgs",
+            "uri": "https://github.com/ros/common_msgs.git",
+            "version": "noetic-devel"
+        },
+        {
+            "local-name": "tj2_interfaces",
+            "uri": "file:///C:/Users/woz4t/tj2_ros/src/tj2_interfaces",
+            "version": ""
+        }
+    ]
+}
