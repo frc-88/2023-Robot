@@ -317,7 +317,7 @@ public class RobotContainer {
   //////////////////////
 
   private void configureDefaultCommands() {
-    m_drive.setDefaultCommand(m_drive.grantDriveCommandFactory(m_drive, m_driverController));
+    m_drive.setDefaultCommand(m_drive.fieldOrientedDriveCommandFactory(m_drive, m_driverController));
     m_intake.setDefaultCommand(m_intake.stowFactory());
     m_arm.setDefaultCommand(m_arm.sendArmToState(ArmStates.stowGeneric));
     m_grabber.setDefaultCommand(m_grabber.holdFactory(m_buttonBox::isConeSelected));

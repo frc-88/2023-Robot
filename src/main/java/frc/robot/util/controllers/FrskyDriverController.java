@@ -25,7 +25,7 @@ public class FrskyDriverController extends FrskyController implements DriverCont
 
     @Override
     public Trigger getScoreButton() {
-        return topRightSwitch;
+        return buttonA;
     }
     
     @Override
