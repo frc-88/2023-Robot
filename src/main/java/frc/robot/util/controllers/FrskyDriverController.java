@@ -10,17 +10,17 @@ public class FrskyDriverController extends FrskyController implements DriverCont
 
     @Override
     public double getTranslationX() {
-        return -getLeftStickX();
+        return getLeftStickX();
     }
 
     @Override
     public double getTranslationY() {
-        return getLeftStickY();
+        return -getLeftStickY();
     }
 
     @Override
     public double getRotation() {
-        return getRightStickX();
+        return -getRightStickX();
     }
 
     @Override
