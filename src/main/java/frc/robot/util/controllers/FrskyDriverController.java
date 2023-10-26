@@ -2,25 +2,37 @@ package frc.robot.util.controllers;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+
 public class FrskyDriverController extends FrskyController implements DriverController{
 
     public FrskyDriverController(int port) {
         super(port);
     }
 
+    private static double deadband(double value, double tolerance) {
+        if (Math.abs(value) < tolerance)
+            return 0.0;
+
+        return Math.copySign(value, (value - tolerance) / (1.0 - tolerance));
+    }
+
+    private static double square(double value){
+        return Math.copySign(value*value, value);
+    }
+
     @Override
     public double getTranslationX() {
-        return getLeftStickX();
+        return square(deadband(getLeftStickX(),.1));
     }
 
     @Override
     public double getTranslationY() {
-        return -getLeftStickY();
+        return -square(deadband(getLeftStickY(), .1));
     }
 
     @Override
     public double getRotation() {
-        return -getRightStickX();
+        return -(deadband(getRightStickX(), .1));
     }
 
     @Override
