@@ -22,17 +22,17 @@ public class FrskyDriverController extends FrskyController implements DriverCont
 
     @Override
     public double getTranslationX() {
-        return square(deadband(getLeftStickX(),.1));
+        return -square(deadband(getLeftStickX(), .02));
     }
 
     @Override
     public double getTranslationY() {
-        return -square(deadband(getLeftStickY(), .1));
+        return square(deadband(getLeftStickY(), .02));
     }
 
     @Override
     public double getRotation() {
-        return -(deadband(getRightStickX(), .1));
+        return deadband(getRightStickX(), .02);
     }
 
     @Override

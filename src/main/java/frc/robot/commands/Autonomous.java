@@ -199,6 +199,7 @@ public class Autonomous {
 
     private static SequentialCommandGroup wall2(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, Aiming aiming, BotPoseProvider source) {
         return new SequentialCommandGroup(
+            new InstantCommand(() -> {System.out.println(alliance);}),
             initialShootCubeMid(drive, intake, arm, grabber, source).deadlineWith(new RepeatCommand(aiming.setRetroPipelineFactory(true))),
             new FollowHolonomicTrajectory(drive, TrajectoryHelper.loadJSONTrajectory(alliance + "WallGrid8ToPiece4.wpilib.json"), false)
                 .deadlineWith(intake.intakeFactory(), arm.stowFrom(ArmStates.scoreCubeMiddle), grabber.holdConeFactory(), 
@@ -300,6 +301,7 @@ public class Autonomous {
 
     private static SequentialCommandGroup centerBaseTo1Mid(String alliance, SwerveDrive drive, Intake intake, Arm arm, Grabber grabber, Lights candle, Aiming aiming, BotPoseProvider source) {
         return new SequentialCommandGroup(
+            new InstantCommand(() -> {System.out.println(alliance);}),
             initialShootCubeMid(drive, intake, arm, grabber, source)
                 .deadlineWith(intake.setConeFactory(), 
                     candle.wantConeFactory(), 
