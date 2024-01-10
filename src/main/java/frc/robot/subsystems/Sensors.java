@@ -62,7 +62,7 @@ public class Sensors extends SubsystemBase {
                             System.out.println(String.format("Found %s codes", qr_code_text));
                             if (qr_code_text.startsWith("tj2-battery")) {
                                 // logging info to DS
-                                DriverStation.reportError(qr_code_text, false);
+                                System.out.println("Battery code: " + qr_code_text);
                                 break;
                             }
                         }
