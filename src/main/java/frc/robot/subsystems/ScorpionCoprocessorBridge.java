@@ -33,23 +33,18 @@ import frc.team88.ros.messages.nav_msgs.Odometry;
 import frc.team88.ros.messages.std_msgs.Float64;
 import frc.team88.ros.messages.std_msgs.Header;
 import frc.team88.ros.messages.std_msgs.Time;
-import frc.team88.ros.messages.sensor_msgs.BatteryState;
 
 public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseProvider {
     private final SwerveDrive m_drive;
     private final AHRS m_imu;
     private final ROSNetworkTablesBridge m_ros_interface;
-    private final BatteryState m_batteryPub;
 
     private final BridgeSubscriber<Float64> m_pingSendSub;
-    private final BridgeSubscriber<frc.team88.ros.messages.std_msgs.String> m_batterySerialSub;
 
     private final BridgePublisher<Odometry> m_odomPub;
     private final BridgePublisher<NavX> m_imuPub;
     private final BridgePublisher<Float64> m_pingReturnPub;
     private final BridgePublisher<Time> m_startBagPub;
-
-    private final String m_batterySerial = "";
 
     private final TFListenerCompact m_tfListenerCompact;
 
@@ -92,13 +87,11 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
         m_ros_interface = new ROSNetworkTablesBridge(instance.getTable(""), UPDATE_INTERVAL);
 
         m_pingSendSub = new BridgeSubscriber<>(m_ros_interface, "ping_send", Float64.class);
-        m_batterySerialSub = new BridgeSubscriber<>(m_ros_interface, "battery_serial", frc.team88.ros.messages.std_msgs.String.class);
 
         m_odomPub = new BridgePublisher<>(m_ros_interface, "odom");
         m_imuPub = new BridgePublisher<>(m_ros_interface, "imu");
         m_pingReturnPub = new BridgePublisher<>(m_ros_interface, "ping_return");
         m_startBagPub = new BridgePublisher<>(m_ros_interface, "start_bag");
-        m_batteryPub = new BridgePublisher<>(m_ros_interface, "battery");
 
         m_tfListenerCompact = new TFListenerCompact(m_ros_interface, "/tf_compact");
 
@@ -118,20 +111,6 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
         }
     }
 
-    private void sendBattery() {
-        frc.team88.ros.messages.std_msgs.String msg;
-        if ((msg = m_batterySerialSub.receive()) != null) {
-            m_batterySerial = msg.getData();
-        }
-        if (m_batterySerial.length() == 0) {
-            return;
-        }
-        double voltage = RobotController.getBatteryVoltage();
-        double current = RobotController.getInputCurrent();
-        m_batteryPub.send(
-            new BatteryState(new Header(0, new TimePrimitive(), "battery"),
-            voltage, 0.0, current, 0.0, 0.0, 0.0, BatteryState.POWER_SUPPLY_HEALTH_UNKNOWN, BatteryState.POWER_SUPPLY_TECHNOLOGY_UNKNOWN, 0.0, 0.0, 0.0, 0.0, 0.0, m_batterySerial));
-    }
 
     private long getTime() {
         return RobotController.getFPGATime();
@@ -210,7 +189,6 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
         sendOdom();
         sendImu();
         checkPing();
-        checkBarcode();
         m_tfListenerCompact.update();
     }
 }
