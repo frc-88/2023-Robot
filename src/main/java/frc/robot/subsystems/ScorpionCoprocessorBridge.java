@@ -111,6 +111,7 @@ public class ScorpionCoprocessorBridge extends SubsystemBase implements BotPoseP
         }
     }
 
+
     private long getTime() {
         return RobotController.getFPGATime();
     }

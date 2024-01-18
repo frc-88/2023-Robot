@@ -26,6 +26,7 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.ScorpionCoprocessorBridge;
+import frc.robot.subsystems.Sensors;
 import frc.robot.util.arm.ArmStates;
 import frc.robot.util.controllers.ButtonBox;
 
@@ -70,6 +71,7 @@ public class RobotContainer {
       m_limelight_back, () -> m_autoCommandName);
   private final Aiming m_aiming = new Aiming(m_drive, m_arm, m_grabber, m_coprocessor, m_limelight_back,
       m_buttonBox.gamepieceSwitch, m_buttonBox.enableAimingSwitch);
+  private final Sensors m_sensor = new Sensors();
 
   public RobotContainer(Robot robot) {
     m_arm.setStowSuppliers(
@@ -167,6 +169,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return m_autoCommand;
   }
+  
 
   ////////////////
   // BUTTON BOX //
